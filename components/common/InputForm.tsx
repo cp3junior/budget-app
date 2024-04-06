@@ -1,71 +1,45 @@
+import { IInputProps } from "@gluestack-ui/input/lib/typescript/types";
 import {
   AlertCircleIcon,
+  FormControl,
   FormControlError,
   FormControlErrorIcon,
   FormControlErrorText,
+  FormControlHelper,
+  FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
+  Input,
+  InputField as InputFieldGUI,
 } from "@gluestack-ui/themed";
-import { Input } from "@gluestack-ui/themed";
-import { FormControlHelper } from "@gluestack-ui/themed";
-import { FormControlHelperText } from "@gluestack-ui/themed";
-import { InputField as InputFieldGUI } from "@gluestack-ui/themed";
-import { FormControl } from "@gluestack-ui/themed";
-import { ReactNode, forwardRef, useRef } from "react";
-import {
-  ViewStyle,
-  StyleSheet,
-  KeyboardTypeOptions,
-  ReturnKeyTypeOptions,
-  TextInputSubmitEditingEventData,
-  NativeSyntheticEvent,
-  TextInput,
-} from "react-native";
+import { ReactNode, forwardRef } from "react";
+import { StyleSheet, TextInputProps, ViewStyle } from "react-native";
 
 interface InputFormProps {
   label: string;
-  type: "text" | "password";
-  placeholder?: string;
+  InputProps: TextInputProps & IInputProps;
   isRequired?: boolean;
   isInvalid?: boolean;
-  blurOnSubmit?: boolean;
   errorText?: string;
   styleFormContainer?: ViewStyle;
-  InputSlot?: ReactNode;
+  InputSlot?: ReactNode | null;
   inputHelper?: string;
-  value?: string;
-  onChangeText?: (text: string) => void;
-  onBlur?: (e: any) => void;
-  onSubmitEditing?: (
-    e: NativeSyntheticEvent<TextInputSubmitEditingEventData>
-  ) => void;
-  keyboardType?: KeyboardTypeOptions;
-  returnKeyType?: ReturnKeyTypeOptions;
 }
 
-const InputForm = forwardRef<TextInput, InputFormProps>(
+const InputForm = forwardRef<any, InputFormProps>(
   (
     {
       styleFormContainer,
-      placeholder,
-      type,
       label,
       InputSlot,
       inputHelper,
       errorText,
       isRequired,
       isInvalid,
-      value,
-      onBlur,
-      onChangeText,
-      keyboardType,
-      returnKeyType,
-      onSubmitEditing,
-      blurOnSubmit,
+      InputProps,
     },
     ref
   ) => {
-    const rrr = useRef();
     return (
       <FormControl
         size="md"
@@ -76,23 +50,11 @@ const InputForm = forwardRef<TextInput, InputFormProps>(
           ...Object.assign({}, styleFormContainer),
         }}
       >
-        <FormControlLabel mb="$1">
+        <FormControlLabel mb="$2">
           <FormControlLabelText>{label}</FormControlLabelText>
         </FormControlLabel>
         <Input>
-          <InputFieldGUI
-            ref={ref}
-            onChangeText={onChangeText}
-            type={type}
-            placeholder={placeholder}
-            value={value}
-            onBlur={onBlur}
-            keyboardType={keyboardType}
-            returnKeyType={returnKeyType}
-            returnKeyLabel={returnKeyType}
-            blurOnSubmit={blurOnSubmit}
-            onSubmitEditing={onSubmitEditing}
-          />
+          <InputFieldGUI ref={ref} {...InputProps} />
           {InputSlot}
         </Input>
         {inputHelper && (

@@ -10,11 +10,13 @@ interface IntroHeaderProps {
 const IntroHeader = ({ small }: IntroHeaderProps) => {
   return (
     <>
-      <View style={styles.contTop}>
-        <Text style={styles.txtTitle} fontWeight="900">
-          💲Dazzle.
-        </Text>
-      </View>
+      {!small && (
+        <View style={styles.contTop}>
+          <Text style={styles.txtTitle} fontWeight="900">
+            💲Dazzle.
+          </Text>
+        </View>
+      )}
       <View style={small ? styles.contMiddleSmall : styles.contMiddle}>
         <View style={styles.illuCont}>
           <View style={styles.illu}>
@@ -29,7 +31,7 @@ const IntroHeader = ({ small }: IntroHeaderProps) => {
 const styles = StyleSheet.create({
   contTop: { paddingHorizontal: 15 },
   contMiddle: { flex: 1 },
-  contMiddleSmall: { height: 150 },
+  contMiddleSmall: { height: 170 },
   txtTitle: {
     fontSize: 50,
     marginBottom: 20,

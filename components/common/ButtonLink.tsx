@@ -24,7 +24,6 @@ const ButtonLink = ({ style, href, title }: ButtonLinkProps) => {
 
 const styles = StyleSheet.create({
   lnkTxt: {
-    textDecorationLine: "underline",
     textAlign: "center",
     color: colors.blue,
   },

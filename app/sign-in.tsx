@@ -1,5 +1,5 @@
 import { StyleSheet, TextInput, View } from "react-native";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import BaseLayout from "../layout/BaseLayout";
 import Text from "../components/common/Text";
 import IntroHeader from "../components/IntroHeader";
@@ -32,6 +32,10 @@ const SignIn = () => {
     setShowPassword((old) => !old);
   };
 
+  const handleFocusPassword = () => {
+    passwordInput.current?.focus();
+  };
+
   const handleSubmit = (
     values: SignInForm,
     actions: FormikHelpers<SignInForm>
@@ -39,22 +43,18 @@ const SignIn = () => {
     console.log(values, actions);
   };
 
-  const handleFocusPassword = () => {
-    passwordInput.current?.focus();
-  };
-
   return (
     <BaseLayout>
       <ScrollView>
-        <IntroHeader small />
         <View style={styles.container}>
           <Text fontWeight="800" style={styles.txtH}>
-            Hello!
+            Welcome Back
           </Text>
           <Text fontWeight="500" style={styles.txtW}>
-            Welcome Back.
+            Login to continue.
           </Text>
         </View>
+        <IntroHeader small />
         <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
           {({ handleChange, handleBlur, handleSubmit, values }) => (
             <View style={styles.formContainer}>
@@ -62,25 +62,34 @@ const SignIn = () => {
                 isRequired
                 isInvalid={false}
                 label="Email"
-                placeholder="Enter your email here"
-                type="text"
                 errorText="Email required."
-                value={values.email}
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                keyboardType="email-address"
-                returnKeyType="next"
-                onSubmitEditing={handleFocusPassword}
-                blurOnSubmit={false}
+                InputProps={{
+                  placeholder: "Enter your email here",
+                  value: values.email,
+                  onChangeText: handleChange("email"),
+                  onBlur: handleBlur("email"),
+                  onSubmitEditing: handleFocusPassword,
+                  type: "text",
+                  blurOnSubmit: false,
+                  keyboardType: "email-address",
+                  returnKeyType: "next",
+                }}
               />
               <InputForm
                 ref={passwordInput}
                 isRequired
                 isInvalid={false}
                 label="Password"
-                placeholder="Password"
-                type={showPassword ? "text" : "password"}
                 errorText="Password required."
+                InputProps={{
+                  placeholder: "Password",
+                  value: values.password,
+                  onChangeText: handleChange("password"),
+                  onBlur: handleBlur("password"),
+                  onSubmitEditing: () => handleSubmit(),
+                  type: showPassword ? "text" : "password",
+                  returnKeyType: "send",
+                }}
                 InputSlot={
                   <InputSlot pr="$3" onPress={changePasswordType}>
                     <InputIcon
@@ -100,6 +109,13 @@ const SignIn = () => {
               <View style={styles.containerBtn}>
                 <Button title="Login" onPress={() => handleSubmit()} />
               </View>
+              <View style={styles.containerTxtLink}>
+                <ButtonLink
+                  style={styles.lnkText}
+                  href="/sign-up"
+                  title="Create Account"
+                />
+              </View>
             </View>
           )}
         </Formik>
@@ -111,14 +127,24 @@ const SignIn = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    marginTop: 30,
+    marginTop: 10,
+    marginBottom: 60,
   },
-  txtH: { fontSize: 40, color: colors.blue },
-  txtW: { fontSize: 35 },
-  formContainer: { paddingHorizontal: 20, marginTop: 20 },
+  txtH: { fontSize: 45, color: colors.blue },
+  txtW: { fontSize: 27 },
+  formContainer: { paddingHorizontal: 20, marginTop: 60 },
   formControl: { marginBottom: 20 },
-  containerBtn: { marginVertical: 40 },
+  containerBtn: { marginTop: 40 },
   btnLink: { textAlign: "left", fontSize: 14 },
+  containerTxtLink: {
+    marginTop: 30,
+    justifyContent: "center",
+    flexDirection: "row",
+    marginBottom: 70,
+  },
+  lnkText: {
+    color: colors.blue,
+  },
 });
 
 export default SignIn;
