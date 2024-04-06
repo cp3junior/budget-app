@@ -1,10 +1,10 @@
 import { View, StyleSheet } from "react-native";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import Text from "../components/common/Text";
 import BaseLayout from "../layout/BaseLayout";
-import { colors } from "../lib/theme";
-import { Button } from "@gluestack-ui/themed";
-import Illustration from "../components/svg/Illustration";
+import IntroHeader from "../components/IntroHeader";
+import ButtonLink from "../components/common/ButtonLink";
+import Button from "../components/common/Button";
 
 export default function Page() {
   const handleNavigate = () => {
@@ -12,20 +12,8 @@ export default function Page() {
   };
 
   return (
-    <BaseLayout bg={colors.darker} style={styles.container}>
-      <View style={styles.contTop}>
-        <Text style={styles.txtTitle} fontWeight="900">
-          💲Dazzle.
-        </Text>
-      </View>
-      <View style={styles.contMiddle}>
-        <View style={styles.illuCont}>
-          <View style={styles.illu}>
-            <Illustration />
-          </View>
-        </View>
-      </View>
-
+    <BaseLayout style={styles.container}>
+      <IntroHeader />
       <View style={styles.contBottom}>
         <Text style={styles.txtCatch} fontWeight="300">
           <Text style={styles.txtCatchDet} fontWeight="700">
@@ -40,25 +28,10 @@ export default function Page() {
       </View>
       <View style={styles.btnGroupCont}>
         <View style={{ flex: 1 }}>
-          <Button
-            backgroundColor={colors.white}
-            $active-backgroundColor="$trueGray400"
-            action="secondary"
-            size="xl"
-            style={styles.btn}
-            onPress={handleNavigate}
-          >
-            <Text fontWeight="700" style={styles.btnTxt}>
-              Sign In
-            </Text>
-          </Button>
+          <Button onPress={handleNavigate} title="Sign In" />
         </View>
         <View style={{ flex: 1 }}>
-          <Link href="/sign-up">
-            <Text style={styles.lnkTxt} fontWeight="800">
-              Sign Up
-            </Text>
-          </Link>
+          <ButtonLink href="/sign-up" title="Sign Up" />
         </View>
       </View>
     </BaseLayout>
@@ -69,18 +42,10 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 20,
   },
-  contTop: { paddingHorizontal: 15 },
-  contMiddle: { flex: 1 },
   contBottom: { paddingHorizontal: 15, marginTop: 20 },
-  txtTitle: {
-    fontSize: 50,
-    marginBottom: 20,
-  },
   txtCatch: { fontSize: 35, marginBottom: 10 },
   txtCatchDet: { fontSize: 35 },
-  btn: {
-    borderRadius: 15,
-  },
+
   btnGroupCont: {
     flexDirection: "row",
     alignItems: "center",
@@ -88,20 +53,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 30,
     marginBottom: 10,
-  },
-  btnTxt: {
-    color: colors.darker,
-  },
-  lnkTxt: {
-    textDecorationLine: "underline",
-    textAlign: "center",
-    color: colors.blue,
-  },
-  illuCont: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  illu: {
-    width: "70%",
   },
 });

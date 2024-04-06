@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, ViewStyle } from "react-native";
-import { StatusBar } from "@gluestack-ui/themed";
+import { Platform, View, ViewStyle } from "react-native";
+import { KeyboardAvoidingView, StatusBar } from "@gluestack-ui/themed";
+import { colors } from "../lib/theme";
 
 interface BaseLayoutProps {
   children: ReactNode;
@@ -12,16 +13,23 @@ interface BaseLayoutProps {
 
 const BaseLayout = ({ bg, children, style, isLight }: BaseLayoutProps) => {
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: bg ?? "transparent",
-        ...Object.assign({}, style),
-      }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} />
-      <SafeAreaView style={{ flex: 1 }}>{children}</SafeAreaView>
-    </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: bg ?? colors.darker,
+          ...Object.assign({}, style),
+        }}
+      >
+        <StatusBar barStyle={isLight ? "dark-content" : "light-content"} />
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>{children}</View>
+        </SafeAreaView>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

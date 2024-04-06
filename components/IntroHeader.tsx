@@ -3,7 +3,11 @@ import React from "react";
 import Text from "./common/Text";
 import Illustration from "./svg/Illustration";
 
-const IntroHeader = () => {
+interface IntroHeaderProps {
+  small?: boolean;
+}
+
+const IntroHeader = ({ small }: IntroHeaderProps) => {
   return (
     <>
       <View style={styles.contTop}>
@@ -11,7 +15,7 @@ const IntroHeader = () => {
           💲Dazzle.
         </Text>
       </View>
-      <View style={styles.contMiddle}>
+      <View style={small ? styles.contMiddleSmall : styles.contMiddle}>
         <View style={styles.illuCont}>
           <View style={styles.illu}>
             <Illustration />
@@ -25,12 +29,11 @@ const IntroHeader = () => {
 const styles = StyleSheet.create({
   contTop: { paddingHorizontal: 15 },
   contMiddle: { flex: 1 },
-
+  contMiddleSmall: { height: 150 },
   txtTitle: {
     fontSize: 50,
     marginBottom: 20,
   },
-
   illuCont: {
     justifyContent: "center",
     alignItems: "center",

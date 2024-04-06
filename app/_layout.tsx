@@ -1,11 +1,7 @@
 import { config } from "@gluestack-ui/config";
-import {
-  Box,
-  GluestackUIProvider,
-  KeyboardAvoidingView,
-} from "@gluestack-ui/themed";
+import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { useFonts } from "expo-font";
-import { Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { useCallback } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { View } from "react-native";
@@ -34,21 +30,9 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider config={config}>
+    <GluestackUIProvider colorMode="dark" config={config}>
       <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-        <KeyboardAvoidingView contentContainerStyle={{ flexGrow: 1 }}>
-          <Box
-            sx={{
-              _web: {
-                height: "100vh",
-                overflow: "hidden",
-              },
-            }}
-            height="100%"
-          >
-            <Stack screenOptions={{ headerShown: false }} />
-          </Box>
-        </KeyboardAvoidingView>
+        <Stack screenOptions={{ headerShown: false }} />
       </View>
     </GluestackUIProvider>
   );
