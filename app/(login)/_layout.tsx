@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { colors } from "../../lib/theme";
 
-const AppLayout = () => {
+const LoginLayout = () => {
   return (
     <Stack
       screenOptions={{
@@ -12,4 +12,4 @@ const AppLayout = () => {
   );
 };
 
-export default AppLayout;
+export default LoginLayout;

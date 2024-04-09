@@ -1,10 +1,9 @@
 import { View, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import Text from "../components/common/Text";
-import BaseLayout from "../layout/BaseLayout";
-import IntroHeader from "../components/IntroHeader";
-import ButtonLink from "../components/common/ButtonLink";
-import Button from "../components/common/Button";
+import IntroHeader from "../../components/IntroHeader";
+import ButtonLink from "../../components/common/ButtonLink";
+import Button from "../../components/common/Button";
+import Text from "../../components/common/Text";
 
 export default function Page() {
   const handleNavigate = () => {
@@ -12,7 +11,7 @@ export default function Page() {
   };
 
   return (
-    <BaseLayout style={styles.container}>
+    <View style={styles.container}>
       <IntroHeader />
       <View style={styles.contBottom}>
         <Text style={styles.txtCatch} fontWeight="300">
@@ -34,13 +33,14 @@ export default function Page() {
           <ButtonLink href="/sign-up" title="Sign Up" />
         </View>
       </View>
-    </BaseLayout>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 20,
+    flex: 1,
   },
   contBottom: { paddingHorizontal: 15, marginTop: 20 },
   txtCatch: { fontSize: 35, marginBottom: 10 },
