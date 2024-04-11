@@ -1,0 +1,3 @@
+interface TabIconProps {
+  isFocused: boolean;
+}

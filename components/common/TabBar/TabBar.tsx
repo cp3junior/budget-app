@@ -1,32 +1,45 @@
 import { StyleSheet, View } from "react-native";
-import Text from "../Text";
+import { colors } from "../../../lib/theme";
+import AddIcon from "../../svg/AddIcon";
 import HomeIcon from "../../svg/HomeIcon";
 import PieIcon from "../../svg/PieIcon";
-import AddIcon from "../../svg/AddIcon";
-import { Link } from "expo-router";
-import { colors } from "../../../lib/theme";
+import TabBarItem, { TabBarItemProps } from "./TabBarItem";
+
+const tabItems: TabBarItemProps[] = [
+  {
+    Icon: HomeIcon,
+    href: "/home",
+    type: "tab",
+  },
+  {
+    Icon: PieIcon,
+    href: "/about",
+    type: "tab",
+  },
+  {
+    href: "",
+    type: "separator",
+  },
+  {
+    Icon: AddIcon,
+    href: "/add-transaction",
+    type: "tab",
+  },
+];
 
 const TabBar = () => {
   return (
     <View style={styles.fixedContainer}>
       <View style={styles.container}>
         <View style={styles.iconContainers}>
-          <View style={styles.icon}>
-            <Link href="/home">
-              <HomeIcon />
-            </Link>
-          </View>
-          <View style={styles.icon}>
-            <Link href="/about">
-              <PieIcon />
-            </Link>
-          </View>
-          <View style={styles.separator} />
-          <View style={styles.icon}>
-            <Link href="/home">
-              <AddIcon />
-            </Link>
-          </View>
+          {tabItems.map((item) => (
+            <TabBarItem
+              key={item.href}
+              type={item.type}
+              href={item.href}
+              Icon={item.Icon}
+            />
+          ))}
         </View>
       </View>
     </View>
@@ -41,16 +54,6 @@ const styles = StyleSheet.create({
     bottom: 25,
     justifyContent: "center",
     alignItems: "center",
-  },
-  separator: {
-    backgroundColor: colors.gray,
-    width: 1,
-    height: 20,
-    marginLeft: 10,
-    marginRight: 5,
-  },
-  icon: {
-    marginHorizontal: 10,
   },
   container: {
     justifyContent: "center",

@@ -2,7 +2,7 @@ import { Path, Svg } from "react-native-svg";
 import { colors } from "../../lib/theme";
 import { TAB_ICON_SIZE } from "../../lib/constant";
 
-const HomeIcon = () => {
+const HomeIcon = ({ isFocused }: TabIconProps) => {
   return (
     <Svg
       width={TAB_ICON_SIZE}
@@ -11,7 +11,7 @@ const HomeIcon = () => {
       viewBox="0 0 24 24"
     >
       <Path
-        stroke={colors.blue}
+        stroke={isFocused ? colors.blue : colors.white}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
