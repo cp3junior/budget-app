@@ -4,12 +4,13 @@ import { useRouter, usePathname } from "expo-router";
 import { ElementType } from "react";
 
 export interface TabBarItemProps {
-  Icon?: ElementType;
   href: string;
   type: "separator" | "tab";
+  Icon?: ElementType;
+  last?: boolean;
 }
 
-const TabBarItem = ({ type, href, Icon }: TabBarItemProps) => {
+const TabBarItem = ({ type, href, Icon, last }: TabBarItemProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -18,7 +19,7 @@ const TabBarItem = ({ type, href, Icon }: TabBarItemProps) => {
   }
 
   return (
-    <View style={styles.icon}>
+    <View style={{ ...styles.icon, marginRight: last ? 0 : 10 }}>
       <TouchableOpacity onPress={() => router.navigate(href)}>
         <View>{Icon && <Icon isFocused={pathname === href} />}</View>
       </TouchableOpacity>
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   icon: {
-    marginHorizontal: 10,
+    marginLeft: 10,
   },
 });
 

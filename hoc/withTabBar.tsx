@@ -12,7 +12,9 @@ const withTabBar = <P extends WrappedComponentProps>(
     return (
       <View style={{ flex: 1 }}>
         <ScrollView style={{ flex: 1 }}>
-          <WrappedComponent {...props} />
+          <View style={{ paddingBottom: 90 }}>
+            <WrappedComponent {...props} />
+          </View>
         </ScrollView>
         <TabBar />
       </View>

@@ -4,6 +4,7 @@ import AddIcon from "../../svg/AddIcon";
 import HomeIcon from "../../svg/HomeIcon";
 import PieIcon from "../../svg/PieIcon";
 import TabBarItem, { TabBarItemProps } from "./TabBarItem";
+import DollarIcon from "../../svg/DollarIcon";
 
 const tabItems: TabBarItemProps[] = [
   {
@@ -13,7 +14,12 @@ const tabItems: TabBarItemProps[] = [
   },
   {
     Icon: PieIcon,
-    href: "/about",
+    href: "/budget",
+    type: "tab",
+  },
+  {
+    Icon: DollarIcon,
+    href: "/transactions",
     type: "tab",
   },
   {
@@ -24,6 +30,7 @@ const tabItems: TabBarItemProps[] = [
     Icon: AddIcon,
     href: "/add-transaction",
     type: "tab",
+    last: true,
   },
 ];
 
@@ -33,12 +40,7 @@ const TabBar = () => {
       <View style={styles.container}>
         <View style={styles.iconContainers}>
           {tabItems.map((item) => (
-            <TabBarItem
-              key={item.href}
-              type={item.type}
-              href={item.href}
-              Icon={item.Icon}
-            />
+            <TabBarItem key={item.href} {...item} />
           ))}
         </View>
       </View>
@@ -51,17 +53,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    bottom: 25,
+    bottom: 15,
     justifyContent: "center",
     alignItems: "center",
   },
   container: {
     justifyContent: "center",
     alignItems: "center",
-    height: 65,
+    height: 60,
     backgroundColor: colors.dark,
     borderRadius: 50,
-    paddingHorizontal: 18,
+    paddingHorizontal: 15,
     borderColor: colors.gray,
     borderWidth: 0.4,
   },

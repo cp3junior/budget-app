@@ -1,19 +1,20 @@
-import { StyleSheet, TextInput, View } from "react-native";
-import { useRef, useState } from "react";
-import Text from "../../components/common/Text";
-import IntroHeader from "../../components/IntroHeader";
-import { Formik, FormikHelpers } from "formik";
 import {
+  EyeIcon,
   EyeOffIcon,
   InputIcon,
   InputSlot,
-  ScrollView,
 } from "@gluestack-ui/themed";
-import { colors } from "../../lib/theme";
-import { EyeIcon } from "@gluestack-ui/themed";
-import ButtonLink from "../../components/common/ButtonLink";
+import { useRouter } from "expo-router";
+import { Formik, FormikHelpers } from "formik";
+import { useRef, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import IntroHeader from "../../components/IntroHeader";
 import Button from "../../components/common/Button";
+import ButtonLink from "../../components/common/ButtonLink";
 import InputForm from "../../components/common/InputForm";
+import Text from "../../components/common/Text";
+import { colors } from "../../lib/theme";
 
 interface SignUpForm {
   fullName: string;
@@ -23,6 +24,8 @@ interface SignUpForm {
 }
 
 const SignUp = () => {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
 
@@ -59,10 +62,11 @@ const SignUp = () => {
     actions: FormikHelpers<SignUpForm>
   ) => {
     console.log(values, actions);
+    router.navigate("/home");
   };
 
   return (
-    <ScrollView>
+    <KeyboardAwareScrollView>
       <View style={styles.container}>
         <Text fontWeight="800" style={styles.txtH}>
           Hello there!
@@ -129,7 +133,7 @@ const SignUp = () => {
                 <InputSlot pr="$3" onPress={changePasswordType}>
                   <InputIcon
                     as={showPassword ? EyeIcon : EyeOffIcon}
-                    color="$darkBlue500"
+                    color={colors.purple}
                   />
                 </InputSlot>
               }
@@ -153,7 +157,7 @@ const SignUp = () => {
                 <InputSlot pr="$3" onPress={changeRePasswordType}>
                   <InputIcon
                     as={showRePassword ? EyeIcon : EyeOffIcon}
-                    color="$darkBlue500"
+                    color={colors.purple}
                   />
                 </InputSlot>
               }
@@ -171,7 +175,7 @@ const SignUp = () => {
           </View>
         )}
       </Formik>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

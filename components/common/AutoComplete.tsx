@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   ChevronDownIcon,
@@ -36,10 +36,29 @@ const suggestionsData = [
   "ArmorDown",
 ];
 
-const AutoComplete = () => {
+interface AutoCompleteProps {
+  zIndex: number;
+  label: string;
+}
+
+const AutoComplete = ({ label, zIndex }: AutoCompleteProps) => {
   const [suggestions, setSuggestions] = useState<string[]>(suggestionsData);
-  const [showSuggestion, setShowSuggestion] = useState(false);
   const [suggestionValue, setSuggestionValue] = useState("");
+  const [showSuggestion, setShowSuggestion] = useState(false);
+  const [showClear, setShowClear] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    canShowClear();
+  }, [suggestionValue]);
+
+  const canShowClear = () => {
+    if (suggestionValue.length > 0) {
+      setShowClear(true);
+    } else {
+      setShowClear(false);
+    }
+  };
 
   const updateSuggestions = (text: string, showSuggestionPopUp: boolean) => {
     const newSuggestions = suggestionsData.filter((suggestion) =>
@@ -61,10 +80,14 @@ const AutoComplete = () => {
 
   const handleBlur = () => {
     setShowSuggestion(false);
+    setIsFocused(false);
+    setShowClear(false);
   };
 
   const handleFocus = () => {
     setShowSuggestion(true);
+    setIsFocused(true);
+    canShowClear();
   };
 
   const handleReset = () => {
@@ -72,13 +95,26 @@ const AutoComplete = () => {
   };
 
   return (
-    <Box zIndex={10}>
-      <FormControl isRequired size="sm">
+    <Box zIndex={zIndex}>
+      <FormControl
+        isRequired
+        size="md"
+        style={{
+          ...styles.formControl,
+          // ...Object.assign({}, styleFormContainer),
+        }}
+      >
         <FormControlLabel mb="$2">
-          <FormControlLabelText>Label</FormControlLabelText>
+          <FormControlLabelText>{label}</FormControlLabelText>
         </FormControlLabel>
         <VStack position="relative" w="$full">
-          <Input variant="outline" size="sm" w="$full" zIndex={1}>
+          <Input
+            variant="outline"
+            size="md"
+            w="$full"
+            zIndex={1}
+            $focus-borderColor={colors.purple}
+          >
             <InputField
               value={suggestionValue}
               onChangeText={handleChange}
@@ -88,15 +124,15 @@ const AutoComplete = () => {
             />
             <InputSlot pr="$3">
               <View style={styles.iconContainer}>
-                {suggestionValue.length > 0 && (
+                {showClear && (
                   <Pressable onPress={handleReset} mr={5}>
                     <InputIcon size="sm" as={CloseIcon} color="$trueGray400" />
                   </Pressable>
                 )}
                 <InputIcon
                   size="lg"
-                  as={showSuggestion ? ChevronUpIcon : ChevronDownIcon}
-                  color="$darkBlue500"
+                  as={isFocused ? ChevronUpIcon : ChevronDownIcon}
+                  color={colors.purple}
                 />
               </View>
             </InputSlot>
@@ -109,7 +145,7 @@ const AutoComplete = () => {
             </FormControlHelper>
           )}
           {showSuggestion && suggestions.length > 0 && (
-            <Box style={styles.suggestionContainer}>
+            <Box style={styles.suggestionContainer} zIndex={2}>
               <ScrollView
                 maxHeight={205}
                 w="100%"
@@ -132,12 +168,12 @@ const AutoComplete = () => {
 };
 
 const styles = StyleSheet.create({
+  formControl: { marginBottom: 20 },
   iconContainer: { flexDirection: "row", alignItems: "center" },
   suggestionContainer: {
-    zIndex: 1,
     position: "absolute",
     width: "100%",
-    top: 38,
+    top: 41,
     borderRadius: 3,
     borderStyle: "solid",
     borderWidth: 0.4,

@@ -9,30 +9,28 @@ import {
   FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
-  Input,
-  InputField,
+  Textarea,
+  TextareaInput,
 } from "@gluestack-ui/themed";
-import { ReactNode, forwardRef } from "react";
+import { forwardRef } from "react";
 import { StyleSheet, TextInputProps, ViewStyle } from "react-native";
 import { colors } from "../../lib/theme";
 
-interface InputFormProps {
+interface TextAreaFormProps {
   label: string;
   InputProps: TextInputProps & IInputProps;
   isRequired?: boolean;
   isInvalid?: boolean;
   errorText?: string;
   styleFormContainer?: ViewStyle;
-  InputSlot?: ReactNode | null;
   inputHelper?: string;
 }
 
-const InputForm = forwardRef<any, InputFormProps>(
+const TextAreaForm = forwardRef<any, TextAreaFormProps>(
   (
     {
       styleFormContainer,
       label,
-      InputSlot,
       inputHelper,
       errorText,
       isRequired,
@@ -54,15 +52,9 @@ const InputForm = forwardRef<any, InputFormProps>(
         <FormControlLabel mb="$2">
           <FormControlLabelText>{label}</FormControlLabelText>
         </FormControlLabel>
-        <Input
-          variant="outline"
-          size="md"
-          w="$full"
-          $focus-borderColor={colors.purple}
-        >
-          <InputField ref={ref} {...InputProps} />
-          {InputSlot}
-        </Input>
+        <Textarea size="md" w="$full" $focus-borderColor={colors.purple}>
+          <TextareaInput ref={ref} {...InputProps} />
+        </Textarea>
         {inputHelper && (
           <FormControlHelper>
             <FormControlHelperText>{inputHelper}</FormControlHelperText>
@@ -83,4 +75,4 @@ const styles = StyleSheet.create({
   formControl: { marginBottom: 20 },
 });
 
-export default InputForm;
+export default TextAreaForm;

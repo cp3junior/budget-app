@@ -1,12 +1,12 @@
-import { StyleSheet, View } from "react-native";
-import Text from "../../components/common/Text";
-import IntroHeader from "../../components/IntroHeader";
 import { Formik, FormikHelpers } from "formik";
-import { ScrollView } from "@gluestack-ui/themed";
-import { colors } from "../../lib/theme";
-import ButtonLink from "../../components/common/ButtonLink";
+import { StyleSheet, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import IntroHeader from "../../components/IntroHeader";
 import Button from "../../components/common/Button";
+import ButtonLink from "../../components/common/ButtonLink";
 import InputForm from "../../components/common/InputForm";
+import Text from "../../components/common/Text";
+import { colors } from "../../lib/theme";
 
 interface ForgotPasswordForm {
   email: string;
@@ -23,7 +23,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <ScrollView>
+    <KeyboardAwareScrollView>
       <View style={styles.container}>
         <Text fontWeight="800" style={styles.txtH}>
           Forgot Password
@@ -65,7 +65,7 @@ const ForgotPassword = () => {
           </View>
         )}
       </Formik>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

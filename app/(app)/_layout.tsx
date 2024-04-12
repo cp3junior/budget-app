@@ -9,6 +9,7 @@ const AppLayout = () => {
         contentStyle: { backgroundColor: colors.darker },
       }}
     >
+      {/* Static screens, used for tabs */}
       <Stack.Screen
         name="home"
         options={{
@@ -17,16 +18,25 @@ const AppLayout = () => {
         }}
       />
       <Stack.Screen
-        name="add-transaction"
-        options={{
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="about"
+        name="budget"
         options={{
           animation: "none",
           gestureEnabled: false,
+        }}
+      />
+      <Stack.Screen
+        name="transactions"
+        options={{
+          animation: "none",
+          gestureEnabled: false,
+        }}
+      />
+
+      {/* Modal Screens */}
+      <Stack.Screen
+        name="add-transaction"
+        options={{
+          presentation: "modal",
         }}
       />
     </Stack>

@@ -1,14 +1,10 @@
 import { config } from "@gluestack-ui/config";
-import {
-  GluestackUIProvider,
-  KeyboardAvoidingView,
-  StatusBar,
-} from "@gluestack-ui/themed";
+import { GluestackUIProvider, StatusBar } from "@gluestack-ui/themed";
 import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
 import { useCallback } from "react";
 import * as SplashScreen from "expo-splash-screen";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import { colors } from "../lib/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,6 +19,7 @@ export default function RootLayout() {
     ManropeSemiBold: require("../assets/fonts/Manrope-SemiBold.ttf"),
     ManropeBold: require("../assets/fonts/Manrope-Bold.ttf"),
     ManropeExtraBold: require("../assets/fonts/Manrope-ExtraBold.ttf"),
+    FjallaOne: require("../assets/fonts/FjallaOne-Regular.ttf"),
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -37,25 +34,16 @@ export default function RootLayout() {
 
   return (
     <GluestackUIProvider colorMode="dark" config={config}>
-      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
-        >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: colors.darker,
-            }}
-          >
-            <StatusBar barStyle="light-content" />
-            <SafeAreaView style={{ flex: 1 }}>
-              <View style={{ flex: 1 }}>
-                <Slot />
-              </View>
-            </SafeAreaView>
+      <View
+        style={{ flex: 1, backgroundColor: colors.darker }}
+        onLayout={onLayoutRootView}
+      >
+        <StatusBar barStyle="light-content" />
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>
+            <Slot />
           </View>
-        </KeyboardAvoidingView>
+        </SafeAreaView>
       </View>
     </GluestackUIProvider>
   );

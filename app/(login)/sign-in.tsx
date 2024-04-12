@@ -1,20 +1,20 @@
-import { StyleSheet, TextInput, View } from "react-native";
-import { useRef, useState } from "react";
-import Text from "../../components/common/Text";
-import IntroHeader from "../../components/IntroHeader";
-import { Formik, FormikHelpers } from "formik";
 import {
+  EyeIcon,
   EyeOffIcon,
   InputIcon,
   InputSlot,
-  ScrollView,
 } from "@gluestack-ui/themed";
-import { colors } from "../../lib/theme";
-import { EyeIcon } from "@gluestack-ui/themed";
-import ButtonLink from "../../components/common/ButtonLink";
-import Button from "../../components/common/Button";
-import InputForm from "../../components/common/InputForm";
 import { router } from "expo-router";
+import { Formik, FormikHelpers } from "formik";
+import { useRef, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import IntroHeader from "../../components/IntroHeader";
+import Button from "../../components/common/Button";
+import ButtonLink from "../../components/common/ButtonLink";
+import InputForm from "../../components/common/InputForm";
+import Text from "../../components/common/Text";
+import { colors } from "../../lib/theme";
 
 interface SignInForm {
   email: string;
@@ -45,7 +45,7 @@ const SignIn = () => {
   };
 
   return (
-    <ScrollView>
+    <KeyboardAwareScrollView>
       <View style={styles.container}>
         <Text fontWeight="800" style={styles.txtH}>
           Welcome Back
@@ -94,7 +94,7 @@ const SignIn = () => {
                 <InputSlot pr="$3" onPress={changePasswordType}>
                   <InputIcon
                     as={showPassword ? EyeIcon : EyeOffIcon}
-                    color="$darkBlue500"
+                    color={colors.purple}
                   />
                 </InputSlot>
               }
@@ -119,7 +119,7 @@ const SignIn = () => {
           </View>
         )}
       </Formik>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

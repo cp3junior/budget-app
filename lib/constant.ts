@@ -1,1 +1,1 @@
-export const TAB_ICON_SIZE = 45;
+export const TAB_ICON_SIZE = 40;
