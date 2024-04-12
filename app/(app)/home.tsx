@@ -1,7 +1,6 @@
 import { Link } from "expo-router";
 import Text from "../../components/common/Text";
 import withTabBar from "../../hoc/withTabBar";
-import { TouchableOpacity } from "react-native";
 
 const Home = () => {
   return (
@@ -11,9 +10,7 @@ const Home = () => {
         <Text>Login</Text>
       </Link>
       <Link href="/test" style={{ marginTop: 40 }}>
-        <TouchableOpacity>
-          <Text>Test</Text>
-        </TouchableOpacity>
+        <Text>Test</Text>
       </Link>
       <Link href="/about" style={{ marginTop: 140 }}>
         <Text>About</Text>

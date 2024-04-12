@@ -1,17 +1,29 @@
 import { Link } from "expo-router";
 import Text from "./Text";
-import { StyleSheet, TextStyle } from "react-native";
+import { GestureResponderEvent, StyleSheet, TextStyle } from "react-native";
 import { colors } from "../../lib/theme";
 
 interface ButtonLinkProps {
   href: string;
   title: string;
+  onPress?: (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
+  ) => void;
   style?: TextStyle;
 }
 
-const ButtonLink = ({ style, href, title }: ButtonLinkProps) => {
+const ButtonLink = ({ style, href, title, onPress }: ButtonLinkProps) => {
+  const handlePress = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
+  ) => {
+    if (onPress) {
+      e.preventDefault();
+      onPress(e);
+    }
+  };
+
   return (
-    <Link href={href}>
+    <Link href={href} onPress={handlePress}>
       <Text
         style={{ ...styles.lnkTxt, ...Object.assign({}, style) }}
         fontWeight="800"
