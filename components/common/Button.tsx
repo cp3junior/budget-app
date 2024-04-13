@@ -14,7 +14,7 @@ const Button = ({ onPress, title }: ButtonProps) => {
       backgroundColor={colors.white}
       $active-backgroundColor="$trueGray400"
       action="secondary"
-      size="xl"
+      size="md"
       style={styles.btn}
       onPress={onPress}
     >
@@ -27,7 +27,7 @@ const Button = ({ onPress, title }: ButtonProps) => {
 
 const styles = StyleSheet.create({
   btn: {
-    borderRadius: 15,
+    borderRadius: 5,
   },
   btnTxt: {
     color: colors.darker,

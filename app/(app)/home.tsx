@@ -1,10 +1,23 @@
 import { Link } from "expo-router";
 import Text from "../../components/common/Text";
 import withTabBar from "../../hoc/withTabBar";
+import { View } from "react-native";
+import { Image } from "@gluestack-ui/themed";
 
 const Home = () => {
   return (
-    <>
+    <View>
+      <View>
+        <View>
+          <Text>Welcome back Andrew</Text>
+        </View>
+        <View>
+          <Image
+            source={require("../../assets/images/user.png")}
+            alt="user profile"
+          />
+        </View>
+      </View>
       <Text style={{ color: "red" }}>Home Page???</Text>
       <Link href="/sign-in">
         <Text>Login</Text>
@@ -70,7 +83,7 @@ const Home = () => {
           Sapiente!
         </Text>
       </Link>
-    </>
+    </View>
   );
 };
 

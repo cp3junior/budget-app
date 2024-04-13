@@ -2,11 +2,12 @@ import { Formik, FormikHelpers } from "formik";
 import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import IntroHeader from "../../components/IntroHeader";
-import Button from "../../components/common/Button";
 import ButtonLink from "../../components/common/ButtonLink";
 import InputForm from "../../components/common/InputForm";
-import Text from "../../components/common/Text";
 import { colors } from "../../lib/theme";
+import FormListContainer from "../../components/common/FormList/FormListContainer";
+import { InputSlot } from "@gluestack-ui/themed";
+import FormListSubmitIcon from "../../components/common/FormList/FormListSubmitIcon";
 
 interface ForgotPasswordForm {
   email: string;
@@ -23,67 +24,55 @@ const ForgotPassword = () => {
   };
 
   return (
-    <KeyboardAwareScrollView>
-      <View style={styles.container}>
-        <Text fontWeight="800" style={styles.txtH}>
-          Forgot Password
-        </Text>
-        <Text fontWeight="500" style={styles.txtW}>
-          Enter your email to reset your password
-        </Text>
-      </View>
-      <IntroHeader small />
-      <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
-        {({ handleChange, handleBlur, handleSubmit, values }) => (
-          <View style={styles.formContainer}>
-            <InputForm
-              isRequired
-              isInvalid={false}
-              label="Email"
-              errorText="Email required."
-              InputProps={{
-                placeholder: "Enter your email here",
-                value: values.email,
-                onChangeText: handleChange("email"),
-                onBlur: handleBlur("email"),
-                onSubmitEditing: () => handleSubmit(),
-                type: "text",
-                keyboardType: "email-address",
-                returnKeyType: "send",
-              }}
-            />
-            <View style={styles.containerBtn}>
-              <Button title="Reset Password" onPress={() => handleSubmit()} />
-            </View>
-            <View style={styles.containerTxtLink}>
-              <ButtonLink
-                style={styles.lnkText}
-                href="/sign-in"
-                title="Back to login"
+    <View style={styles.flex}>
+      <KeyboardAwareScrollView style={styles.flex}>
+        <IntroHeader small text="Reset your password" />
+        <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
+          {({ handleChange, handleBlur, handleSubmit, values }) => (
+            <FormListContainer>
+              <InputForm
+                isRequired
+                isInvalid={false}
+                InputProps={{
+                  placeholder: "Enter your email here",
+                  value: values.email,
+                  onChangeText: handleChange("email"),
+                  onBlur: handleBlur("email"),
+                  onSubmitEditing: () => handleSubmit(),
+                  type: "text",
+                  keyboardType: "email-address",
+                  returnKeyType: "send",
+                }}
+                InputSlot={
+                  <InputSlot
+                    pr="$3"
+                    disabled={false}
+                    onPress={() => handleSubmit()}
+                  >
+                    <FormListSubmitIcon />
+                  </InputSlot>
+                }
               />
-            </View>
-          </View>
-        )}
-      </Formik>
-    </KeyboardAwareScrollView>
+            </FormListContainer>
+          )}
+        </Formik>
+      </KeyboardAwareScrollView>
+      <View style={styles.containerTxtLink}>
+        <ButtonLink
+          style={styles.lnkText}
+          href="/sign-in"
+          title="Back to Login"
+        />
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    marginTop: 10,
-    marginBottom: 60,
-  },
-  txtH: { fontSize: 45, color: colors.blue },
-  txtW: { fontSize: 23 },
-  formContainer: { paddingHorizontal: 20, marginTop: 60 },
-  containerBtn: { marginTop: 40 },
+  flex: { flex: 1 },
   containerTxtLink: {
-    marginTop: 30,
     justifyContent: "center",
-    flexDirection: "row",
-    marginBottom: 70,
+    marginBottom: 20,
   },
   lnkText: {
     color: colors.blue,

@@ -60,10 +60,10 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    height: 60,
+    height: 68,
     backgroundColor: colors.dark,
     borderRadius: 50,
-    paddingHorizontal: 15,
+    paddingHorizontal: 14,
     borderColor: colors.gray,
     borderWidth: 0.4,
   },

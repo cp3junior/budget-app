@@ -2,12 +2,14 @@ import { View, StyleSheet } from "react-native";
 import React from "react";
 import Text from "./common/Text";
 import Illustration from "./svg/Illustration";
+import { colors } from "../lib/theme";
 
 interface IntroHeaderProps {
   small?: boolean;
+  text?: string;
 }
 
-const IntroHeader = ({ small }: IntroHeaderProps) => {
+const IntroHeader = ({ small, text }: IntroHeaderProps) => {
   return (
     <>
       {!small && (
@@ -24,6 +26,13 @@ const IntroHeader = ({ small }: IntroHeaderProps) => {
           </View>
         </View>
       </View>
+      {small && (
+        <View style={styles.txtContainer}>
+          <Text fontWeight="800" style={styles.txtW}>
+            {text}
+          </Text>
+        </View>
+      )}
     </>
   );
 };
@@ -31,7 +40,7 @@ const IntroHeader = ({ small }: IntroHeaderProps) => {
 const styles = StyleSheet.create({
   contTop: { paddingHorizontal: 15 },
   contMiddle: { flex: 1 },
-  contMiddleSmall: { height: 170 },
+  contMiddleSmall: { height: 180, marginTop: 50, marginBottom: 30 },
   txtTitle: {
     fontSize: 50,
     marginBottom: 20,
@@ -42,6 +51,15 @@ const styles = StyleSheet.create({
   },
   illu: {
     width: "70%",
+  },
+  txtContainer: {
+    marginBottom: 0,
+  },
+
+  txtW: {
+    fontSize: 30,
+    color: colors.blue,
+    textAlign: "center",
   },
 });
 

@@ -6,13 +6,20 @@ import { colors } from "../../lib/theme";
 interface ButtonLinkProps {
   href: string;
   title: string;
+  fontWeight?: TextStyle["fontWeight"];
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
   style?: TextStyle;
 }
 
-const ButtonLink = ({ style, href, title, onPress }: ButtonLinkProps) => {
+const ButtonLink = ({
+  style,
+  href,
+  title,
+  onPress,
+  fontWeight,
+}: ButtonLinkProps) => {
   const handlePress = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => {
@@ -26,7 +33,7 @@ const ButtonLink = ({ style, href, title, onPress }: ButtonLinkProps) => {
     <Link href={href} onPress={handlePress}>
       <Text
         style={{ ...styles.lnkTxt, ...Object.assign({}, style) }}
-        fontWeight="800"
+        fontWeight={fontWeight ?? "800"}
       >
         {title}
       </Text>

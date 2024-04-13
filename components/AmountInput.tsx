@@ -14,42 +14,48 @@ import { colors } from "../lib/theme";
 
 interface AmountInputProps {
   isInvalid?: boolean;
+  index: number;
 }
 
-const AmountInput = forwardRef<any, AmountInputProps>(({ isInvalid }, ref) => {
-  const [text, setText] = useState("");
+const AmountInput = forwardRef<any, AmountInputProps>(
+  ({ isInvalid, index }, ref) => {
+    const [text, setText] = useState("");
 
-  const handleTextChange = (inputText: string) => {
-    const [formattedValue] = formatCurrency(inputText);
+    const handleTextChange = (inputText: string) => {
+      const [formattedValue] = formatCurrency(inputText);
 
-    setText(formattedValue);
-  };
+      setText(formattedValue);
+    };
 
-  return (
-    <FormControl
-      size="md"
-      isInvalid={isInvalid}
-      isRequired
-      style={styles.container}
-    >
-      <Input w="$full" style={styles.inputStyle}>
-        <InputField
-          ref={ref}
-          onChangeText={handleTextChange}
-          value={text}
-          placeholder="$0.00"
-          style={styles.textInputStyle}
-          keyboardType="numeric"
-        />
-      </Input>
+    return (
+      <FormControl
+        size="md"
+        isInvalid={isInvalid}
+        isRequired
+        style={styles.container}
+      >
+        <Input w="$full" style={styles.inputStyle}>
+          <InputField
+            ref={ref}
+            onChangeText={handleTextChange}
+            value={text}
+            placeholder="$0.00"
+            style={{
+              ...styles.textInputStyle,
+              color: index === 0 ? colors.red : colors.green,
+            }}
+            keyboardType="numeric"
+          />
+        </Input>
 
-      <FormControlError>
-        <FormControlErrorIcon as={AlertCircleIcon} />
-        <FormControlErrorText>The amount is required</FormControlErrorText>
-      </FormControlError>
-    </FormControl>
-  );
-});
+        <FormControlError>
+          <FormControlErrorIcon as={AlertCircleIcon} />
+          <FormControlErrorText>The amount is required</FormControlErrorText>
+        </FormControlError>
+      </FormControl>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -70,7 +76,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     textAlign: "center",
     fontSize: 70,
-    color: colors.blue,
     fontFamily: "FjallaOne",
   },
 });

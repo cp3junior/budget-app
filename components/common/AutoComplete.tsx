@@ -98,7 +98,7 @@ const AutoComplete = ({ label, zIndex }: AutoCompleteProps) => {
     <Box zIndex={zIndex}>
       <FormControl
         isRequired
-        size="md"
+        size="sm"
         style={{
           ...styles.formControl,
           // ...Object.assign({}, styleFormContainer),
@@ -110,8 +110,9 @@ const AutoComplete = ({ label, zIndex }: AutoCompleteProps) => {
         <VStack position="relative" w="$full">
           <Input
             variant="outline"
-            size="md"
+            size="sm"
             w="$full"
+            h={34}
             zIndex={1}
             $focus-borderColor={colors.purple}
           >
