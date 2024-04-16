@@ -14,10 +14,10 @@ export default function Page() {
     <View style={styles.container}>
       <IntroHeader />
       <View style={styles.contBottom}>
+        <Text style={styles.txtCatchDet} fontWeight="700">
+          Take Control
+        </Text>
         <Text style={styles.txtCatch} fontWeight="300">
-          <Text style={styles.txtCatchDet} fontWeight="700">
-            Take Control
-          </Text>{" "}
           of Your Finances Today!
         </Text>
         <Text fontWeight="300">

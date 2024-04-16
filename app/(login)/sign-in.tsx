@@ -37,7 +37,7 @@ const SignIn = () => {
     setTimeout(() => {
       setLoading(false);
       router.navigate("/home");
-      console.log("saved");
+      console.log("loged in");
     }, 500);
   };
 

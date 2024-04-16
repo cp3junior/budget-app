@@ -2,8 +2,6 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  ChevronDownIcon,
-  ChevronUpIcon,
   Input,
   InputField,
   InputIcon,
@@ -11,14 +9,9 @@ import {
   Pressable,
   ScrollView,
   VStack,
-  FormControl,
-  FormControlLabel,
-  FormControlLabelText,
   CloseIcon,
 } from "@gluestack-ui/themed";
 import { colors } from "../../lib/theme";
-import { FormControlHelper } from "@gluestack-ui/themed";
-import { FormControlHelperText } from "@gluestack-ui/themed";
 
 const suggestionsData = [
   "very light",
@@ -38,19 +31,28 @@ const suggestionsData = [
 
 interface AutoCompleteProps {
   zIndex: number;
-  label: string;
+  placeholder: string;
+  onFocus: (focus: boolean) => void;
 }
 
-const AutoComplete = ({ label, zIndex }: AutoCompleteProps) => {
+const AutoComplete = ({ placeholder, zIndex, onFocus }: AutoCompleteProps) => {
   const [suggestions, setSuggestions] = useState<string[]>(suggestionsData);
   const [suggestionValue, setSuggestionValue] = useState("");
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [showClear, setShowClear] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     canShowClear();
+    canShowSuggestion();
   }, [suggestionValue]);
+
+  const canShowSuggestion = () => {
+    if (suggestionValue.length > 1) {
+      setShowSuggestion(true);
+    } else {
+      setShowSuggestion(false);
+    }
+  };
 
   const canShowClear = () => {
     if (suggestionValue.length > 0) {
@@ -62,7 +64,7 @@ const AutoComplete = ({ label, zIndex }: AutoCompleteProps) => {
 
   const updateSuggestions = (text: string, showSuggestionPopUp: boolean) => {
     const newSuggestions = suggestionsData.filter((suggestion) =>
-      suggestion.includes(text)
+      suggestion.toLowerCase().includes(text.toLowerCase())
     );
     setSuggestions(newSuggestions);
 
@@ -80,14 +82,14 @@ const AutoComplete = ({ label, zIndex }: AutoCompleteProps) => {
 
   const handleBlur = () => {
     setShowSuggestion(false);
-    setIsFocused(false);
     setShowClear(false);
+    onFocus(false);
   };
 
   const handleFocus = () => {
-    setShowSuggestion(true);
-    setIsFocused(true);
+    canShowSuggestion();
     canShowClear();
+    onFocus(true);
   };
 
   const handleReset = () => {
@@ -95,101 +97,77 @@ const AutoComplete = ({ label, zIndex }: AutoCompleteProps) => {
   };
 
   return (
-    <Box zIndex={zIndex}>
-      <FormControl
-        isRequired
-        size="sm"
-        style={{
-          ...styles.formControl,
-          // ...Object.assign({}, styleFormContainer),
-        }}
-      >
-        <FormControlLabel mb="$2">
-          <FormControlLabelText>{label}</FormControlLabelText>
-        </FormControlLabel>
-        <VStack position="relative" w="$full">
-          <Input
-            variant="outline"
-            size="sm"
-            w="$full"
-            h={34}
-            zIndex={1}
-            $focus-borderColor={colors.purple}
-          >
-            <InputField
-              value={suggestionValue}
-              onChangeText={handleChange}
-              onBlur={handleBlur}
-              onFocus={handleFocus}
-              blurOnSubmit
-            />
-            <InputSlot pr="$3">
-              <View style={styles.iconContainer}>
-                {showClear && (
-                  <Pressable onPress={handleReset} mr={5}>
-                    <InputIcon size="sm" as={CloseIcon} color="$trueGray400" />
-                  </Pressable>
-                )}
-                <InputIcon
-                  size="lg"
-                  as={isFocused ? ChevronUpIcon : ChevronDownIcon}
-                  color={colors.purple}
-                />
-              </View>
-            </InputSlot>
-          </Input>
-          {suggestions.length === 0 && suggestionValue.length > 1 && (
-            <FormControlHelper>
-              <FormControlHelperText>
-                This data will be saved as a new entry
-              </FormControlHelperText>
-            </FormControlHelper>
-          )}
-          {showSuggestion && suggestions.length > 0 && (
-            <Box style={styles.suggestionContainer} zIndex={2}>
-              <ScrollView
-                maxHeight={205}
-                w="100%"
-                keyboardShouldPersistTaps="always"
-              >
-                {suggestions.map((val, idx) => (
-                  <Pressable key={idx} onPress={() => handlePress(val)}>
-                    <Box style={styles.suggestionItemContainer}>
-                      <Text style={styles.suggestionItemText}>{val}</Text>
-                    </Box>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            </Box>
-          )}
-        </VStack>
-      </FormControl>
+    <Box zIndex={zIndex} p={0}>
+      <VStack position="relative" w="$full">
+        <Input size="sm" w="$full" style={styles.inputStyle}>
+          <InputField
+            style={styles.inputFieldStyle}
+            value={suggestionValue}
+            onChangeText={handleChange}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
+            blurOnSubmit
+            placeholder={placeholder}
+            keyboardAppearance="dark"
+          />
+          <InputSlot pr="$3">
+            <View style={styles.iconContainer}>
+              {showClear && (
+                <Pressable onPress={handleReset} mr={5}>
+                  <InputIcon size="md" as={CloseIcon} color="$trueGray400" />
+                </Pressable>
+              )}
+            </View>
+          </InputSlot>
+        </Input>
+
+        {showSuggestion && suggestions.length > 0 && (
+          <Box style={styles.suggestionContainer} zIndex={2}>
+            <ScrollView
+              maxHeight={205}
+              w="100%"
+              keyboardShouldPersistTaps="always"
+            >
+              {suggestions.map((val, idx) => (
+                <Pressable key={idx} onPress={() => handlePress(val)}>
+                  <Box style={styles.suggestionItemContainer}>
+                    <Text style={styles.suggestionItemText}>{val}</Text>
+                  </Box>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </Box>
+        )}
+      </VStack>
     </Box>
   );
 };
 
 const styles = StyleSheet.create({
-  formControl: { marginBottom: 20 },
+  inputStyle: { height: 44, zIndex: 1, borderWidth: 0, padding: 0 },
+  inputFieldStyle: { fontSize: 17, paddingLeft: 0 },
   iconContainer: { flexDirection: "row", alignItems: "center" },
   suggestionContainer: {
     position: "absolute",
-    width: "100%",
+    flex: 1,
     top: 41,
+    left: -20,
+    right: 0,
     borderRadius: 3,
     borderStyle: "solid",
-    borderWidth: 0.4,
+    borderWidth: 0.3,
     borderColor: colors.gray,
     backgroundColor: colors.dark,
   },
   suggestionItemContainer: {
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
   },
   suggestionItemText: {
     color: colors.white,
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: "500",
-    lineHeight: 16,
+    lineHeight: 19,
   },
 });
 

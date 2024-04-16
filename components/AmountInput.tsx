@@ -9,8 +9,8 @@ import {
 } from "@gluestack-ui/themed";
 import { forwardRef, useState } from "react";
 import { StyleSheet } from "react-native";
-import { formatCurrency } from "../lib/helpers";
 import { colors } from "../lib/theme";
+import { NumericFormat } from "react-number-format";
 
 interface AmountInputProps {
   isInvalid?: boolean;
@@ -22,9 +22,7 @@ const AmountInput = forwardRef<any, AmountInputProps>(
     const [text, setText] = useState("");
 
     const handleTextChange = (inputText: string) => {
-      const [formattedValue] = formatCurrency(inputText);
-
-      setText(formattedValue);
+      setText(inputText);
     };
 
     return (
@@ -35,16 +33,25 @@ const AmountInput = forwardRef<any, AmountInputProps>(
         style={styles.container}
       >
         <Input w="$full" style={styles.inputStyle}>
-          <InputField
-            ref={ref}
-            onChangeText={handleTextChange}
+          <NumericFormat
             value={text}
-            placeholder="$0.00"
-            style={{
-              ...styles.textInputStyle,
-              color: index === 0 ? colors.red : colors.green,
-            }}
-            keyboardType="numeric"
+            displayType={"text"}
+            thousandSeparator={true}
+            prefix={"$"}
+            renderText={(formattedValue) => (
+              <InputField
+                ref={ref}
+                onChangeText={handleTextChange}
+                value={formattedValue}
+                placeholder="$0.00"
+                style={{
+                  ...styles.textInputStyle,
+                  color: index === 0 ? colors.red : colors.green,
+                }}
+                keyboardType="numeric"
+                keyboardAppearance="dark"
+              />
+            )}
           />
         </Input>
 

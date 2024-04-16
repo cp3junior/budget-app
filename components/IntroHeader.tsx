@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
 
   txtW: {
-    fontSize: 30,
+    fontSize: 20,
     color: colors.blue,
     textAlign: "center",
   },

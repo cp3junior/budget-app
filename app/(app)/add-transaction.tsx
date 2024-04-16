@@ -14,17 +14,88 @@ import DateTimePicker, {
 import FormListContainer from "../../components/common/FormList/FormListContainer";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
 import Text from "../../components/common/Text";
-
-const types = ["Credit", "Debit"];
+import FormListContent from "../../components/common/FormList/FormListContent";
+import DropDownMenu, {
+  DropdownItem,
+} from "../../components/common/DropDownMenu/DropDownMenu";
+import { NumericFormat } from "react-number-format";
+// import NumberFormat from "react-number-format";
 
 const directions = ["Expense", "Income"];
+
+const categories: DropdownItem[] = [
+  {
+    id: 1,
+    label: "Groceries",
+    items: [
+      {
+        id: 11,
+        label: "Eggs",
+        icon: "01.circle",
+      },
+      {
+        id: 21,
+        label: "Food",
+        icon: "z.square",
+      },
+    ],
+  },
+  {
+    id: 2,
+    label: "Car",
+    items: [
+      {
+        id: 12,
+        label: "Gas",
+        icon: "chevron.up.chevron.down",
+      },
+      {
+        id: 22,
+        label: "Maintenance",
+        icon: "square.and.arrow.up",
+      },
+    ],
+  },
+  {
+    id: 3,
+    label: "Utilities",
+    items: [
+      {
+        id: 13,
+        label: "Electricity",
+        icon: "chevron.up.chevron.down",
+      },
+      {
+        id: 23,
+        label: "Water",
+        icon: "square.and.arrow.up",
+      },
+    ],
+  },
+];
+
+const types: DropdownItem[] = [
+  {
+    id: 1,
+    label: "Credit",
+    icon: "creditcard.and.123",
+  },
+  {
+    id: 2,
+    label: "Debit",
+    icon: "creditcard.fill",
+  },
+];
 
 const AddTransactionScreen = () => {
   const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(0);
-  const [index2, setIndex2] = useState(0);
-
+  const [category, setCategory] = useState<DropdownItem>(
+    categories[0]?.items?.[0] as DropdownItem
+  );
+  const [type, setType] = useState<DropdownItem>(types[0]);
   const [date, setDate] = useState(new Date());
+  const [isLocationFocused, setIsLocationFocused] = useState(false);
 
   const onChange = (_: DateTimePickerEvent, selectedDate: Date | undefined) => {
     if (selectedDate) setDate(selectedDate);
@@ -39,10 +110,18 @@ const AddTransactionScreen = () => {
     }, 2000);
   };
 
+  const handleCategoryChange = (item: DropdownItem) => {
+    setCategory(item);
+  };
+  const handleTypeChange = (item: DropdownItem) => {
+    setType(item);
+  };
+
   return (
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
+      extraScrollHeight={isLocationFocused ? 150 : 0}
     >
       <View style={styles.headerContainer}>
         <ButtonLink style={styles.btnStyle} href="../" title="Cancel" />
@@ -69,18 +148,27 @@ const AddTransactionScreen = () => {
 
         <AmountInput index={index} />
         <FormListContainer style={styles.textInputContainer}>
-          <View style={styles.listItemContainer}>
-            <Text fontWeight="800" style={styles.flex}>
-              Category
-            </Text>
-            <View>
-              <Text>Sell</Text>
-            </View>
-          </View>
-          {/* <InputForm InputProps={{ placeholder: "Category select" }} /> */}
-
+          <FormListContent>
+            <DropDownMenu
+              label="Category"
+              id="category"
+              value={category}
+              onChange={handleCategoryChange}
+              data={categories}
+            />
+          </FormListContent>
           <FormListSeparator />
-          <View style={styles.listItemContainer}>
+          <FormListContent>
+            <DropDownMenu
+              label="Type"
+              id="type"
+              value={type}
+              onChange={handleTypeChange}
+              data={types}
+            />
+          </FormListContent>
+          <FormListSeparator />
+          <FormListContent>
             <Text fontWeight="800" style={styles.flex}>
               Date
             </Text>
@@ -99,27 +187,17 @@ const AddTransactionScreen = () => {
                 themeVariant="dark"
               />
             </View>
-          </View>
+          </FormListContent>
         </FormListContainer>
         <FormListContainer style={styles.textInputContainer}>
-          <Text>OKOKO</Text>
-          {/* <InputForm InputProps={{ placeholder: "Location" }} /> */}
-          <AutoComplete zIndex={1} label="Location" />
+          <AutoComplete
+            zIndex={2}
+            placeholder="Locations"
+            onFocus={setIsLocationFocused}
+          />
           <FormListSeparator />
           <InputForm InputProps={{ placeholder: "Notes" }} />
         </FormListContainer>
-
-        {/* <AutoComplete zIndex={2} label="Category" /> */}
-        {/* <AutoComplete zIndex={1} label="Location" /> */}
-
-        <SegmentedControl
-          appearance="dark"
-          values={types}
-          selectedIndex={index2}
-          onChange={(event) => {
-            setIndex2(event.nativeEvent.selectedSegmentIndex);
-          }}
-        />
       </View>
     </KeyboardAwareScrollView>
   );
@@ -141,12 +219,6 @@ const styles = StyleSheet.create({
   },
   btnStyle: { fontSize: 18 },
   flex: { flex: 1 },
-  listItemContainer: {
-    flexDirection: "row",
-    height: 44,
-    alignItems: "center",
-    paddingRight: 20,
-  },
   datePickerContent: { flexDirection: "row" },
 });
 

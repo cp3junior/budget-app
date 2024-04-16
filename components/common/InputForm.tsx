@@ -23,6 +23,7 @@ const InputForm = forwardRef<any, InputFormProps>(
               ...(InputProps.style as Object),
               ...styles.textInputStyle,
             }}
+            keyboardAppearance="dark"
           />
           {InputSlot}
         </Input>
