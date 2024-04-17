@@ -1,7 +1,7 @@
+import { usePathname, useRouter } from "expo-router";
+import { ElementType } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { colors } from "../../../lib/theme";
-import { useRouter, usePathname } from "expo-router";
-import { ElementType } from "react";
 
 export interface TabBarItemProps {
   href: string;

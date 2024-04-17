@@ -1,9 +1,9 @@
+import { ChevronsUpDownIcon } from "@gluestack-ui/themed";
 import { StyleSheet, View } from "react-native";
-import * as DropdownMenu from "zeego/dropdown-menu";
 import SFSymbol from "sweet-sfsymbols";
 import { SystemName } from "sweet-sfsymbols/src/SweetSFSymbols.types";
+import * as DropdownMenu from "zeego/dropdown-menu";
 import Text from "../Text";
-import { ChevronsUpDownIcon } from "@gluestack-ui/themed";
 
 export interface DropdownItem {
   id: number;

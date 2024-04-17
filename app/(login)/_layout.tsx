@@ -1,14 +1,17 @@
 import { Stack } from "expo-router";
 import { colors } from "../../lib/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const LoginLayout = () => {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: colors.darker },
-      }}
-    />
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.darker },
+        }}
+      />
+    </SafeAreaView>
   );
 };
 

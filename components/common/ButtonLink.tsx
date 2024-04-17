@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
-import Text from "./Text";
 import { GestureResponderEvent, StyleSheet, TextStyle } from "react-native";
 import { colors } from "../../lib/theme";
+import Text from "./Text";
 
 interface ButtonLinkProps {
   href: string;

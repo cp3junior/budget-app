@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { colors } from "../../../lib/theme";
 
 interface FormListContainerProps {

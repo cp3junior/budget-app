@@ -1,25 +1,23 @@
-import { View, StyleSheet } from "react-native";
-import React, { useState } from "react";
-import ButtonLink from "../../components/common/ButtonLink";
-import AutoComplete from "../../components/common/AutoComplete";
 import { Spinner } from "@gluestack-ui/themed";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import InputForm from "../../components/common/InputForm";
-import { colors } from "../../lib/theme";
-import AmountInput from "../../components/AmountInput";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import FormListContainer from "../../components/common/FormList/FormListContainer";
-import FormListSeparator from "../../components/common/FormList/FormListSeparator";
-import Text from "../../components/common/Text";
-import FormListContent from "../../components/common/FormList/FormListContent";
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import React, { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AmountInput from "../../components/AmountInput";
+import AutoComplete from "../../components/common/AutoComplete";
+import ButtonLink from "../../components/common/ButtonLink";
 import DropDownMenu, {
   DropdownItem,
 } from "../../components/common/DropDownMenu/DropDownMenu";
-import { NumericFormat } from "react-number-format";
-// import NumberFormat from "react-number-format";
+import FormListContainer from "../../components/common/FormList/FormListContainer";
+import FormListContent from "../../components/common/FormList/FormListContent";
+import FormListSeparator from "../../components/common/FormList/FormListSeparator";
+import InputForm from "../../components/common/InputForm";
+import Text from "../../components/common/Text";
+import { colors } from "../../lib/theme";
 
 const directions = ["Expense", "Income"];
 
@@ -145,7 +143,6 @@ const AddTransactionScreen = () => {
             setIndex(event.nativeEvent.selectedSegmentIndex);
           }}
         />
-
         <AmountInput index={index} />
         <FormListContainer style={styles.textInputContainer}>
           <FormListContent>

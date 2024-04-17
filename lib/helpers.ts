@@ -11,3 +11,7 @@ export const formatCurrency = (
   const formatedValue = formatter.format(parsedValue);
   return [formatedValue, parsedValue];
 };
+
+export const capitalize = (text: string): string => {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};

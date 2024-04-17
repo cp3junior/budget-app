@@ -1,12 +1,13 @@
-import { View, Text } from "react-native";
-import React from "react";
+import SafeContainer from "../../components/common/SafeContainer";
+import Text from "../../components/common/Text";
 import withTabBar from "../../hoc/withTabBar";
 
 const Budget = () => {
   return (
-    <View>
-      <Text>Budget</Text>
-    </View>
+    <SafeContainer>
+      <Text>Add Budget</Text>
+      <Text>List Budgets with dates</Text>
+    </SafeContainer>
   );
 };
 

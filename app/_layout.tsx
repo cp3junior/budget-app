@@ -2,11 +2,10 @@ import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider, StatusBar } from "@gluestack-ui/themed";
 import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
-import { useCallback } from "react";
 import * as SplashScreen from "expo-splash-screen";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { colors } from "../lib/theme";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,11 +38,9 @@ export default function RootLayout() {
         onLayout={onLayoutRootView}
       >
         <StatusBar barStyle="light-content" />
-        <SafeAreaView style={{ flex: 1 }}>
-          <View style={{ flex: 1 }}>
-            <Slot />
-          </View>
-        </SafeAreaView>
+        <View style={{ flex: 1 }}>
+          <Slot />
+        </View>
       </View>
     </GluestackUIProvider>
   );

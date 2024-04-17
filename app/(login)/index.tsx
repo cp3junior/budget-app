@@ -1,8 +1,8 @@
-import { View, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import { StyleSheet, View } from "react-native";
 import IntroHeader from "../../components/IntroHeader";
-import ButtonLink from "../../components/common/ButtonLink";
 import Button from "../../components/common/Button";
+import ButtonLink from "../../components/common/ButtonLink";
 import Text from "../../components/common/Text";
 
 export default function Page() {
@@ -22,7 +22,7 @@ export default function Page() {
         </Text>
         <Text fontWeight="300">
           With our app, you can easily track your income and expenses, set
-          financial goals, and make informd decisions about your money.
+          financial goals, and make informed decisions about your money.
         </Text>
       </View>
       <View style={styles.btnGroupCont}>

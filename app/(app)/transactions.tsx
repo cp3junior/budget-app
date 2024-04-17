@@ -1,12 +1,13 @@
-import { View, Text } from "react-native";
-import React from "react";
+import SafeContainer from "../../components/common/SafeContainer";
+import Text from "../../components/common/Text";
 import withTabBar from "../../hoc/withTabBar";
 
 const Transactions = () => {
   return (
-    <View>
-      <Text>Transactions</Text>
-    </View>
+    <SafeContainer>
+      <Text>Transactions list</Text>
+      <Text>Transactions Search, powerful filter, graph on top</Text>
+    </SafeContainer>
   );
 };
 
