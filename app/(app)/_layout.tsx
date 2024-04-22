@@ -73,7 +73,10 @@ const AppLayout = () => {
           <Stack.Screen
             key={name}
             name={name}
-            options={{ ...withHeaderOptions, headerTitle: capitalize(name) }}
+            options={{
+              ...withHeaderOptions,
+              headerTitle: capitalize(name),
+            }}
           />
         ))}
 

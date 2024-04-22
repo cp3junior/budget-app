@@ -6,16 +6,17 @@ import { StyleSheet, TextInputProps, View } from "react-native";
 interface InputFormProps {
   InputProps: TextInputProps & IInputProps;
   isRequired?: boolean;
+  isReadOnly?: boolean;
   isInvalid?: boolean;
   InputSlot?: ReactNode | null;
   inputHelper?: string;
 }
 
 const InputForm = forwardRef<any, InputFormProps>(
-  ({ InputSlot, InputProps }, ref) => {
+  ({ InputSlot, InputProps, isReadOnly }, ref) => {
     return (
       <View style={styles.flex}>
-        <Input w="$full" style={styles.inptStyle}>
+        <Input w="$full" style={styles.inptStyle} isReadOnly={isReadOnly}>
           <InputField
             ref={ref}
             {...InputProps}

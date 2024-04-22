@@ -13,7 +13,8 @@ import FormListSubmitIcon from "../../components/common/FormList/FormListSubmitI
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
 
 interface SignUpForm {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   rePassword: string;
@@ -29,7 +30,8 @@ const SignUp = () => {
   const rePasswordInput = useRef<TextInput>(null);
 
   const initialFormValues: SignUpForm = {
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     rePassword: "",
@@ -70,10 +72,25 @@ const SignUp = () => {
                 isRequired
                 isInvalid={false}
                 InputProps={{
-                  placeholder: "Full name",
-                  value: values.fullName,
-                  onChangeText: handleChange("fullName"),
-                  onBlur: handleBlur("fullName"),
+                  placeholder: "First name",
+                  value: values.firstName,
+                  onChangeText: handleChange("firstName"),
+                  onBlur: handleBlur("firstName"),
+                  onSubmitEditing: handleFocusEmail,
+                  type: "text",
+                  blurOnSubmit: false,
+                  returnKeyType: "next",
+                }}
+              />
+              <FormListSeparator />
+              <InputForm
+                isRequired
+                isInvalid={false}
+                InputProps={{
+                  placeholder: "Last name",
+                  value: values.lastName,
+                  onChangeText: handleChange("lastName"),
+                  onBlur: handleBlur("lastName"),
                   onSubmitEditing: handleFocusEmail,
                   type: "text",
                   blurOnSubmit: false,

@@ -57,7 +57,16 @@ const DropDownMenu = ({
                     <DropdownMenu.SubTrigger
                       key={`${id}-sub-trigger-${idItem}`}
                     >
-                      {labelItem}
+                      <DropdownMenu.ItemTitle>
+                        {labelItem}
+                      </DropdownMenu.ItemTitle>
+                      {iconItem && (
+                        <DropdownMenu.ItemIcon
+                          ios={{
+                            name: iconItem,
+                          }}
+                        />
+                      )}
                     </DropdownMenu.SubTrigger>
                     <DropdownMenu.SubContent>
                       {items.map((item) => {
@@ -68,7 +77,7 @@ const DropDownMenu = ({
                         } = item;
                         return (
                           <DropdownMenu.CheckboxItem
-                            key={`${id}-sub-${idSubItem}`}
+                            key={`${id}-sub-${idItem}-${idSubItem}`}
                             value={labelSubItem === value.label}
                             onValueChange={() => {
                               onChange(item);

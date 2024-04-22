@@ -11,6 +11,7 @@ interface FormListButtonLinkProps {
   color?: string;
   hasIcon?: boolean;
   hasExternal?: boolean;
+  onPress?: () => void;
 }
 
 const FormListButtonLink = ({
@@ -20,11 +21,16 @@ const FormListButtonLink = ({
   hasIcon = true,
   hasExternal,
   value,
+  onPress,
 }: FormListButtonLinkProps) => {
   const router = useRouter();
 
   const handleNavigate = () => {
-    router.navigate(href);
+    if (onPress) {
+      onPress();
+    } else {
+      router.navigate(href);
+    }
   };
   return (
     <TouchableOpacity onPress={handleNavigate} style={styles.container}>
@@ -64,6 +70,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     flex: 1,
+    paddingRight: 10,
   },
   externatContainer: {
     flexDirection: "row",

@@ -1,4 +1,3 @@
-import { Spinner } from "@gluestack-ui/themed";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -8,7 +7,6 @@ import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AmountInput from "../../components/AmountInput";
 import AutoComplete from "../../components/common/AutoComplete";
-import ButtonLink from "../../components/common/ButtonLink";
 import DropDownMenu, {
   DropdownItem,
 } from "../../components/common/DropDownMenu/DropDownMenu";
@@ -16,61 +14,11 @@ import FormListContainer from "../../components/common/FormList/FormListContaine
 import FormListContent from "../../components/common/FormList/FormListContent";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
 import InputForm from "../../components/common/InputForm";
+import ModalHeader from "../../components/common/ModalHeader";
 import Text from "../../components/common/Text";
-import { colors } from "../../lib/theme";
+import { categories } from "../../lib/constant";
 
 const directions = ["Expense", "Income"];
-
-const categories: DropdownItem[] = [
-  {
-    id: 1,
-    label: "Groceries",
-    items: [
-      {
-        id: 11,
-        label: "Eggs",
-        icon: "01.circle",
-      },
-      {
-        id: 21,
-        label: "Food",
-        icon: "z.square",
-      },
-    ],
-  },
-  {
-    id: 2,
-    label: "Car",
-    items: [
-      {
-        id: 12,
-        label: "Gas",
-        icon: "chevron.up.chevron.down",
-      },
-      {
-        id: 22,
-        label: "Maintenance",
-        icon: "square.and.arrow.up",
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "Utilities",
-    items: [
-      {
-        id: 13,
-        label: "Electricity",
-        icon: "chevron.up.chevron.down",
-      },
-      {
-        id: 23,
-        label: "Water",
-        icon: "square.and.arrow.up",
-      },
-    ],
-  },
-];
 
 const types: DropdownItem[] = [
   {
@@ -99,7 +47,7 @@ const AddTransactionScreen = () => {
     if (selectedDate) setDate(selectedDate);
   };
 
-  const handle = () => {
+  const handlePress = () => {
     setLoading(true);
 
     setTimeout(() => {
@@ -121,19 +69,7 @@ const AddTransactionScreen = () => {
       keyboardShouldPersistTaps="handled"
       extraScrollHeight={isLocationFocused ? 150 : 0}
     >
-      <View style={styles.headerContainer}>
-        <ButtonLink style={styles.btnStyle} href="../" title="Cancel" />
-        {loading ? (
-          <Spinner color={colors.blue} />
-        ) : (
-          <ButtonLink
-            style={styles.btnStyle}
-            href=""
-            onPress={handle}
-            title="Add"
-          />
-        )}
-      </View>
+      <ModalHeader onPress={handlePress} title="Add" isLoading={loading} />
       <View>
         <SegmentedControl
           appearance="dark"
@@ -209,12 +145,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 15,
-  },
-  btnStyle: { fontSize: 18 },
   flex: { flex: 1 },
   datePickerContent: { flexDirection: "row" },
 });
