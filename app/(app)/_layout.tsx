@@ -1,12 +1,10 @@
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { ScreenProps } from "expo-router/build/views/Screen";
-import { useEffect } from "react";
 import { View } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useAuthContext } from "../../hook/useAuthContext";
 import {
   modalScreens,
   tabsScreens,
@@ -40,14 +38,6 @@ const withModalOptions: ScreenProps["options"] = {
 
 const AppLayout = () => {
   const insets = useSafeAreaInsets();
-
-  const { currentUser } = useAuthContext();
-
-  useEffect(() => {
-    if (!currentUser) {
-      router.replace("/");
-    }
-  }, [currentUser]);
 
   return (
     <SafeAreaProvider>

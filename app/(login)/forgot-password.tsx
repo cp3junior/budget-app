@@ -33,7 +33,6 @@ const ForgotPassword = () => {
 
     try {
       await resetPassword(email);
-      setLoading(false);
       router.push({
         pathname: "/sign-in",
         params: { email },

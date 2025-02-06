@@ -86,8 +86,6 @@ const SignUp = () => {
       await updateProfile(credentials.user, {
         displayName: `${firstName} ${lastName}`,
       });
-
-      setLoading(false);
     } catch (error) {
       const message = getErrorMessage(error);
       setError(message);

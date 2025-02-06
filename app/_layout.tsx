@@ -1,10 +1,10 @@
 import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider, StatusBar } from "@gluestack-ui/themed";
 import { useFonts } from "expo-font";
-import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
 import { View } from "react-native";
+import AppEntry from "../components/AppEntry";
 import { AuthContextProvider } from "../context/AuthContextProvider";
 import { colors } from "../lib/theme";
 
@@ -40,9 +40,7 @@ export default function RootLayout() {
           onLayout={onLayoutRootView}
         >
           <StatusBar barStyle="light-content" />
-          <View style={{ flex: 1 }}>
-            <Slot />
-          </View>
+          <AppEntry />
         </View>
       </AuthContextProvider>
     </GluestackUIProvider>

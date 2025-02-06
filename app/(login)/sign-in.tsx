@@ -54,7 +54,6 @@ const SignIn = () => {
 
     try {
       await signIn(email, password);
-      setLoading(false);
     } catch (error) {
       const message = getErrorMessage(error);
       setError(message);

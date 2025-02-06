@@ -5,9 +5,13 @@ import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import withTabBar from "../../hoc/withTabBar";
 import { colors } from "../../lib/theme";
+import { useAuthContext } from "../../hook/useAuthContext";
 
 const Home = () => {
   const router = useRouter();
+  const { currentUser } = useAuthContext();
+
+  if (!currentUser) return null;
 
   const navigateToProfileScreen = () => {
     router.navigate("/profile");
@@ -17,7 +21,7 @@ const Home = () => {
     <SafeContainer>
       <View style={styles.headerContainer}>
         <View>
-          <Text style={styles.txtName}>Hi, Andrew!</Text>
+          <Text style={styles.txtName}>Hi, {currentUser.firstName}!</Text>
           <Text style={styles.txtTrack} fontWeight="800">
             Track, Plan, Save
           </Text>
