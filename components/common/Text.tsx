@@ -5,7 +5,6 @@ import { colors } from "../../lib/theme";
 interface TextProps {
   children: ReactNode;
   fontWeight?: TextStyle["fontWeight"];
-  fontSize?: number;
   style?: TextStyle;
 }
 

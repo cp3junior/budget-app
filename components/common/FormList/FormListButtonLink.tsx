@@ -6,7 +6,7 @@ import Text from "../Text";
 
 interface FormListButtonLinkProps {
   label: string;
-  href: string;
+  href?: string;
   value?: string;
   color?: string;
   hasIcon?: boolean;
@@ -29,7 +29,7 @@ const FormListButtonLink = ({
     if (onPress) {
       onPress();
     } else {
-      router.navigate(href);
+      router.navigate(href || "/");
     }
   };
   return (

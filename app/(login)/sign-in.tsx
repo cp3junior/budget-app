@@ -1,52 +1,84 @@
 import { InputSlot, Spinner } from "@gluestack-ui/themed";
-import { Formik, FormikHelpers } from "formik";
-import { useRef, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { Formik } from "formik";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as Yup from "yup";
+import ErrorText from "../../components/ErrorText";
 import IntroHeader from "../../components/IntroHeader";
 import ButtonLink from "../../components/common/ButtonLink";
-import InputForm from "../../components/common/InputForm";
-import { colors } from "../../lib/theme";
+import FormListContainer from "../../components/common/FormList/FormListContainer";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
 import FormListSubmitIcon from "../../components/common/FormList/FormListSubmitIcon";
-import FormListContainer from "../../components/common/FormList/FormListContainer";
-import { router } from "expo-router";
+import InputForm from "../../components/common/InputForm";
+import { signIn } from "../../lib/firebaseAuth";
+import { getErrorMessage } from "../../lib/helpers";
+import { colors } from "../../lib/theme";
 
-interface SignInForm {
-  email: string;
-  password: string;
-}
+const SignInSchema = Yup.object().shape({
+  email: Yup.string().email("Invalid email").required("Required"),
+  password: Yup.string().required("Required"),
+});
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showResetPasswordMessage, setShowResetPasswordMessage] =
+    useState(false);
 
   const passwordInput = useRef<TextInput>(null);
+  const params = useLocalSearchParams();
 
-  const initialFormValues: SignInForm = { email: "", password: "" };
+  useEffect(() => {
+    if (params?.email) {
+      setShowResetPasswordMessage(true);
+      passwordInput.current?.focus();
+    } else {
+      setShowResetPasswordMessage(false);
+    }
+  }, [params]);
+
+  const initialFormValues: SignInForm = {
+    email: (params?.email as string) || "",
+    password: "",
+  };
 
   const handleFocusPassword = () => {
     passwordInput.current?.focus();
   };
 
-  const handleSubmit = (
-    values: SignInForm,
-    actions: FormikHelpers<SignInForm>
-  ) => {
-    console.log(values, actions);
+  const handleSubmit = async ({ email, password }: SignInForm) => {
     setLoading(true);
-    setTimeout(() => {
+    setError("");
+
+    try {
+      await signIn(email, password);
       setLoading(false);
-      router.navigate("/home");
-      console.log("loged in");
-    }, 500);
+    } catch (error) {
+      const message = getErrorMessage(error);
+      setError(message);
+      setLoading(false);
+    }
   };
 
   return (
     <View style={styles.flex}>
       <KeyboardAwareScrollView style={styles.flex}>
         <IntroHeader small text="Login to continue" />
-        <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
-          {({ handleChange, handleBlur, handleSubmit, values }) => (
+        <Formik
+          initialValues={initialFormValues}
+          onSubmit={handleSubmit}
+          validationSchema={SignInSchema}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
             <FormListContainer
               footer={
                 <View style={styles.forgot}>
@@ -61,7 +93,7 @@ const SignIn = () => {
             >
               <InputForm
                 isRequired
-                isInvalid={false}
+                isInvalid={Boolean(errors?.email && touched?.email)}
                 InputProps={{
                   placeholder: "Email",
                   value: values.email,
@@ -78,7 +110,7 @@ const SignIn = () => {
               <InputForm
                 ref={passwordInput}
                 isRequired
-                isInvalid={false}
+                isInvalid={Boolean(errors?.password && touched?.password)}
                 InputProps={{
                   placeholder: "Password",
                   value: values.password,
@@ -105,6 +137,13 @@ const SignIn = () => {
             </FormListContainer>
           )}
         </Formik>
+        {error && <ErrorText message={error} />}
+        {showResetPasswordMessage && (
+          <ErrorText
+            isMessage
+            message="Password reset email sent! Please check your inbox and follow the instructions to reset your password. Once reset, you can log in with your new password."
+          />
+        )}
       </KeyboardAwareScrollView>
       <View style={styles.containerTxtLink}>
         <ButtonLink

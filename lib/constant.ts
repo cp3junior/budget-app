@@ -1,6 +1,16 @@
-import { DropdownItem } from "../components/common/DropDownMenu/DropDownMenu";
+export const TAB_ICON_SIZE = 40;
 
-export const TAB_ICON_SIZE = 44;
+export const COLLECTION_USER = "users";
+
+export const tabsScreens = ["home", "budget", "transactions", "whishlist"];
+export const withHeaderScreens = [
+  "profile",
+  "about",
+  "categories",
+  "locations",
+  "products",
+];
+export const modalScreens = ["add-transaction", "profile-edit"];
 
 export const categories: DropdownItem[] = [
   {

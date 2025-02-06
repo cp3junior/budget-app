@@ -11,12 +11,6 @@ import FormListContainer from "../../components/common/FormList/FormListContaine
 import InputForm from "../../components/common/InputForm";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
 
-interface ProfileForm {
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
 const ProfileEditScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
 

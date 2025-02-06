@@ -50,6 +50,10 @@ const AboutScreen = () => {
         financial goals, and make informed decisions about your money. It's time
         to get the control back.
       </Text>
+      <Text style={{ ...styles.aboutTxt, marginTop: 12 }}>
+        This app is provided for free, and we prioritize your privacy—your data
+        is securely stored and never shared.
+      </Text>
     </SafeContainer>
   );
 };
@@ -60,7 +64,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 16,
     paddingHorizontal: 20,
-    // textAlign: "center",
   },
   containerStyle: {
     padding: 0,

@@ -5,6 +5,7 @@ import HomeIcon from "../../svg/HomeIcon";
 import PieIcon from "../../svg/PieIcon";
 import TabBarItem, { TabBarItemProps } from "./TabBarItem";
 import DollarIcon from "../../svg/DollarIcon";
+import DollarTransactionIcon from "../../svg/DollarTransactionIcon";
 
 const tabItems: TabBarItemProps[] = [
   {
@@ -19,6 +20,11 @@ const tabItems: TabBarItemProps[] = [
   },
   {
     Icon: DollarIcon,
+    href: "/whishlist",
+    type: "tab",
+  },
+  {
+    Icon: DollarTransactionIcon,
     href: "/transactions",
     type: "tab",
   },
@@ -60,10 +66,10 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    height: 68,
+    height: 60,
     backgroundColor: colors.dark,
-    borderRadius: 50,
-    paddingHorizontal: 14,
+    borderRadius: 30,
+    paddingHorizontal: 12,
     borderColor: colors.gray,
     borderWidth: 0.4,
   },

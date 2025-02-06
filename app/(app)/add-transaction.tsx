@@ -7,9 +7,7 @@ import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AmountInput from "../../components/AmountInput";
 import AutoComplete from "../../components/common/AutoComplete";
-import DropDownMenu, {
-  DropdownItem,
-} from "../../components/common/DropDownMenu/DropDownMenu";
+import DropDownMenu from "../../components/common/DropDownMenu/DropDownMenu";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
 import FormListContent from "../../components/common/FormList/FormListContent";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";

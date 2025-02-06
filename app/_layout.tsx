@@ -5,6 +5,7 @@ import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
 import { View } from "react-native";
+import { AuthContextProvider } from "../context/AuthContextProvider";
 import { colors } from "../lib/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -33,15 +34,17 @@ export default function RootLayout() {
 
   return (
     <GluestackUIProvider colorMode="dark" config={config}>
-      <View
-        style={{ flex: 1, backgroundColor: colors.darker }}
-        onLayout={onLayoutRootView}
-      >
-        <StatusBar barStyle="light-content" />
-        <View style={{ flex: 1 }}>
-          <Slot />
+      <AuthContextProvider>
+        <View
+          style={{ flex: 1, backgroundColor: colors.darker }}
+          onLayout={onLayoutRootView}
+        >
+          <StatusBar barStyle="light-content" />
+          <View style={{ flex: 1 }}>
+            <Slot />
+          </View>
         </View>
-      </View>
+      </AuthContextProvider>
     </GluestackUIProvider>
   );
 }

@@ -1,7 +1,8 @@
-import { IInputProps } from "@gluestack-ui/input/lib/typescript/types";
+import { IInputProps } from "@gluestack-ui/input/lib/types";
 import { Input, InputField } from "@gluestack-ui/themed";
 import { ReactNode, forwardRef } from "react";
 import { StyleSheet, TextInputProps, View } from "react-native";
+import { colors } from "../../lib/theme";
 
 interface InputFormProps {
   InputProps: TextInputProps & IInputProps;
@@ -13,16 +14,21 @@ interface InputFormProps {
 }
 
 const InputForm = forwardRef<any, InputFormProps>(
-  ({ InputSlot, InputProps, isReadOnly }, ref) => {
+  ({ InputSlot, InputProps, isReadOnly, isInvalid }, ref) => {
     return (
       <View style={styles.flex}>
         <Input w="$full" style={styles.inptStyle} isReadOnly={isReadOnly}>
           <InputField
             ref={ref}
+            placeholderTextColor={
+              isInvalid ? colors.redVivid : colors.grayLight
+            }
+            autoCapitalize="none"
             {...InputProps}
             style={{
               ...(InputProps.style as Object),
               ...styles.textInputStyle,
+              ...(isInvalid ? { color: colors.redVivid } : {}),
             }}
             keyboardAppearance="dark"
           />

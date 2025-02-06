@@ -1,38 +1,71 @@
-import { Formik, FormikHelpers } from "formik";
+import { InputSlot, Spinner } from "@gluestack-ui/themed";
+import { useRouter } from "expo-router";
+import { Formik } from "formik";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as Yup from "yup";
+import ErrorText from "../../components/ErrorText";
 import IntroHeader from "../../components/IntroHeader";
 import ButtonLink from "../../components/common/ButtonLink";
-import InputForm from "../../components/common/InputForm";
-import { colors } from "../../lib/theme";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
-import { InputSlot } from "@gluestack-ui/themed";
 import FormListSubmitIcon from "../../components/common/FormList/FormListSubmitIcon";
+import InputForm from "../../components/common/InputForm";
+import { resetPassword } from "../../lib/firebaseAuth";
+import { getErrorMessage } from "../../lib/helpers";
+import { colors } from "../../lib/theme";
 
-interface ForgotPasswordForm {
-  email: string;
-}
+const ForgotPasswordSchema = Yup.object().shape({
+  email: Yup.string().email("Invalid email").required("Required"),
+});
 
 const ForgotPassword = () => {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const initialFormValues: ForgotPasswordForm = { email: "" };
 
-  const handleSubmit = (
-    values: ForgotPasswordForm,
-    actions: FormikHelpers<ForgotPasswordForm>
-  ) => {
-    console.log(values, actions);
+  const handleSubmit = async ({ email }: ForgotPasswordForm) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await resetPassword(email);
+      setLoading(false);
+      router.push({
+        pathname: "/sign-in",
+        params: { email },
+      });
+    } catch (error) {
+      const message = getErrorMessage(error);
+      setError(message);
+      setLoading(false);
+    }
   };
 
   return (
     <View style={styles.flex}>
       <KeyboardAwareScrollView style={styles.flex}>
         <IntroHeader small text="Reset your password" />
-        <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
-          {({ handleChange, handleBlur, handleSubmit, values }) => (
+        <Formik
+          initialValues={initialFormValues}
+          onSubmit={handleSubmit}
+          validationSchema={ForgotPasswordSchema}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
             <FormListContainer>
               <InputForm
                 isRequired
-                isInvalid={false}
+                isInvalid={Boolean(errors?.email && touched?.email)}
                 InputProps={{
                   placeholder: "Enter your email here",
                   value: values.email,
@@ -46,16 +79,21 @@ const ForgotPassword = () => {
                 InputSlot={
                   <InputSlot
                     pr="$3"
-                    disabled={false}
+                    disabled={loading}
                     onPress={() => handleSubmit()}
                   >
-                    <FormListSubmitIcon />
+                    {loading ? (
+                      <Spinner color={colors.blue} />
+                    ) : (
+                      <FormListSubmitIcon />
+                    )}
                   </InputSlot>
                 }
               />
             </FormListContainer>
           )}
         </Formik>
+        {error && <ErrorText message={error} />}
       </KeyboardAwareScrollView>
       <View style={styles.containerTxtLink}>
         <ButtonLink

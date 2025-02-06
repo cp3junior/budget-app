@@ -8,12 +8,17 @@ import FormListSeparator from "../../components/common/FormList/FormListSeparato
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import { colors } from "../../lib/theme";
+import { logOut } from "../../lib/firebaseAuth";
 
 const ProfileScreen = () => {
   const router = useRouter();
 
   const navigateToProfileEditScreen = () => {
     router.navigate("/profile-edit");
+  };
+
+  const handleLogout = async () => {
+    await logOut();
   };
 
   return (
@@ -65,9 +70,9 @@ const ProfileScreen = () => {
       <FormListContainer style={styles.containerStyle}>
         <FormListButtonLink
           label="Logout"
-          href="/sign-in"
           hasIcon={false}
           color={colors.redVivid}
+          onPress={handleLogout}
         />
       </FormListContainer>
     </SafeContainer>
