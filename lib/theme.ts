@@ -10,4 +10,5 @@ export const colors = {
   red: "#faa5a4",
   redVivid: "#f61d22",
   green: "#b3e3ad",
+  yellow: "#EBDF3F",
 };

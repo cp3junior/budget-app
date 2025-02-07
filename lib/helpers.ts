@@ -17,6 +17,15 @@ export const formatCurrency = (
 export const capitalize = (text: string): string => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
+export const capitalizeAndRemoveDash = (text: string): string => {
+  const capitalized = capitalize(text);
+  return capitalized.replace(/-/g, " ");
+};
+
+export const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
+};
 
 export const generateUniqueString = (length = 20) => {
   const characters =

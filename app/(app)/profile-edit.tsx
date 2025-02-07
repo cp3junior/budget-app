@@ -30,8 +30,6 @@ const ProfileEditScreen = () => {
     values: ProfileForm,
     actions: FormikHelpers<ProfileForm>
   ) => {
-    console.log(values, actions);
-
     setIsLoading(true);
     setTimeout(() => {
       handleSave();

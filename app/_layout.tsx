@@ -7,6 +7,7 @@ import { View } from "react-native";
 import AppEntry from "../components/AppEntry";
 import { AuthContextProvider } from "../context/AuthContextProvider";
 import { colors } from "../lib/theme";
+import { AppContextProvider } from "../context/AppContextProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,13 +36,15 @@ export default function RootLayout() {
   return (
     <GluestackUIProvider colorMode="dark" config={config}>
       <AuthContextProvider>
-        <View
-          style={{ flex: 1, backgroundColor: colors.darker }}
-          onLayout={onLayoutRootView}
-        >
-          <StatusBar barStyle="light-content" />
-          <AppEntry />
-        </View>
+        <AppContextProvider>
+          <View
+            style={{ flex: 1, backgroundColor: colors.darker }}
+            onLayout={onLayoutRootView}
+          >
+            <StatusBar barStyle="light-content" />
+            <AppEntry />
+          </View>
+        </AppContextProvider>
       </AuthContextProvider>
     </GluestackUIProvider>
   );

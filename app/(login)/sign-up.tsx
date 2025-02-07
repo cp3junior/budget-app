@@ -75,9 +75,8 @@ const SignUp = () => {
         firstName,
         lastName,
         image: "",
-        isSharing: false,
         sharedAccounId: email,
-        sharingEmails: [],
+        sharedAccounName: "",
         createdAt: new Date(),
       };
 

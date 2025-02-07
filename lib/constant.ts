@@ -1,6 +1,7 @@
 export const TAB_ICON_SIZE = 40;
 
 export const COLLECTION_USER = "users";
+export const COLLECTION_REQUESTS = "requests";
 
 export const tabsScreens = ["home", "budget", "transactions", "whishlist"];
 export const withHeaderScreens = [
@@ -9,6 +10,7 @@ export const withHeaderScreens = [
   "categories",
   "locations",
   "products",
+  "account-sharing",
 ];
 export const modalScreens = ["add-transaction", "profile-edit"];
 

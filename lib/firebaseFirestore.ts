@@ -5,9 +5,11 @@ import {
   doc,
   DocumentData,
   getDocs,
+  onSnapshot,
   orderBy,
   query,
   QueryConstraint,
+  Unsubscribe,
   updateDoc,
   where,
   WhereFilterOp,
@@ -61,6 +63,57 @@ export const fetchDocuments = async <T>(
   }
 
   return docs as T[];
+};
+
+export const fetchSnapshot = <T>(
+  collectionName: string,
+  options?: {
+    orderByField?: string;
+    orderDirection?: "asc" | "desc";
+    whereClauses?: {
+      field: string;
+      operator: WhereFilterOp;
+      value: any;
+    }[];
+  },
+  callback?: (data: T[]) => void
+): Unsubscribe => {
+  const collectionRef = collection(db, collectionName);
+
+  const queryConstraints: QueryConstraint[] = [];
+
+  if (options?.whereClauses) {
+    options.whereClauses.forEach((clause) => {
+      queryConstraints.push(where(clause.field, clause.operator, clause.value));
+    });
+  }
+
+  if (options?.orderByField) {
+    queryConstraints.push(
+      orderBy(options.orderByField, options.orderDirection || "desc")
+    );
+  }
+
+  const q = query(collectionRef, ...queryConstraints);
+
+  const unsubscribe = onSnapshot(
+    q,
+    (querySnapshot) => {
+      const docs: T[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as T[];
+
+      if (callback) {
+        callback(docs);
+      }
+    },
+    (error) => {
+      console.error("Error fetching real-time updates:", error);
+    }
+  );
+
+  return unsubscribe;
 };
 
 export const addDocument = async <T extends WithFieldValue<DocumentData>>(

@@ -5,6 +5,7 @@ import { useAuthContext } from "../hook/useAuthContext";
 
 const AppEntry = () => {
   const { authReady, currentUser } = useAuthContext();
+
   const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {

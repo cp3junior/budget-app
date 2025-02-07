@@ -10,7 +10,7 @@ import {
   tabsScreens,
   withHeaderScreens,
 } from "../../lib/constant";
-import { capitalize } from "../../lib/helpers";
+import { capitalizeAndRemoveDash } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
 
 const withTabsOptions: ScreenProps["options"] = {
@@ -70,7 +70,7 @@ const AppLayout = () => {
             name={name}
             options={{
               ...withHeaderOptions,
-              headerTitle: capitalize(name),
+              headerTitle: capitalizeAndRemoveDash(name),
             }}
           />
         ))}

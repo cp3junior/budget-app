@@ -1,7 +1,8 @@
 import { createContext } from "react";
+import { User as UserFirebase } from "@firebase/auth";
 
 interface AuthContextType {
-  currentUser: User | null;
+  currentUser: UserFirebase | null;
   authReady: boolean;
 }
 
