@@ -12,6 +12,7 @@ interface FormListButtonLinkProps {
   hasIcon?: boolean;
   hasExternal?: boolean;
   onPress?: () => void;
+  onLongPress?: () => void;
 }
 
 const FormListButtonLink = ({
@@ -22,6 +23,7 @@ const FormListButtonLink = ({
   hasExternal,
   value,
   onPress,
+  onLongPress,
 }: FormListButtonLinkProps) => {
   const router = useRouter();
 
@@ -33,7 +35,11 @@ const FormListButtonLink = ({
     }
   };
   return (
-    <TouchableOpacity onPress={handleNavigate} style={styles.container}>
+    <TouchableOpacity
+      onPress={handleNavigate}
+      onLongPress={onLongPress}
+      style={styles.container}
+    >
       <Text
         fontWeight="500"
         style={{ ...styles.textStyle, color: color ? color : colors.white }}

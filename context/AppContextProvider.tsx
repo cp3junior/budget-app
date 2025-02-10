@@ -4,7 +4,11 @@ import { Unsubscribe } from "firebase/firestore";
 import { authStateListener } from "../lib/firebaseAuth";
 import { User as UserFirebase } from "@firebase/auth";
 import { fetchSnapshot, updateDocument } from "../lib/firebaseFirestore";
-import { COLLECTION_REQUESTS, COLLECTION_USER } from "../lib/constant";
+import {
+  COLLECTION_LOCATIONS,
+  COLLECTION_REQUESTS,
+  COLLECTION_USER,
+} from "../lib/constant";
 import { Alert } from "react-native";
 
 interface AppContextProviderProps {
@@ -13,6 +17,7 @@ interface AppContextProviderProps {
 
 export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [locations, setLocations] = useState<LocationItem[]>([]);
 
   useEffect(() => {
     let userUnsubscribe: null | Unsubscribe = null;
@@ -64,6 +69,31 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
     return () => {
       if (requestUnsubscribe) requestUnsubscribe();
+    };
+  }, [user]);
+
+  useEffect(() => {
+    let locationUnsubscribe: null | Unsubscribe = null;
+    if (user) {
+      locationUnsubscribe = fetchSnapshot<LocationItem>(
+        COLLECTION_LOCATIONS,
+        {
+          whereClauses: [
+            {
+              field: "sharedAccounId",
+              value: user.sharedAccounId,
+              operator: "==",
+            },
+          ],
+        },
+        (data) => {
+          setLocations(data);
+        }
+      );
+    }
+
+    return () => {
+      if (locationUnsubscribe) locationUnsubscribe();
     };
   }, [user]);
 
@@ -120,6 +150,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     <AppContext.Provider
       value={{
         user,
+        locations,
       }}
     >
       {children}

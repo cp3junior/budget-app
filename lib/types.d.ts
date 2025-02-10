@@ -34,6 +34,17 @@ declare global {
     createdAt: Date | Timestamp;
   };
 
+  type LocationItem = LocationItemFirestore & {
+    id: string;
+  };
+
+  type LocationItemFirestore = {
+    sharedAccounId: string;
+    name: string;
+    createdAt: Date | Timestamp;
+  };
+
+  //** Normal types */
   type StatusRequest = "pending" | "accepted" | "rejected" | "cancelled";
 
   type ToggleItem = {

@@ -1,4 +1,3 @@
-import { Spinner } from "@gluestack-ui/themed";
 import { useNavigation } from "expo-router";
 import { Unsubscribe } from "firebase/firestore";
 import React, { Fragment, useLayoutEffect, useState } from "react";
@@ -18,8 +17,8 @@ import { colors } from "../../lib/theme";
 import FormListContainer from "../common/FormList/FormListContainer";
 import FormListSeparator from "../common/FormList/FormListSeparator";
 import HeaderAddButton from "../common/HeaderAddButton";
-import Text from "../common/Text";
 import SafeContainer from "../common/SafeContainer";
+import Text from "../common/Text";
 
 const SharingAccount = () => {
   const navigation = useNavigation();
@@ -35,16 +34,12 @@ const SharingAccount = () => {
       const isAccessingOtherAccount = user.email !== user.sharedAccounId;
       if (!isAccessingOtherAccount) {
         navigation.setOptions({
-          headerRight: () =>
-            loading ? (
-              <Spinner color={colors.purple} />
-            ) : (
-              <HeaderAddButton
-                onPress={() =>
-                  showPrompt("", "Enter the user's email address.")
-                }
-              />
-            ),
+          headerRight: () => (
+            <HeaderAddButton
+              isLoading={loading}
+              onPress={() => showPrompt("", "Enter the user's email address.")}
+            />
+          ),
         });
       } else {
         navigation.setOptions({
