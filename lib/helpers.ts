@@ -1,5 +1,10 @@
 import { FirebaseError } from "firebase/app";
 
+export const getFileExtension = (filename: string): string | null => {
+  const parts = filename.split(".");
+  return parts.length > 1 ? parts.pop() || null : null;
+};
+
 export const formatCurrency = (
   text: string
 ): [formatedValue: string, parsedValue: number] => {

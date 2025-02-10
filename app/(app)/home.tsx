@@ -1,11 +1,11 @@
-import { Image } from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import ProfileImage from "../../components/common/ProfileImage";
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import withTabBar from "../../hoc/withTabBar";
-import { colors } from "../../lib/theme";
 import { useAppContext } from "../../hook/useAppContext";
+import { colors } from "../../lib/theme";
 
 const Home = () => {
   const router = useRouter();
@@ -30,11 +30,7 @@ const Home = () => {
           onPress={navigateToProfileScreen}
           style={styles.userImageContainer}
         >
-          <Image
-            source={require("../../assets/images/user.png")}
-            alt="user profile"
-            style={styles.userImage}
-          />
+          <ProfileImage style={styles.userImage} />
         </TouchableOpacity>
       </View>
       <View>

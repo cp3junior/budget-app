@@ -1,17 +1,21 @@
-import { Image } from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
+import ProfileImage from "../../components/common/ProfileImage";
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
-import { colors } from "../../lib/theme";
+import { useAppContext } from "../../hook/useAppContext";
 import { logOut } from "../../lib/firebaseAuth";
+import { colors } from "../../lib/theme";
 
 const ProfileScreen = () => {
   const router = useRouter();
+  const { user } = useAppContext();
+
+  if (!user) return null;
 
   const navigateToProfileEditScreen = () => {
     router.navigate("/profile-edit");
@@ -29,16 +33,12 @@ const ProfileScreen = () => {
           style={styles.profileContainerStyle}
         >
           <View style={styles.userImageContainer}>
-            <Image
-              source={require("../../assets/images/user.png")}
-              alt="user profile"
-              style={styles.userImage}
-            />
+            <ProfileImage style={styles.userImage} />
           </View>
           <View style={styles.detContainer}>
             <View style={styles.flex}>
               <Text style={styles.txtName} fontWeight="900">
-                RAILALA Andrew
+                {user.firstName} {user.lastName}
               </Text>
               <Text>Edit your profile</Text>
             </View>

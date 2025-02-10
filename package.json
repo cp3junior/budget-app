@@ -6,7 +6,7 @@
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "rm -rf ios/ && expo run:ios",
-    "prebuild:ios": "expo prebuild --platform ios",
+    "prebuild:ios": "rm -rf ios/ && expo prebuild --platform ios",
     "web": "expo start --web",
     "build:web": "expo export -p web"
   },
@@ -43,7 +43,10 @@
     "sweet-sfsymbols": "^0.6.0",
     "yup": "^1.3.3",
     "yup-password": "^0.3.0",
-    "zeego": "^1.10.0"
+    "zeego": "^1.10.0",
+    "expo-image-picker": "~14.7.1",
+    "expo-file-system": "~16.0.9",
+    "expo-image-manipulator": "~11.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

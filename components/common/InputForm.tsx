@@ -29,6 +29,7 @@ const InputForm = forwardRef<any, InputFormProps>(
               ...(InputProps.style as Object),
               ...styles.textInputStyle,
               ...(isInvalid ? { color: colors.redVivid } : {}),
+              ...(isReadOnly ? { color: colors.grayLight } : {}),
             }}
             keyboardAppearance="dark"
           />

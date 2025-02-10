@@ -19,13 +19,13 @@ const tabItems: TabBarItemProps[] = [
     type: "tab",
   },
   {
-    Icon: DollarIcon,
-    href: "/whishlist",
+    Icon: DollarTransactionIcon,
+    href: "/transactions",
     type: "tab",
   },
   {
-    Icon: DollarTransactionIcon,
-    href: "/transactions",
+    Icon: DollarIcon,
+    href: "/whishlist",
     type: "tab",
   },
   {

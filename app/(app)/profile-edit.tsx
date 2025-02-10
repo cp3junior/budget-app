@@ -1,45 +1,115 @@
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import Text from "../../components/common/Text";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import ModalHeader from "../../components/common/ModalHeader";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "expo-router";
+import { Formik, FormikProps } from "formik";
 import { useRef, useState } from "react";
-import { Image } from "@gluestack-ui/themed";
+import {
+  Alert,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import SFSymbol from "sweet-sfsymbols";
-import { colors } from "../../lib/theme";
-import { Formik, FormikHelpers } from "formik";
+import * as Yup from "yup";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
-import InputForm from "../../components/common/InputForm";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
+import InputForm from "../../components/common/InputForm";
+import ModalHeader from "../../components/common/ModalHeader";
+import ProfileImage from "../../components/common/ProfileImage";
+import Text from "../../components/common/Text";
+import { useAppContext } from "../../hook/useAppContext";
+import { COLLECTION_USER } from "../../lib/constant";
+import { updateDocument } from "../../lib/firebaseFirestore";
+import { getFileExtension } from "../../lib/helpers";
+import { colors } from "../../lib/theme";
+
+const ProfileSchema = Yup.object().shape({
+  firstName: Yup.string().required("Required"),
+  lastName: Yup.string().required("Required"),
+});
 
 const ProfileEditScreen = () => {
+  const { user } = useAppContext();
+  const navigation = useNavigation();
+
   const [isLoading, setIsLoading] = useState(false);
 
-  const emailInput = useRef<TextInput>(null);
+  const lastNameInput = useRef<TextInput>(null);
+  const formikRef = useRef<FormikProps<ProfileForm> | null>(null);
+
+  if (!user) return null;
 
   const initialFormValues: ProfileForm = {
-    firstName: "",
-    lastName: "",
-    email: "test@email.com",
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
   };
 
   const handleSave = () => {
-    console.log("Saving");
+    if (formikRef.current) {
+      formikRef.current?.handleSubmit();
+    }
   };
 
-  const handleSubmit = (
-    values: ProfileForm,
-    actions: FormikHelpers<ProfileForm>
-  ) => {
+  const handleSubmit = async ({ firstName, lastName }: ProfileForm) => {
     setIsLoading(true);
-    setTimeout(() => {
-      handleSave();
-      setIsLoading(false);
-    }, 500);
+    await updateDocument(COLLECTION_USER, user.id, { lastName, firstName });
+    navigation.goBack();
   };
 
-  const handleFocusEmail = () => {
-    emailInput.current?.focus();
+  const handleFocusLastName = () => {
+    lastNameInput.current?.focus();
   };
+
+  const handleImageChange = async () => {
+    try {
+      setIsLoading(true);
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "You need to grant gallery access.");
+        setIsLoading(false);
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0,
+        base64: true,
+      });
+
+      if (!result.canceled) {
+        const file = result.assets[0];
+        const croppedImage = await ImageManipulator.manipulateAsync(
+          file.uri,
+          [{ resize: { width: 150, height: 150 } }],
+          {
+            compress: 0.5,
+            format: ImageManipulator.SaveFormat.JPEG,
+            base64: true,
+          }
+        );
+
+        const extension = getFileExtension(croppedImage.uri);
+        let base64Image = croppedImage.base64 as string;
+
+        if (extension && base64Image) {
+          base64Image = `data:image/${extension};base64,${base64Image}`;
+          await updateDocument(COLLECTION_USER, user.id, {
+            image: base64Image,
+          });
+        }
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <KeyboardAwareScrollView
       style={styles.container}
@@ -49,15 +119,11 @@ const ProfileEditScreen = () => {
       <View>
         <View>
           <TouchableOpacity
-            // onPress={navigateToProfileEditScreen}
             style={styles.profileContainerStyle}
+            onPress={handleImageChange}
           >
             <View style={styles.userImageContainer}>
-              <Image
-                source={require("../../assets/images/user.png")}
-                alt="user profile"
-                style={styles.userImage}
-              />
+              <ProfileImage style={styles.userImage} />
             </View>
             <View style={styles.ediTextCOnt}>
               <SFSymbol size={13} name="pencil" colors={[colors.white]} />
@@ -65,18 +131,30 @@ const ProfileEditScreen = () => {
             </View>
           </TouchableOpacity>
           <View>
-            <Formik initialValues={initialFormValues} onSubmit={handleSubmit}>
-              {({ handleChange, handleBlur, values }) => (
+            <Formik
+              innerRef={formikRef}
+              initialValues={initialFormValues}
+              onSubmit={handleSubmit}
+              validationSchema={ProfileSchema}
+            >
+              {({
+                handleChange,
+                handleBlur,
+                values,
+                errors,
+                touched,
+                handleSubmit,
+              }) => (
                 <FormListContainer style={styles.containerForm}>
                   <InputForm
                     isRequired
-                    isInvalid={false}
+                    isInvalid={Boolean(errors?.firstName && touched?.firstName)}
                     InputProps={{
                       placeholder: "First name",
                       value: values.firstName,
                       onChangeText: handleChange("firstName"),
                       onBlur: handleBlur("firstName"),
-                      onSubmitEditing: handleFocusEmail,
+                      onSubmitEditing: handleFocusLastName,
                       type: "text",
                       blurOnSubmit: false,
                       returnKeyType: "next",
@@ -84,25 +162,23 @@ const ProfileEditScreen = () => {
                   />
                   <FormListSeparator />
                   <InputForm
+                    ref={lastNameInput}
                     isRequired
-                    isInvalid={false}
+                    isInvalid={Boolean(errors?.lastName && touched?.lastName)}
                     InputProps={{
                       placeholder: "Last name",
                       value: values.lastName,
                       onChangeText: handleChange("lastName"),
                       onBlur: handleBlur("lastName"),
-                      onSubmitEditing: handleFocusEmail,
+                      onSubmitEditing: () => handleSubmit(),
                       type: "text",
-                      blurOnSubmit: false,
-                      returnKeyType: "next",
+                      returnKeyType: "send",
                     }}
                   />
                   <FormListSeparator />
                   <InputForm
-                    ref={emailInput}
                     isRequired
                     isReadOnly
-                    isInvalid={false}
                     InputProps={{
                       placeholder: "Email",
                       value: values.email,
@@ -111,7 +187,6 @@ const ProfileEditScreen = () => {
                       type: "text",
                       blurOnSubmit: false,
                       keyboardType: "email-address",
-                      returnKeyType: "next",
                     }}
                   />
                 </FormListContainer>
