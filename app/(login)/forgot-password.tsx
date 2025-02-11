@@ -63,7 +63,6 @@ const ForgotPassword = () => {
           }) => (
             <FormListContainer>
               <InputForm
-                isRequired
                 isInvalid={Boolean(errors?.email && touched?.email)}
                 InputProps={{
                   placeholder: "Enter your email here",

@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TextStyle, TouchableOpacity, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";
 import { colors } from "../../../lib/theme";
 import Text from "../Text";
+import { ReactNode } from "react";
 
 interface FormListButtonLinkProps {
   label: string;
@@ -13,6 +14,8 @@ interface FormListButtonLinkProps {
   hasExternal?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
+  footerNode?: ReactNode;
+  textStyle?: TextStyle;
 }
 
 const FormListButtonLink = ({
@@ -24,6 +27,8 @@ const FormListButtonLink = ({
   value,
   onPress,
   onLongPress,
+  footerNode,
+  textStyle,
 }: FormListButtonLinkProps) => {
   const router = useRouter();
 
@@ -40,43 +45,54 @@ const FormListButtonLink = ({
       onLongPress={onLongPress}
       style={styles.container}
     >
-      <Text
-        fontWeight="500"
-        style={{ ...styles.textStyle, color: color ? color : colors.white }}
-      >
-        {label}
-      </Text>
-      {hasIcon && (
-        <View>
-          <SFSymbol size={12} name="chevron.right" colors={[colors.white]} />
-        </View>
-      )}
-      {hasExternal && (
-        <View style={styles.externatContainer}>
-          <Text style={styles.externalText}>{value}</Text>
-          <SFSymbol
-            weight="thin"
-            size={15}
-            name="arrow.up.forward.square"
-            colors={[colors.grayLight]}
-          />
-        </View>
-      )}
+      <View style={styles.containerTop}>
+        <Text
+          fontWeight="500"
+          style={{
+            ...styles.textStyle,
+            color: color ? color : colors.white,
+            ...textStyle,
+          }}
+        >
+          {label}
+        </Text>
+        {hasIcon && (
+          <View>
+            <SFSymbol size={12} name="chevron.right" colors={[colors.white]} />
+          </View>
+        )}
+        {hasExternal && (
+          <View style={styles.externatContainer}>
+            <Text style={styles.externalText}>{value}</Text>
+            <SFSymbol
+              weight="thin"
+              size={15}
+              name="arrow.up.forward.square"
+              colors={[colors.grayLight]}
+            />
+          </View>
+        )}
+      </View>
+      {footerNode && <View>{footerNode}</View>}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: 44,
+    minHeight: 44,
     flex: 1,
+    paddingRight: 20,
+    paddingVertical: 10,
+    justifyContent: "center",
+  },
+  containerTop: {
     alignItems: "center",
     flexDirection: "row",
-    paddingRight: 20,
   },
   textStyle: {
-    flex: 1,
     paddingRight: 10,
+    flex: 1,
   },
   externatContainer: {
     flexDirection: "row",

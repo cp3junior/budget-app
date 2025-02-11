@@ -1,53 +1,148 @@
-import { StyleSheet, View } from "react-native";
+import { Stack, useRouter } from "expo-router";
 import { Fragment, useState } from "react";
-import Text from "../../components/common/Text";
-import SafeContainer from "../../components/common/SafeContainer";
-import { Stack } from "expo-router";
-import HeaderAddButton from "../../components/common/HeaderAddButton";
-import DialogEdit from "../../components/common/DialogEdit";
-import FormListContainer from "../../components/common/FormList/FormListContainer";
+import { Alert, StyleSheet, View } from "react-native";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
+import FormListContainer from "../../components/common/FormList/FormListContainer";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
-
-const products = [
-  "Diapers",
-  "Biscuit",
-  "Cookie",
-  "Chocolate",
-  "Milk",
-  "Rice",
-  "Sauce",
-  "Sugar",
-  "Salt",
-  "Fish",
-  "Salmon",
-];
+import HeaderAddButton from "../../components/common/HeaderAddButton";
+import SafeContainer from "../../components/common/SafeContainer";
+import Text from "../../components/common/Text";
+import ProductItemListFooter from "../../components/ProductItemListFooter";
+import SearchComponent from "../../components/SearchComponent";
+import { useAppContext } from "../../hook/useAppContext";
+import { COLLECTION_PRODUCTS } from "../../lib/constant";
+import { addDocument, deleteDocument } from "../../lib/firebaseFirestore";
+import { colors } from "../../lib/theme";
 
 const ProductsScreen = () => {
-  const [show, setShow] = useState(false);
+  const router = useRouter();
+  const { products, user } = useAppContext();
 
-  const handleClose = () => {
-    setShow(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [search, setSearch] = useState("");
+
+  if (!user) return null;
+
+  const showPrompt = (defaultValue: string, message: string) => {
+    Alert.prompt(
+      "Product",
+      message,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Save",
+          onPress: (text: string | undefined) => handleAdd(text),
+          style: "default",
+          isPreferred: true,
+        },
+      ],
+      "plain-text",
+      defaultValue
+    );
   };
-  const handleShow = () => {
-    setShow(true);
+
+  const handleShowAddPrompt = () => {
+    showPrompt("", "Enter the product name.");
   };
+
+  const showDeletePrompt = (product: ProductItem) => {
+    Alert.alert("Delete product", "Are you sure you want to delete this?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: () => handleDelete(product),
+        style: "destructive",
+      },
+    ]);
+  };
+
+  const handleDelete = async (product: ProductItem) => {
+    setIsLoading(true);
+    await deleteDocument(COLLECTION_PRODUCTS, product.id);
+    setIsLoading(false);
+  };
+
+  const handleAdd = async (text: string | undefined) => {
+    if (!text) return;
+    if (!text.trim()) return;
+    setIsLoading(true);
+
+    const fountExisting = products.find(
+      (prod) => prod.name.trim() === text.trim()
+    );
+    if (fountExisting) {
+      showPrompt(text, "Product already exists.");
+      setIsLoading(false);
+      return;
+    }
+
+    const data: ProductItemFirestore = {
+      sharedAccounId: user.sharedAccounId,
+      name: text.trim(),
+      prices: [],
+      createdAt: new Date(),
+    };
+    await addDocument<ProductItemFirestore>(COLLECTION_PRODUCTS, data);
+
+    setIsLoading(false);
+  };
+
+  const navigateToDetails = (id: string) => {
+    router.push({
+      pathname: "/product-details",
+      params: { productId: id },
+    });
+  };
+
+  const sortedProducts = products.sort((a, b) =>
+    a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+  );
+
+  const filteredProducts = sortedProducts.filter((prod) =>
+    prod.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <SafeContainer hasHeader>
       <Stack.Screen
         options={{
-          headerRight: () => <HeaderAddButton onPress={handleShow} />,
+          headerRight: () => (
+            <HeaderAddButton
+              isLoading={isLoading}
+              onPress={handleShowAddPrompt}
+            />
+          ),
         }}
       />
-      <DialogEdit title="Edit Product" show={show} onClose={handleClose} />
+      <SearchComponent onSearch={setSearch} searchText={search} />
+      <Text style={styles.textInfo}>
+        Products are the items you buy regularly. This list helps you keep track
+        of the prices quickly.
+      </Text>
+      <Text fontWeight="600" style={styles.textInfoDisc}>
+        Press or hold one product to View/Edit or Delete.
+      </Text>
       <View style={styles.container}>
         <FormListContainer style={styles.containerStyle}>
-          {products.map((loc, index) => {
-            const canShow: boolean = products.length !== index + 1;
+          {filteredProducts.map((prod, index) => {
+            const showSeparator: boolean =
+              filteredProducts.length !== index + 1;
             return (
-              <Fragment key={loc}>
-                <FormListButtonLink label={loc} href="" onPress={handleShow} />
-                {canShow && <FormListSeparator />}
+              <Fragment key={prod.id}>
+                <FormListButtonLink
+                  label={prod.name}
+                  href=""
+                  onPress={() => navigateToDetails(prod.id)}
+                  onLongPress={() => showDeletePrompt(prod)}
+                  footerNode={<ProductItemListFooter product={prod} />}
+                />
+                {showSeparator && <FormListSeparator />}
               </Fragment>
             );
           })}
@@ -64,6 +159,16 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   container: { flex: 1, marginBottom: 60 },
+  textInfo: {
+    color: colors.grayLight,
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  textInfoDisc: {
+    color: colors.grayLight,
+    marginBottom: 20,
+    fontSize: 14,
+  },
 });
 
 export default ProductsScreen;

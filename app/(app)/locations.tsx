@@ -46,8 +46,7 @@ const LocationsScreen = () => {
         },
       ],
       "plain-text",
-      defaultValue,
-      "email-address"
+      defaultValue
     );
   };
 
@@ -60,19 +59,17 @@ const LocationsScreen = () => {
   };
 
   const showDeletePrompt = (location: LocationItem) => {
-    setTimeout(() => {
-      Alert.alert("Delete location", "Are you sure you want to delete this?", [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          onPress: () => handleDelete(location),
-          style: "destructive",
-        },
-      ]);
-    }, 300);
+    Alert.alert("Delete location", "Are you sure you want to delete this?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: () => handleDelete(location),
+        style: "destructive",
+      },
+    ]);
   };
 
   const handleDelete = async (location: LocationItem) => {
@@ -143,13 +140,12 @@ const LocationsScreen = () => {
         experience on the DollarDazzle more efficient and personalized.
       </Text>
       <Text fontWeight="600" style={styles.textInfoDisc}>
-        You can add as many as you want, press or hold one location to Edit or
-        Delete.
+        Press or hold one location to Edit or Delete.
       </Text>
       <View style={styles.container}>
         <FormListContainer style={styles.containerStyle}>
           {sortedLocations.map((loc, index) => {
-            const showSeparator: boolean = locations.length !== index + 1;
+            const showSeparator: boolean = sortedLocations.length !== index + 1;
             return (
               <Fragment key={loc.id}>
                 <FormListButtonLink

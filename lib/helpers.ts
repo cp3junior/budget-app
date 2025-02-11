@@ -75,3 +75,16 @@ export const getErrorMessage = (error: unknown): string => {
   console.error(error);
   return message;
 };
+
+export const generateRandomString = (length = 10): string => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+
+  return result;
+};

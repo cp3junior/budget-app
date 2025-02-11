@@ -33,11 +33,10 @@ const ProfileSchema = Yup.object().shape({
 const ProfileEditScreen = () => {
   const { user } = useAppContext();
   const navigation = useNavigation();
-
-  const [isLoading, setIsLoading] = useState(false);
-
   const lastNameInput = useRef<TextInput>(null);
   const formikRef = useRef<FormikProps<ProfileForm> | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!user) return null;
 
@@ -147,7 +146,6 @@ const ProfileEditScreen = () => {
               }) => (
                 <FormListContainer style={styles.containerForm}>
                   <InputForm
-                    isRequired
                     isInvalid={Boolean(errors?.firstName && touched?.firstName)}
                     InputProps={{
                       placeholder: "First name",
@@ -163,7 +161,6 @@ const ProfileEditScreen = () => {
                   <FormListSeparator />
                   <InputForm
                     ref={lastNameInput}
-                    isRequired
                     isInvalid={Boolean(errors?.lastName && touched?.lastName)}
                     InputProps={{
                       placeholder: "Last name",
@@ -177,7 +174,6 @@ const ProfileEditScreen = () => {
                   />
                   <FormListSeparator />
                   <InputForm
-                    isRequired
                     isReadOnly
                     InputProps={{
                       placeholder: "Email",

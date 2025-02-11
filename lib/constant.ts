@@ -3,6 +3,7 @@ export const TAB_ICON_SIZE = 40;
 export const COLLECTION_USER = "users";
 export const COLLECTION_REQUESTS = "requests";
 export const COLLECTION_LOCATIONS = "locations";
+export const COLLECTION_PRODUCTS = "products";
 
 export const tabsScreens = ["home", "budget", "transactions", "whishlist"];
 export const withHeaderScreens = [
@@ -12,8 +13,13 @@ export const withHeaderScreens = [
   "locations",
   "products",
   "account-sharing",
+  "product-details",
 ];
-export const modalScreens = ["add-transaction", "profile-edit"];
+export const modalScreens = [
+  "add-transaction",
+  "profile-edit",
+  "product-price",
+];
 
 export const categories: DropdownItem[] = [
   {

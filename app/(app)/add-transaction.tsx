@@ -65,7 +65,6 @@ const AddTransactionScreen = () => {
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
-      extraScrollHeight={isLocationFocused ? 150 : 0}
     >
       <ModalHeader onPress={handlePress} title="Add" isLoading={loading} />
       <View>
@@ -121,11 +120,7 @@ const AddTransactionScreen = () => {
           </FormListContent>
         </FormListContainer>
         <FormListContainer style={styles.textInputContainer}>
-          <AutoComplete
-            zIndex={2}
-            placeholder="Locations"
-            onFocus={setIsLocationFocused}
-          />
+          <AutoComplete suggestions={[]} zIndex={3} placeholder="Locations" />
           <FormListSeparator />
           <InputForm InputProps={{ placeholder: "Notes" }} />
         </FormListContainer>

@@ -1,42 +1,38 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { IInputProps } from "@gluestack-ui/input/lib/types";
 import {
   Box,
   Input,
   InputField,
-  InputIcon,
   InputSlot,
   Pressable,
   ScrollView,
   VStack,
-  CloseIcon,
 } from "@gluestack-ui/themed";
+import React, { useEffect, useState } from "react";
+import { Dimensions, StyleSheet, TextInputProps, View } from "react-native";
+import SFSymbol from "sweet-sfsymbols";
 import { colors } from "../../lib/theme";
-
-const suggestionsData = [
-  "very light",
-  "Rabit",
-  "Monkey",
-  "Bubble",
-  "BubbleDown",
-  "Banana",
-  "BubbleUp",
-  "Food",
-  "FoodDown",
-  "FoodUp",
-  "Clothes",
-  "Armor",
-  "ArmorDown",
-];
+import Text from "./Text";
 
 interface AutoCompleteProps {
   zIndex: number;
-  placeholder: string;
-  onFocus: (focus: boolean) => void;
+  suggestions: SuggestionAutocomplete[];
+  InputProps: TextInputProps & IInputProps;
+  isReadOnly?: boolean;
+  isInvalid?: boolean;
 }
 
-const AutoComplete = ({ placeholder, zIndex, onFocus }: AutoCompleteProps) => {
-  const [suggestions, setSuggestions] = useState<string[]>(suggestionsData);
+const { width } = Dimensions.get("window");
+
+const AutoComplete = ({
+  zIndex,
+  suggestions = [],
+  InputProps,
+  isInvalid,
+  isReadOnly,
+}: AutoCompleteProps) => {
+  const [filteredSuggestions, setFilteredSuggestions] =
+    useState<SuggestionAutocomplete[]>(suggestions);
   const [suggestionValue, setSuggestionValue] = useState("");
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [showClear, setShowClear] = useState(false);
@@ -47,10 +43,13 @@ const AutoComplete = ({ placeholder, zIndex, onFocus }: AutoCompleteProps) => {
   }, [suggestionValue]);
 
   const canShowSuggestion = () => {
-    if (suggestionValue.length > 1) {
-      setShowSuggestion(true);
-    } else {
+    if (suggestionValue.length <= 1) {
       setShowSuggestion(false);
+    } else {
+      setShowSuggestion(
+        filteredSuggestions.length > 1 ||
+          filteredSuggestions[0]?.name !== suggestionValue
+      );
     }
   };
 
@@ -62,38 +61,42 @@ const AutoComplete = ({ placeholder, zIndex, onFocus }: AutoCompleteProps) => {
     }
   };
 
-  const updateSuggestions = (text: string, showSuggestionPopUp: boolean) => {
-    const newSuggestions = suggestionsData.filter((suggestion) =>
-      suggestion.toLowerCase().includes(text.toLowerCase())
+  const updateSuggestions = (text: string) => {
+    let newSuggestions = suggestions.filter((suggestion) =>
+      suggestion.name.toLowerCase().includes(text.toLowerCase())
     );
-    setSuggestions(newSuggestions);
+    newSuggestions = newSuggestions.filter(
+      (suggestion) => suggestion.name.toLowerCase() !== text.toLowerCase()
+    );
 
+    setFilteredSuggestions(newSuggestions);
     setSuggestionValue(text);
-    setShowSuggestion(showSuggestionPopUp);
+    if (InputProps.onChangeText) InputProps.onChangeText(text);
   };
 
   const handleChange = (text: string) => {
-    updateSuggestions(text, true);
+    updateSuggestions(text);
   };
 
   const handlePress = (text: string) => {
-    updateSuggestions(text, false);
+    updateSuggestions(text);
   };
 
-  const handleBlur = () => {
+  const handleBlur = (e: any) => {
     setShowSuggestion(false);
     setShowClear(false);
-    onFocus(false);
+    if (InputProps.onBlur) {
+      InputProps.onBlur(e);
+    }
   };
 
   const handleFocus = () => {
     canShowSuggestion();
     canShowClear();
-    onFocus(true);
   };
 
   const handleReset = () => {
-    updateSuggestions("", true);
+    updateSuggestions("");
   };
 
   return (
@@ -101,40 +104,68 @@ const AutoComplete = ({ placeholder, zIndex, onFocus }: AutoCompleteProps) => {
       <VStack position="relative" w="$full">
         <Input size="sm" w="$full" style={styles.inputStyle}>
           <InputField
-            style={styles.inputFieldStyle}
+            blurOnSubmit
+            keyboardAppearance="dark"
+            autoCapitalize="none"
+            {...InputProps}
+            placeholderTextColor={
+              isInvalid ? colors.redVivid : colors.grayLight
+            }
             value={suggestionValue}
             onChangeText={handleChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
-            blurOnSubmit
-            placeholder={placeholder}
-            keyboardAppearance="dark"
+            style={{
+              ...styles.inputFieldStyle,
+              ...(InputProps?.style as Object),
+              ...(isInvalid ? { color: colors.redVivid } : {}),
+              ...(isReadOnly ? { color: colors.grayLight } : {}),
+            }}
           />
           <InputSlot pr="$3">
             <View style={styles.iconContainer}>
               {showClear && (
                 <Pressable onPress={handleReset} mr={5}>
-                  <InputIcon size="md" as={CloseIcon} color="$trueGray400" />
+                  <SFSymbol
+                    weight="thin"
+                    size={17}
+                    name="x.circle.fill"
+                    colors={[colors.grayLight]}
+                  />
                 </Pressable>
               )}
             </View>
           </InputSlot>
         </Input>
 
-        {showSuggestion && suggestions.length > 0 && (
+        {showSuggestion && filteredSuggestions.length > 0 && (
           <Box style={styles.suggestionContainer} zIndex={2}>
             <ScrollView
               maxHeight={205}
               w="100%"
               keyboardShouldPersistTaps="always"
+              horizontal
+              showsHorizontalScrollIndicator={false}
             >
-              {suggestions.map((val, idx) => (
-                <Pressable key={idx} onPress={() => handlePress(val)}>
-                  <Box style={styles.suggestionItemContainer}>
-                    <Text style={styles.suggestionItemText}>{val}</Text>
-                  </Box>
-                </Pressable>
-              ))}
+              {filteredSuggestions.map((sugg, idx) => {
+                const showSeparator: boolean =
+                  filteredSuggestions.length !== idx + 1;
+                return (
+                  <View style={{ flexDirection: "row" }} key={sugg.id}>
+                    <Pressable onPress={() => handlePress(sugg.name)}>
+                      <Box style={styles.suggestionItemContainer}>
+                        <Text
+                          fontWeight="900"
+                          style={styles.suggestionItemText}
+                        >
+                          {sugg.name}
+                        </Text>
+                      </Box>
+                    </Pressable>
+                    {showSeparator && <View style={styles.separator} />}
+                  </View>
+                );
+              })}
             </ScrollView>
           </Box>
         )}
@@ -150,24 +181,30 @@ const styles = StyleSheet.create({
   suggestionContainer: {
     position: "absolute",
     flex: 1,
-    top: 41,
+    top: 33,
     left: -20,
-    right: 0,
-    borderRadius: 3,
+    // right: 0,
+    borderRadius: 6,
     borderStyle: "solid",
     borderWidth: 0.3,
     borderColor: colors.gray,
     backgroundColor: colors.dark,
+    // minWidth: 10,
+    maxWidth: width - 40,
   },
   suggestionItemContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
   },
   suggestionItemText: {
     color: colors.white,
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: "500",
     lineHeight: 19,
+  },
+  separator: {
+    backgroundColor: colors.gray,
+    width: 1,
   },
 });
 

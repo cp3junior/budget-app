@@ -6,11 +6,9 @@ import { colors } from "../../lib/theme";
 
 interface InputFormProps {
   InputProps: TextInputProps & IInputProps;
-  isRequired?: boolean;
   isReadOnly?: boolean;
   isInvalid?: boolean;
   InputSlot?: ReactNode | null;
-  inputHelper?: string;
 }
 
 const InputForm = forwardRef<any, InputFormProps>(
@@ -26,8 +24,8 @@ const InputForm = forwardRef<any, InputFormProps>(
             autoCapitalize="none"
             {...InputProps}
             style={{
-              ...(InputProps.style as Object),
               ...styles.textInputStyle,
+              ...(InputProps?.style as Object),
               ...(isInvalid ? { color: colors.redVivid } : {}),
               ...(isReadOnly ? { color: colors.grayLight } : {}),
             }}

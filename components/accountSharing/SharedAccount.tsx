@@ -68,6 +68,7 @@ const SharedAccount = () => {
               hasIcon={false}
               color={colors.redVivid}
               onPress={showPrompt}
+              textStyle={styles.textStyle}
             />
           </FormListContainer>
         </View>
@@ -104,6 +105,9 @@ const styles = StyleSheet.create({
   },
   footerCOntainer: {
     height: 110,
+  },
+  textStyle: {
+    textAlign: "center",
   },
 });
 

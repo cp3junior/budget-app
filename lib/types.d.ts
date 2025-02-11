@@ -44,6 +44,30 @@ declare global {
     createdAt: Date | Timestamp;
   };
 
+  type ProductItem = ProductItemFirestore & {
+    id: string;
+  };
+
+  type ProductItemFirestore = {
+    sharedAccounId: string;
+    name: string;
+    prices: ProductPrice[];
+    createdAt: Date | Timestamp;
+  };
+
+  type ProductPrice = {
+    id: string;
+    location: string;
+    amount: string;
+    date: Date | Timestamp;
+    createdAt: Date | Timestamp;
+  };
+
+  type SuggestionAutocomplete = {
+    id: string;
+    name: string;
+  };
+
   //** Normal types */
   type StatusRequest = "pending" | "accepted" | "rejected" | "cancelled";
 
@@ -63,6 +87,10 @@ declare global {
     email: string;
   };
 
+  type ProductPriceForm = {
+    amount: string;
+    location: string;
+  };
   type SignInForm = {
     email: string;
     password: string;

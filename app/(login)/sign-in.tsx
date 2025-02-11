@@ -91,7 +91,6 @@ const SignIn = () => {
               }
             >
               <InputForm
-                isRequired
                 isInvalid={Boolean(errors?.email && touched?.email)}
                 InputProps={{
                   placeholder: "Email",
@@ -108,7 +107,6 @@ const SignIn = () => {
               <FormListSeparator />
               <InputForm
                 ref={passwordInput}
-                isRequired
                 isInvalid={Boolean(errors?.password && touched?.password)}
                 InputProps={{
                   placeholder: "Password",

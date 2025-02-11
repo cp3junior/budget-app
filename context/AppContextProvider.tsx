@@ -6,6 +6,7 @@ import { User as UserFirebase } from "@firebase/auth";
 import { fetchSnapshot, updateDocument } from "../lib/firebaseFirestore";
 import {
   COLLECTION_LOCATIONS,
+  COLLECTION_PRODUCTS,
   COLLECTION_REQUESTS,
   COLLECTION_USER,
 } from "../lib/constant";
@@ -18,6 +19,7 @@ interface AppContextProviderProps {
 export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [locations, setLocations] = useState<LocationItem[]>([]);
+  const [products, setProducts] = useState<ProductItem[]>([]);
 
   useEffect(() => {
     let userUnsubscribe: null | Unsubscribe = null;
@@ -97,6 +99,31 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     };
   }, [user]);
 
+  useEffect(() => {
+    let productUnsubscribe: null | Unsubscribe = null;
+    if (user) {
+      productUnsubscribe = fetchSnapshot<ProductItem>(
+        COLLECTION_PRODUCTS,
+        {
+          whereClauses: [
+            {
+              field: "sharedAccounId",
+              value: user.sharedAccounId,
+              operator: "==",
+            },
+          ],
+        },
+        (data) => {
+          setProducts(data);
+        }
+      );
+    }
+
+    return () => {
+      if (productUnsubscribe) productUnsubscribe();
+    };
+  }, [user]);
+
   const showAlert = (request: ShareRequest, userId: string) => {
     const userName = request.senderName;
     const email = request.sender;
@@ -151,6 +178,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
       value={{
         user,
         locations,
+        products,
       }}
     >
       {children}

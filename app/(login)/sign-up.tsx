@@ -112,7 +112,6 @@ const SignUp = () => {
             <>
               <FormListContainer>
                 <InputForm
-                  isRequired
                   isInvalid={Boolean(errors?.firstName && touched?.firstName)}
                   InputProps={{
                     placeholder: "First name",
@@ -127,7 +126,6 @@ const SignUp = () => {
                 />
                 <FormListSeparator />
                 <InputForm
-                  isRequired
                   isInvalid={Boolean(errors?.lastName && touched?.lastName)}
                   InputProps={{
                     placeholder: "Last name",
@@ -143,7 +141,6 @@ const SignUp = () => {
                 <FormListSeparator />
                 <InputForm
                   ref={emailInput}
-                  isRequired
                   isInvalid={Boolean(errors?.email && touched?.email)}
                   InputProps={{
                     placeholder: "Email",
@@ -160,7 +157,6 @@ const SignUp = () => {
                 <FormListSeparator />
                 <InputForm
                   ref={passwordInput}
-                  isRequired
                   isInvalid={Boolean(errors?.password && touched?.password)}
                   InputProps={{
                     placeholder: "Password",
@@ -176,7 +172,6 @@ const SignUp = () => {
                 <FormListSeparator />
                 <InputForm
                   ref={rePasswordInput}
-                  isRequired
                   isInvalid={Boolean(errors?.rePassword && touched?.rePassword)}
                   InputProps={{
                     placeholder: "Re-type Password",
