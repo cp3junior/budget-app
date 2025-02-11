@@ -55,9 +55,28 @@ declare global {
     createdAt: Date | Timestamp;
   };
 
+  type TransactionItem = TransactionItemFirestore & {
+    id: string;
+  };
+
+  type TransactionItemFirestore = {
+    sharedAccounId: string;
+    userId: string;
+    categoryId: number;
+    transactionTypeId: number;
+    locationId: string;
+    transactionDirection: number;
+    amount: string;
+    description?: string;
+    archived: boolean;
+    date: Date | Timestamp;
+    time: Date | Timestamp;
+    createdAt: Date | Timestamp;
+  };
+
   type ProductPrice = {
     id: string;
-    location: string;
+    locationId: string;
     amount: string;
     date: Date | Timestamp;
     createdAt: Date | Timestamp;

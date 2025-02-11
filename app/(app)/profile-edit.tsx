@@ -114,7 +114,12 @@ const ProfileEditScreen = () => {
       style={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <ModalHeader onPress={handleSave} title="Save" isLoading={isLoading} />
+      <ModalHeader
+        isSettingPage
+        onPress={handleSave}
+        title="Save"
+        isLoading={isLoading}
+      />
       <View>
         <View>
           <TouchableOpacity

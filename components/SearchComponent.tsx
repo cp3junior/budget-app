@@ -47,6 +47,7 @@ const SearchComponent = ({ onSearch, searchText }: SearchComponentProps) => {
           onChangeText={(text) => onSearch(text)}
           type="text"
           returnKeyType="search"
+          blurOnSubmit
         />
         <InputSlot>
           <View>

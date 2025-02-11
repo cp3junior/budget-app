@@ -17,7 +17,7 @@ import { colors } from "../../lib/theme";
 
 const ProductDetails = () => {
   const params = useLocalSearchParams();
-  const { user, products } = useAppContext();
+  const { user, products, locations } = useAppContext();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -98,6 +98,11 @@ const ProductDetails = () => {
     setIsLoading(false);
   };
 
+  const getLocationName = (locationId: string): string => {
+    const location = locations.find((loc) => loc.id === locationId);
+    return location?.name ?? "";
+  };
+
   return (
     <SafeContainer
       hasHeader
@@ -153,7 +158,7 @@ const ProductDetails = () => {
                   <View style={styles.containerListLeft}>
                     <View>
                       <Text fontWeight="700" style={styles.containerListText}>
-                        {price.location}
+                        {getLocationName(price.locationId)}
                       </Text>
                     </View>
                     <TouchableOpacity

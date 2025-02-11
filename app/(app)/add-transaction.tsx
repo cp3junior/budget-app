@@ -1,9 +1,8 @@
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useNavigation } from "expo-router";
+import React, { useRef, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AmountInput from "../../components/AmountInput";
 import AutoComplete from "../../components/common/AutoComplete";
@@ -14,51 +13,114 @@ import FormListSeparator from "../../components/common/FormList/FormListSeparato
 import InputForm from "../../components/common/InputForm";
 import ModalHeader from "../../components/common/ModalHeader";
 import Text from "../../components/common/Text";
-import { categories } from "../../lib/constant";
-
-const directions = ["Expense", "Income"];
-
-const types: DropdownItem[] = [
-  {
-    id: 1,
-    label: "Credit",
-    icon: "creditcard.and.123",
-  },
-  {
-    id: 2,
-    label: "Debit",
-    icon: "creditcard.fill",
-  },
-];
+import { useAppContext } from "../../hook/useAppContext";
+import {
+  categories,
+  COLLECTION_LOCATIONS,
+  COLLECTION_TRANSACTIONS,
+  transactionDirections,
+  transactionTypes,
+} from "../../lib/constant";
+import { addDocument } from "../../lib/firebaseFirestore";
 
 const AddTransactionScreen = () => {
+  const { user, locations } = useAppContext();
+  const navigate = useNavigation();
+  const notesInput = useRef<TextInput>(null);
+  const locationInput = useRef<TextInput>(null);
+  const amountInput = useRef<TextInput>(null);
+
   const [loading, setLoading] = useState(false);
-  const [index, setIndex] = useState(0);
+  const [transactionDirection, setTransactionDirection] = useState(0);
+  const [amount, setAmount] = useState("");
+  const [invalidAmount, setInvalidAmount] = useState(false);
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [invalidLocation, setInvalidLocation] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
   const [category, setCategory] = useState<DropdownItem>(
     categories[0]?.items?.[0] as DropdownItem
   );
-  const [type, setType] = useState<DropdownItem>(types[0]);
-  const [date, setDate] = useState(new Date());
-  const [isLocationFocused, setIsLocationFocused] = useState(false);
+  const [transactionType, setTransactionType] = useState<DropdownItem>(
+    transactionTypes[0]
+  );
 
-  const onChange = (_: DateTimePickerEvent, selectedDate: Date | undefined) => {
-    if (selectedDate) setDate(selectedDate);
+  if (!user) return null;
+
+  const onChange = (selectedDate: Date | undefined, name: string) => {
+    if (selectedDate) {
+      if (name === "date") setDate(selectedDate);
+      if (name === "time") setTime(selectedDate);
+    }
   };
 
-  const handlePress = () => {
+  const handleSubmit = async () => {
+    if (!amount) {
+      setInvalidAmount(true);
+      amountInput.current?.focus();
+      return;
+    }
+
+    if (!location) {
+      setInvalidLocation(true);
+      locationInput.current?.focus();
+      return;
+    }
+
+    setInvalidLocation(false);
+    setInvalidAmount(false);
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      console.log("saved");
-    }, 2000);
+    const newLocationExists = locations.find(
+      (loc) => loc.name.trim().toLowerCase() === location.trim().toLowerCase()
+    );
+
+    let locationId = "";
+
+    if (!newLocationExists) {
+      const dataLocation: LocationItemFirestore = {
+        sharedAccounId: user.sharedAccounId,
+        name: location.trim(),
+        createdAt: new Date(),
+      };
+      locationId = await addDocument<LocationItemFirestore>(
+        COLLECTION_LOCATIONS,
+        dataLocation
+      );
+    } else {
+      locationId = newLocationExists.id;
+    }
+
+    const data: TransactionItemFirestore = {
+      userId: user.id,
+      sharedAccounId: user.sharedAccounId,
+      amount,
+      categoryId: category.id,
+      transactionTypeId: transactionType.id,
+      transactionDirection,
+      description,
+      locationId,
+      date,
+      time,
+      createdAt: new Date(),
+      archived: false,
+    };
+
+    await addDocument<TransactionItemFirestore>(COLLECTION_TRANSACTIONS, data);
+
+    navigate.goBack();
   };
 
   const handleCategoryChange = (item: DropdownItem) => {
     setCategory(item);
   };
   const handleTypeChange = (item: DropdownItem) => {
-    setType(item);
+    setTransactionType(item);
+  };
+
+  const handleFocusLocation = () => {
+    notesInput.current?.focus();
   };
 
   return (
@@ -66,17 +128,23 @@ const AddTransactionScreen = () => {
       style={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <ModalHeader onPress={handlePress} title="Add" isLoading={loading} />
+      <ModalHeader onPress={handleSubmit} title="Add" isLoading={loading} />
       <View>
         <SegmentedControl
           appearance="dark"
-          values={directions}
-          selectedIndex={index}
+          values={transactionDirections}
+          selectedIndex={transactionDirection}
           onChange={(event) => {
-            setIndex(event.nativeEvent.selectedSegmentIndex);
+            setTransactionDirection(event.nativeEvent.selectedSegmentIndex);
           }}
         />
-        <AmountInput index={index} />
+        <AmountInput
+          ref={amountInput}
+          value={amount}
+          onChange={setAmount}
+          index={transactionDirection}
+          isInvalid={invalidAmount}
+        />
         <FormListContainer style={styles.textInputContainer}>
           <FormListContent>
             <DropDownMenu
@@ -90,11 +158,11 @@ const AddTransactionScreen = () => {
           <FormListSeparator />
           <FormListContent>
             <DropDownMenu
-              label="Type"
+              label="Transaction type"
               id="type"
-              value={type}
+              value={transactionType}
               onChange={handleTypeChange}
-              data={types}
+              data={transactionTypes}
             />
           </FormListContent>
           <FormListSeparator />
@@ -106,23 +174,46 @@ const AddTransactionScreen = () => {
               <DateTimePicker
                 value={date}
                 mode="date"
-                onChange={onChange}
+                onChange={(_, date) => onChange(date, "date")}
                 themeVariant="dark"
               />
               <DateTimePicker
-                value={date}
+                value={time}
                 mode="time"
                 is24Hour={true}
-                onChange={onChange}
+                onChange={(_, date) => onChange(date, "time")}
                 themeVariant="dark"
               />
             </View>
           </FormListContent>
         </FormListContainer>
         <FormListContainer style={styles.textInputContainer}>
-          <AutoComplete suggestions={[]} zIndex={3} placeholder="Locations" />
+          <AutoComplete
+            ref={locationInput}
+            suggestions={locations}
+            zIndex={3}
+            isInvalid={invalidLocation}
+            InputProps={{
+              placeholder: "Location",
+              value: location,
+              onChangeText: setLocation,
+              onSubmitEditing: handleFocusLocation,
+              type: "text",
+              returnKeyType: "next",
+            }}
+          />
           <FormListSeparator />
-          <InputForm InputProps={{ placeholder: "Notes" }} />
+          <InputForm
+            ref={notesInput}
+            InputProps={{
+              placeholder: "Notes",
+              value: description,
+              onChangeText: setDescription,
+              onSubmitEditing: () => handleSubmit(),
+              type: "text",
+              returnKeyType: "send",
+            }}
+          />
         </FormListContainer>
       </View>
     </KeyboardAwareScrollView>

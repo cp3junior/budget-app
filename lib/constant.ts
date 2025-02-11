@@ -4,6 +4,7 @@ export const COLLECTION_USER = "users";
 export const COLLECTION_REQUESTS = "requests";
 export const COLLECTION_LOCATIONS = "locations";
 export const COLLECTION_PRODUCTS = "products";
+export const COLLECTION_TRANSACTIONS = "transactions";
 
 export const tabsScreens = ["home", "budget", "transactions", "whishlist"];
 export const withHeaderScreens = [
@@ -21,414 +22,429 @@ export const modalScreens = [
   "product-price",
 ];
 
+export const transactionDirections = ["Expense", "Income"];
+
+export const transactionTypes: DropdownItem[] = [
+  {
+    id: 1,
+    label: "Credit",
+    icon: "creditcard.and.123",
+  },
+  {
+    id: 2,
+    label: "Debit",
+    icon: "creditcard.fill",
+  },
+];
+
 export const categories: DropdownItem[] = [
   {
-    id: 0,
+    id: 1,
     label: "Income",
     icon: "creditcard.fill",
     items: [
       {
-        id: 1,
+        id: 11,
         label: "Salary",
         icon: "creditcard",
       },
       {
-        id: 2,
+        id: 12,
         label: "Side Hustle",
         icon: "dollarsign.circle",
       },
       {
-        id: 3,
+        id: 13,
         label: "Investments",
         icon: "dollarsign.arrow.circlepath",
       },
       {
-        id: 4,
+        id: 14,
         label: "Bonuses",
         icon: "dollarsign",
       },
       {
-        id: 5,
+        id: 15,
         label: "Tips",
         icon: "dollarsign.square",
       },
       {
-        id: 6,
+        id: 16,
         label: "Gifts",
         icon: "giftcard",
       },
     ],
   },
   {
-    id: 1,
+    id: 2,
     label: "Food & Drinks",
     icon: "takeoutbag.and.cup.and.straw.fill",
     items: [
       {
-        id: 1,
+        id: 21,
         label: "Food",
         icon: "fork.knife",
       },
       {
-        id: 2,
+        id: 22,
         label: "Alcohol",
         icon: "wineglass",
       },
       {
-        id: 3,
+        id: 23,
         label: "Drinks",
         icon: "waterbottle",
       },
       {
-        id: 4,
+        id: 24,
         label: "Coffee",
         icon: "cup.and.saucer",
       },
       {
-        id: 5,
+        id: 25,
         label: "Groceries",
         icon: "cart",
       },
       {
-        id: 6,
+        id: 26,
         label: "Restaurant",
         icon: "menucard",
       },
       {
-        id: 7,
+        id: 27,
         label: "Takeout",
         icon: "takeoutbag.and.cup.and.straw",
       },
     ],
   },
   {
-    id: 2,
+    id: 3,
     label: "Entertainment",
     icon: "gamecontroller.fill",
     items: [
       {
-        id: 1,
+        id: 31,
         label: "Games",
         icon: "gamecontroller",
       },
       {
-        id: 2,
+        id: 32,
         label: "Hobby",
         icon: "camera",
       },
       {
-        id: 3,
+        id: 33,
         label: "Vacation",
         icon: "beach.umbrella",
       },
       {
-        id: 4,
+        id: 34,
         label: "Cinema",
         icon: "popcorn",
       },
       {
-        id: 5,
+        id: 35,
         label: "Music",
         icon: "music.note.list",
       },
       {
-        id: 6,
+        id: 36,
         label: "Sports",
         icon: "figure.run",
       },
       {
-        id: 7,
+        id: 37,
         label: "Books",
         icon: "books.vertical",
       },
       {
-        id: 8,
+        id: 38,
         label: "Gym",
         icon: "dumbbell",
       },
     ],
   },
   {
-    id: 3,
+    id: 4,
     label: "Utilities",
     icon: "bolt.fill",
     items: [
       {
-        id: 1,
+        id: 41,
         label: "Electricity",
         icon: "bolt",
       },
       {
-        id: 2,
+        id: 42,
         label: "Internet",
         icon: "wifi",
       },
       {
-        id: 3,
+        id: 43,
         label: "Cable TV",
         icon: "tv",
       },
       {
-        id: 4,
+        id: 44,
         label: "Water",
         icon: "drop",
       },
       {
-        id: 5,
+        id: 45,
         label: "Telephone",
         icon: "phone",
       },
       {
-        id: 6,
+        id: 46,
         label: "Heating",
         icon: "thermometer.medium",
       },
       {
-        id: 7,
+        id: 47,
         label: "Garbage",
         icon: "trash",
       },
       {
-        id: 8,
+        id: 48,
         label: "Security",
         icon: "shield",
       },
       {
-        id: 9,
+        id: 49,
         label: "Laundry",
         icon: "washer",
       },
       {
-        id: 10,
+        id: 410,
         label: "Cooking Gas",
         icon: "cooktop",
       },
     ],
   },
   {
-    id: 4,
+    id: 5,
     label: "Lifestyle",
     icon: "figure.2.and.child.holdinghands",
     items: [
       {
-        id: 1,
+        id: 51,
         label: "Charity",
         icon: "gift",
       },
       {
-        id: 2,
+        id: 52,
         label: "Child Care",
         icon: "figure.and.child.holdinghands",
       },
       {
-        id: 3,
+        id: 53,
         label: "Doctor",
         icon: "stethoscope",
       },
       {
-        id: 4,
+        id: 54,
         label: "Education",
         icon: "graduationcap",
       },
       {
-        id: 5,
+        id: 55,
         label: "Pet",
         icon: "pawprint",
       },
       {
-        id: 6,
+        id: 56,
         label: "Shopping",
         icon: "handbag",
       },
       {
-        id: 7,
+        id: 57,
         label: "Medication",
         icon: "pills",
       },
       {
-        id: 8,
+        id: 58,
         label: "Fashion",
         icon: "tshirt",
       },
       {
-        id: 9,
+        id: 59,
         label: "Cosmetics",
         icon: "theatermask.and.paintbrush",
       },
     ],
   },
   {
-    id: 5,
+    id: 6,
     label: "Housing",
     icon: "house.fill",
     items: [
       {
-        id: 1,
+        id: 61,
         label: "Rent",
         icon: "house",
       },
       {
-        id: 2,
+        id: 62,
         label: "Home Supplies",
         icon: "lightbulb",
       },
       {
-        id: 3,
+        id: 63,
         label: "Home Maintenance",
         icon: "wrench.and.screwdriver",
       },
     ],
   },
   {
-    id: 6,
+    id: 7,
     label: "Transportation",
     icon: "car.fill",
     items: [
       {
-        id: 1,
+        id: 71,
         label: "Flight",
         icon: "airplane.departure",
       },
       {
-        id: 2,
+        id: 72,
         label: "Public Transport",
         icon: "bus",
       },
       {
-        id: 3,
+        id: 73,
         label: "Gas",
         icon: "fuelpump",
       },
       {
-        id: 4,
+        id: 74,
         label: "Parking",
         icon: "p.circle",
       },
       {
-        id: 5,
+        id: 75,
         label: "Maintenance",
         icon: "bolt.car",
       },
       {
-        id: 6,
+        id: 76,
         label: "Taxi",
         icon: "car.2",
       },
       {
-        id: 7,
+        id: 77,
         label: "Tolls",
         icon: "road.lanes",
       },
     ],
   },
   {
-    id: 7,
+    id: 8,
     label: "Banking",
     icon: "building.columns.fill",
     items: [
       {
-        id: 1,
+        id: 81,
         label: "Credit Card",
         icon: "creditcard.and.123",
       },
       {
-        id: 2,
+        id: 82,
         label: "Bank Fees",
         icon: "banknote",
       },
       {
-        id: 3,
+        id: 83,
         label: "Loan",
         icon: "building.columns.circle",
       },
       {
-        id: 4,
+        id: 84,
         label: "Car Loan",
         icon: "car.circle",
       },
       {
-        id: 5,
+        id: 85,
         label: "House Loan",
         icon: "house.circle",
       },
       {
-        id: 6,
+        id: 86,
         label: "Student Loan",
         icon: "graduationcap.circle",
       },
     ],
   },
   {
-    id: 8,
+    id: 9,
     label: "Insurance",
     icon: "shield.lefthalf.filled",
     items: [
       {
-        id: 1,
+        id: 91,
         label: "Car Insurance",
         icon: "car.side.lock",
       },
       {
-        id: 2,
+        id: 92,
         label: "Home Insurance",
         icon: "house.and.flag",
       },
       {
-        id: 3,
+        id: 93,
         label: "Health Insurance",
         icon: "cross.case",
       },
       {
-        id: 4,
+        id: 94,
         label: "Life Insurance",
         icon: "heart.text.square",
       },
       {
-        id: 5,
+        id: 95,
         label: "Other Insurance",
         icon: "staroflife.shield",
       },
     ],
   },
   {
-    id: 9,
+    id: 10,
     label: "Taxes",
     icon: "umbrella.percent.fill",
     items: [
       {
-        id: 1,
+        id: 101,
         label: "Property Tax",
         icon: "house.lodge",
       },
       {
-        id: 2,
+        id: 102,
         label: "Income Tax",
         icon: "australiandollarsign.square",
       },
       {
-        id: 3,
+        id: 103,
         label: "Vehicule Tax",
         icon: "gauge.open.with.lines.needle.67percent.and.arrowtriangle.and.car",
       },
       {
-        id: 4,
+        id: 104,
         label: "Other Tax",
         icon: "percent",
       },
     ],
   },
   {
-    id: 10,
+    id: 11,
     label: "Others",
     icon: "tray.2.fill",
     items: [
       {
-        id: 1,
+        id: 111,
         label: "Unknown",
         icon: "questionmark.circle",
       },
       {
-        id: 2,
+        id: 112,
         label: "Miscellanous",
         icon: "exclamationmark.circle",
       },

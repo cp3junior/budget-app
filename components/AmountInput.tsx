@@ -1,64 +1,51 @@
-import {
-  AlertCircleIcon,
-  FormControl,
-  FormControlError,
-  FormControlErrorIcon,
-  FormControlErrorText,
-  Input,
-  InputField,
-} from "@gluestack-ui/themed";
+import { FormControl, Input, InputField } from "@gluestack-ui/themed";
 import { forwardRef, useState } from "react";
 import { StyleSheet } from "react-native";
-import { colors } from "../lib/theme";
 import { NumericFormat } from "react-number-format";
+import { colors } from "../lib/theme";
 
 interface AmountInputProps {
   isInvalid?: boolean;
+  onChange: (text: string) => void;
+  value: string;
   index: number;
 }
 
 const AmountInput = forwardRef<any, AmountInputProps>(
-  ({ isInvalid, index }, ref) => {
-    const [text, setText] = useState("");
-
-    const handleTextChange = (inputText: string) => {
-      setText(inputText);
-    };
+  ({ isInvalid, index, value, onChange }, ref) => {
+    const [internalValue, setInternalValue] = useState(value);
 
     return (
-      <FormControl
-        size="md"
-        isInvalid={isInvalid}
-        isRequired
-        style={styles.container}
-      >
+      <FormControl size="md" isRequired style={styles.container}>
         <Input w="$full" style={styles.inputStyle}>
           <NumericFormat
-            value={text}
+            value={internalValue}
             displayType={"text"}
             thousandSeparator={true}
             prefix={"$"}
+            onValueChange={(values, sourceInfo) => {
+              onChange(values.value);
+            }}
+            allowNegative={false}
             renderText={(formattedValue) => (
               <InputField
                 ref={ref}
-                onChangeText={handleTextChange}
+                onChangeText={setInternalValue}
                 value={formattedValue}
                 placeholder="$0.00"
                 style={{
                   ...styles.textInputStyle,
                   color: index === 0 ? colors.red : colors.green,
                 }}
+                placeholderTextColor={
+                  isInvalid ? colors.redVivid : colors.grayLight
+                }
                 keyboardType="numeric"
                 keyboardAppearance="dark"
               />
             )}
           />
         </Input>
-
-        <FormControlError>
-          <FormControlErrorIcon as={AlertCircleIcon} />
-          <FormControlErrorText>The amount is required</FormControlErrorText>
-        </FormControlError>
       </FormControl>
     );
   }

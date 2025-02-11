@@ -7,17 +7,33 @@ interface ModalHeaderProps {
   onPress: () => void;
   isLoading: boolean;
   title: string;
+  isSettingPage?: boolean;
 }
 
-const ModalHeader = ({ onPress, isLoading, title }: ModalHeaderProps) => {
+const ModalHeader = ({
+  onPress,
+  isLoading,
+  title,
+  isSettingPage,
+}: ModalHeaderProps) => {
   return (
     <View style={styles.headerContainer}>
-      <ButtonLink style={styles.btnStyle} href="../" title="Cancel" />
+      <ButtonLink
+        style={{
+          ...styles.btnStyle,
+          ...{ color: isSettingPage ? colors.purple : colors.blue },
+        }}
+        href="../"
+        title="Cancel"
+      />
       {isLoading ? (
-        <Spinner color={colors.blue} />
+        <Spinner color={isSettingPage ? colors.purple : colors.blue} />
       ) : (
         <ButtonLink
-          style={styles.btnStyle}
+          style={{
+            ...styles.btnStyle,
+            ...{ color: isSettingPage ? colors.purple : colors.blue },
+          }}
           href=""
           onPress={onPress}
           title={title}
@@ -33,7 +49,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 15,
   },
-  btnStyle: { fontSize: 18 },
+  btnStyle: { fontSize: 18, color: "red" },
 });
 
 export default ModalHeader;

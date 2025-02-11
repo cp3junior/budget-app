@@ -13,8 +13,8 @@ import InputForm from "../../components/common/InputForm";
 import ModalHeader from "../../components/common/ModalHeader";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
-import { COLLECTION_PRODUCTS } from "../../lib/constant";
-import { updateDocument } from "../../lib/firebaseFirestore";
+import { COLLECTION_LOCATIONS, COLLECTION_PRODUCTS } from "../../lib/constant";
+import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
 import { generateRandomString } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
 import * as Yup from "yup";
@@ -59,10 +59,31 @@ const ProductPrice = () => {
 
   const handleSubmit = async ({ amount, location }: ProductPriceForm) => {
     setIsLoading(true);
+
+    const newLocationExists = locations.find(
+      (loc) => loc.name.trim().toLowerCase() === location.trim().toLowerCase()
+    );
+
+    let locationId = "";
+
+    if (!newLocationExists) {
+      const dataLocation: LocationItemFirestore = {
+        sharedAccounId: user.sharedAccounId,
+        name: location.trim(),
+        createdAt: new Date(),
+      };
+      locationId = await addDocument<LocationItemFirestore>(
+        COLLECTION_LOCATIONS,
+        dataLocation
+      );
+    } else {
+      locationId = newLocationExists.id;
+    }
+
     const productPriceTest: ProductPrice = {
       id: generateRandomString(),
       amount,
-      location,
+      locationId,
       createdAt: date,
       date: new Date(),
     };
@@ -79,7 +100,12 @@ const ProductPrice = () => {
       style={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <ModalHeader onPress={handleSave} title="Add" isLoading={isLoading} />
+      <ModalHeader
+        isSettingPage
+        onPress={handleSave}
+        title="Add"
+        isLoading={isLoading}
+      />
       <View style={styles.containerMain}>
         <Text style={styles.textStyle}>
           Enter the product price and location to keep track of your spending.
@@ -108,7 +134,7 @@ const ProductPrice = () => {
               <AutoComplete
                 isInvalid={Boolean(errors?.location && touched?.location)}
                 suggestions={locations}
-                zIndex={2}
+                zIndex={3}
                 InputProps={{
                   placeholder: "Location",
                   value: values.location,
