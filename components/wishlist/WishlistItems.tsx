@@ -1,7 +1,11 @@
 import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
+import { useRouter } from "expo-router";
 import React, { Fragment } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";
+import { useAppContext } from "../../hook/useAppContext";
+import { COLLECTION_WALLETS, COLLECTION_WISHLISTS } from "../../lib/constant";
+import { deleteDocument, updateDocument } from "../../lib/firebaseFirestore";
 import {
   calculateRemaining,
   calculateRemainingPercent,
@@ -14,10 +18,6 @@ import { colors } from "../../lib/theme";
 import FormListContainer from "../common/FormList/FormListContainer";
 import FormListSeparator from "../common/FormList/FormListSeparator";
 import Text from "../common/Text";
-import { useRouter } from "expo-router";
-import { deleteDocument, updateDocument } from "../../lib/firebaseFirestore";
-import { COLLECTION_WALLETS, COLLECTION_WISHLISTS } from "../../lib/constant";
-import { useAppContext } from "../../hook/useAppContext";
 
 interface WishlistItemsProps {
   wishlists: WishListItem[];

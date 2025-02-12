@@ -1,4 +1,4 @@
-import { useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Formik, FormikProps } from "formik";
 import React, { useRef, useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
@@ -12,8 +12,13 @@ import FormListSeparator from "../../components/common/FormList/FormListSeparato
 import InputForm from "../../components/common/InputForm";
 import ModalHeader from "../../components/common/ModalHeader";
 import { useAppContext } from "../../hook/useAppContext";
-import { categories, COLLECTION_WISHLISTS } from "../../lib/constant";
-import { addDocument } from "../../lib/firebaseFirestore";
+import {
+  categories,
+  COLLECTION_WALLETS,
+  COLLECTION_WISHLISTS,
+} from "../../lib/constant";
+import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
+import { convertToFloat, getCategoryByCategoryId } from "../../lib/helpers";
 
 const WishlistSchema = Yup.object().shape({
   name: Yup.string().required("Required"),
@@ -21,26 +26,36 @@ const WishlistSchema = Yup.object().shape({
 });
 
 const WishlistEdit = () => {
-  const { user } = useAppContext();
+  const { user, wishlists, wallet } = useAppContext();
   const navigate = useNavigation();
+  const params = useLocalSearchParams();
+
+  const wishlistId = (params.wishlistId as string) || "";
+  const currentWishlist = wishlists.find((wish) => wish.id === wishlistId);
+
+  const initialFormValues: WhishlistForm = {
+    name: currentWishlist?.name || "",
+    description: currentWishlist?.description || "",
+  };
+
+  let initialCategory = categories[0]?.items?.[0] as DropdownItem;
+
+  if (currentWishlist) {
+    const category = getCategoryByCategoryId(currentWishlist.categoryId);
+    if (category) initialCategory = category;
+  }
 
   const amountInput = useRef<TextInput>(null);
   const descriptionInput = useRef<TextInput>(null);
   const formikRef = useRef<FormikProps<WhishlistForm> | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(currentWishlist?.fullAmount || "");
   const [invalidAmount, setInvalidAmount] = useState(false);
-  const [category, setCategory] = useState<DropdownItem>(
-    categories[0]?.items?.[0] as DropdownItem
-  );
+  const [category, setCategory] = useState<DropdownItem>(initialCategory);
 
   if (!user) return null;
-
-  const initialFormValues: WhishlistForm = {
-    name: "",
-    description: "",
-  };
+  if (!wallet) return null;
 
   const handleCategoryChange = (item: DropdownItem) => {
     setCategory(item);
@@ -56,13 +71,19 @@ const WishlistEdit = () => {
     }
   };
 
-  const handleSubmit = async ({ description, name }: WhishlistForm) => {
+  const handleSubmit = (values: WhishlistForm) => {
     if (!amount) {
       setInvalidAmount(true);
       amountInput.current?.focus();
       return;
     }
     setInvalidAmount(false);
+
+    if (wishlistId) editWishlist(values);
+    else addWishlist(values);
+  };
+
+  const addWishlist = async ({ description, name }: WhishlistForm) => {
     setIsLoading(true);
 
     const data: WishListItemFirestore = {
@@ -82,12 +103,51 @@ const WishlistEdit = () => {
     navigate.goBack();
   };
 
+  const editWishlist = async ({ description, name }: WhishlistForm) => {
+    if (!currentWishlist) return;
+    setIsLoading(true);
+
+    let completed = false;
+
+    const intOldAmount = convertToFloat(currentWishlist.fullAmount);
+    const intPaidAmount = convertToFloat(currentWishlist.amount);
+    const intNewAmount = convertToFloat(amount);
+
+    if (intNewAmount < intOldAmount) {
+      if (intNewAmount < intPaidAmount) {
+        completed = true;
+        const difference = intPaidAmount - intNewAmount;
+        const walletAmount = convertToFloat(wallet.amount);
+        const newAmount = `${walletAmount + difference}`;
+        await updateDocument(COLLECTION_WALLETS, wallet.id, {
+          amount: newAmount,
+        });
+      }
+    }
+
+    const dataUpdate = {
+      name,
+      description,
+      fullAmount: amount,
+      categoryId: category.id,
+      completed,
+    };
+
+    await updateDocument(COLLECTION_WISHLISTS, currentWishlist.id, dataUpdate);
+
+    navigate.goBack();
+  };
+
   return (
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <ModalHeader onPress={handleSave} title="Add" isLoading={isLoading} />
+      <ModalHeader
+        onPress={handleSave}
+        title={wishlistId ? "Save" : "Add"}
+        isLoading={isLoading}
+      />
       <AmountInput
         ref={amountInput}
         value={amount}

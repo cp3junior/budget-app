@@ -1,9 +1,7 @@
-import { ReactNode, useEffect, useState } from "react";
-import { AppContext } from "./AppContext";
-import { Unsubscribe } from "firebase/firestore";
-import { authStateListener } from "../lib/firebaseAuth";
 import { User as UserFirebase } from "@firebase/auth";
-import { fetchSnapshot, updateDocument } from "../lib/firebaseFirestore";
+import { Unsubscribe } from "firebase/firestore";
+import { ReactNode, useEffect, useState } from "react";
+import { Alert } from "react-native";
 import {
   COLLECTION_LOCATIONS,
   COLLECTION_PRODUCTS,
@@ -12,7 +10,9 @@ import {
   COLLECTION_WALLETS,
   COLLECTION_WISHLISTS,
 } from "../lib/constant";
-import { Alert } from "react-native";
+import { authStateListener } from "../lib/firebaseAuth";
+import { fetchSnapshot, updateDocument } from "../lib/firebaseFirestore";
+import { AppContext } from "./AppContext";
 
 interface AppContextProviderProps {
   children: ReactNode;

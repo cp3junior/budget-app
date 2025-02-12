@@ -1,11 +1,11 @@
-import { StyleSheet, View } from "react-native";
-import React from "react";
-import Text from "../../components/common/Text";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useAppContext } from "../../hook/useAppContext";
-import SafeContainer from "../../components/common/SafeContainer";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
+import SafeContainer from "../../components/common/SafeContainer";
+import Text from "../../components/common/Text";
+import { useAppContext } from "../../hook/useAppContext";
 import { colors } from "../../lib/theme";
 
 const WishlistDetails = () => {
@@ -20,11 +20,17 @@ const WishlistDetails = () => {
   if (!currentWishlist) return null;
 
   const navigateToAddTransaction = () => {
-    router.push("/add-transaction");
+    router.push({
+      pathname: "/add-transaction",
+      params: { wishlistId },
+    });
   };
 
   const handleEditWishlist = () => {
-    router.push("/wishlist-edit");
+    router.push({
+      pathname: "/wishlist-edit",
+      params: { wishlistId },
+    });
   };
 
   return (
