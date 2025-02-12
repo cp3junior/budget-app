@@ -5,8 +5,9 @@ export const COLLECTION_REQUESTS = "requests";
 export const COLLECTION_LOCATIONS = "locations";
 export const COLLECTION_PRODUCTS = "products";
 export const COLLECTION_TRANSACTIONS = "transactions";
+export const COLLECTION_WISHLISTS = "wishlists";
 
-export const tabsScreens = ["home", "budget", "transactions", "whishlist"];
+export const tabsScreens = ["home", "budget", "transactions", "wishlist"];
 export const withHeaderScreens = [
   "profile",
   "about",
@@ -20,6 +21,7 @@ export const modalScreens = [
   "add-transaction",
   "profile-edit",
   "product-price",
+  "wishlist-edit",
 ];
 
 export const transactionDirections = ["Expense", "Income"];

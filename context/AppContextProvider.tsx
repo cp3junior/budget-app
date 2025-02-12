@@ -9,6 +9,7 @@ import {
   COLLECTION_PRODUCTS,
   COLLECTION_REQUESTS,
   COLLECTION_USER,
+  COLLECTION_WISHLISTS,
 } from "../lib/constant";
 import { Alert } from "react-native";
 
@@ -20,6 +21,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [products, setProducts] = useState<ProductItem[]>([]);
+  const [wishlists, setWishlists] = useState<WishListItem[]>([]);
 
   useEffect(() => {
     let userUnsubscribe: null | Unsubscribe = null;
@@ -124,6 +126,31 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     };
   }, [user]);
 
+  useEffect(() => {
+    let wishlistUnsubscribe: null | Unsubscribe = null;
+    if (user) {
+      wishlistUnsubscribe = fetchSnapshot<WishListItem>(
+        COLLECTION_WISHLISTS,
+        {
+          whereClauses: [
+            {
+              field: "sharedAccounId",
+              value: user.sharedAccounId,
+              operator: "==",
+            },
+          ],
+        },
+        (data) => {
+          setWishlists(data);
+        }
+      );
+    }
+
+    return () => {
+      if (wishlistUnsubscribe) wishlistUnsubscribe();
+    };
+  }, [user]);
+
   const showAlert = (request: ShareRequest, userId: string) => {
     const userName = request.senderName;
     const email = request.sender;
@@ -179,6 +206,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
         user,
         locations,
         products,
+        wishlists,
       }}
     >
       {children}

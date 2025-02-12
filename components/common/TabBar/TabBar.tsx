@@ -25,7 +25,7 @@ const tabItems: TabBarItemProps[] = [
   },
   {
     Icon: DollarIcon,
-    href: "/whishlist",
+    href: "/wishlist",
     type: "tab",
   },
   {

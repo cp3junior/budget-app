@@ -74,6 +74,21 @@ declare global {
     createdAt: Date | Timestamp;
   };
 
+  type WishListItem = WishListItemFirestore & {
+    id: string;
+  };
+
+  type WishListItemFirestore = {
+    sharedAccounId: string;
+    transactions: string[];
+    fullAmount: string;
+    amount: string;
+    name: string;
+    description: string;
+    categoryId: number;
+    createdAt: Date | Timestamp;
+  };
+
   type ProductPrice = {
     id: string;
     locationId: string;
@@ -107,7 +122,6 @@ declare global {
   };
 
   type ProductPriceForm = {
-    amount: string;
     location: string;
   };
   type SignInForm = {
@@ -121,6 +135,11 @@ declare global {
     email: string;
     password: string;
     rePassword: string;
+  };
+
+  type WhishlistForm = {
+    name: string;
+    description: string;
   };
 
   type DropdownItem = {

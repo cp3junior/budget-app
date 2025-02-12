@@ -3,7 +3,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AutoComplete from "../../components/common/AutoComplete";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
@@ -19,9 +19,9 @@ import { generateRandomString } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
 import * as Yup from "yup";
 import { Formik, FormikProps } from "formik";
+import AmountInput from "../../components/AmountInput";
 
 const ProductPriceSchema = Yup.object().shape({
-  amount: Yup.number().required("Required"),
   location: Yup.string().required("Required"),
 });
 
@@ -30,12 +30,14 @@ const ProductPrice = () => {
   const { user, products, locations } = useAppContext();
   const navigate = useNavigation();
   const formikRef = useRef<FormikProps<ProductPriceForm> | null>(null);
+  const amountInput = useRef<TextInput>(null);
 
-  const productId = params.productId as string;
-
+  const [amount, setAmount] = useState("");
+  const [invalidAmount, setInvalidAmount] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState(new Date());
 
+  const productId = params.productId as string;
   if (!productId) return null;
   if (!user) return null;
 
@@ -43,7 +45,6 @@ const ProductPrice = () => {
   if (!currentProduct) return null;
 
   const initialFormValues: ProductPriceForm = {
-    amount: "",
     location: "",
   };
 
@@ -57,7 +58,13 @@ const ProductPrice = () => {
     }
   };
 
-  const handleSubmit = async ({ amount, location }: ProductPriceForm) => {
+  const handleSubmit = async ({ location }: ProductPriceForm) => {
+    if (!amount) {
+      setInvalidAmount(true);
+      amountInput.current?.focus();
+      return;
+    }
+    setInvalidAmount(false);
     setIsLoading(true);
 
     const newLocationExists = locations.find(
@@ -107,9 +114,15 @@ const ProductPrice = () => {
         isLoading={isLoading}
       />
       <View style={styles.containerMain}>
-        <Text style={styles.textStyle}>
-          Enter the product price and location to keep track of your spending.
-        </Text>
+        <View>
+          <AmountInput
+            ref={amountInput}
+            value={amount}
+            onChange={setAmount}
+            index={1}
+            isInvalid={invalidAmount}
+          />
+        </View>
         <Formik
           innerRef={formikRef}
           initialValues={initialFormValues}
@@ -118,19 +131,6 @@ const ProductPrice = () => {
         >
           {({ handleChange, handleBlur, values, errors, touched }) => (
             <FormListContainer style={styles.textInputContainer}>
-              <InputForm
-                isInvalid={Boolean(errors?.amount && touched?.amount)}
-                InputProps={{
-                  placeholder: "Price",
-                  value: values.amount,
-                  onChangeText: handleChange("amount"),
-                  onBlur: handleBlur("amount"),
-                  type: "text",
-                  blurOnSubmit: false,
-                  keyboardType: "numeric",
-                }}
-              />
-              <FormListSeparator />
               <AutoComplete
                 isInvalid={Boolean(errors?.location && touched?.location)}
                 suggestions={locations}
@@ -161,6 +161,9 @@ const ProductPrice = () => {
             </FormListContainer>
           )}
         </Formik>
+        <Text style={styles.textStyle}>
+          Enter the product price and location to keep track of your spending.
+        </Text>
       </View>
     </KeyboardAwareScrollView>
   );
@@ -169,7 +172,7 @@ const ProductPrice = () => {
 const styles = StyleSheet.create({
   textInputContainer: {
     padding: 0,
-    marginBottom: 40,
+    marginBottom: 20,
   },
   container: {
     paddingHorizontal: 20,

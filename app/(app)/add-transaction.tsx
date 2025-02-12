@@ -206,7 +206,7 @@ const AddTransactionScreen = () => {
           <InputForm
             ref={notesInput}
             InputProps={{
-              placeholder: "Notes",
+              placeholder: "Description",
               value: description,
               onChangeText: setDescription,
               onSubmitEditing: () => handleSubmit(),
