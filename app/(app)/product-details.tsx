@@ -16,19 +16,17 @@ import { updateDocument } from "../../lib/firebaseFirestore";
 import { colors } from "../../lib/theme";
 
 const ProductDetails = () => {
-  const params = useLocalSearchParams();
   const { user, products, locations } = useAppContext();
+  const params = useLocalSearchParams();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const productId = params.productId as string;
-
   if (!productId) return null;
   if (!user) return null;
 
   const currentProduct = products.find((prod) => prod.id === productId);
-
   if (!currentProduct) return null;
 
   const showPrompt = (defaultValue: string, message: string) => {

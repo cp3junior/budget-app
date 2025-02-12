@@ -73,6 +73,7 @@ const WishlistEdit = () => {
       fullAmount: amount,
       amount: "",
       categoryId: category.id,
+      completed: false,
       createdAt: new Date(),
     };
 

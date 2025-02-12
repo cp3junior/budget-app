@@ -23,7 +23,8 @@ const AmountInput = forwardRef<any, AmountInputProps>(
             displayType={"text"}
             thousandSeparator={true}
             prefix={"$"}
-            onValueChange={(values, sourceInfo) => {
+            decimalScale={2}
+            onValueChange={(values) => {
               onChange(values.value);
             }}
             allowNegative={false}

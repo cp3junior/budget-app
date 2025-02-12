@@ -5,6 +5,7 @@ interface AppContextType {
   locations: LocationItem[];
   products: ProductItem[];
   wishlists: WishListItem[];
+  wallet: WalletItem | null;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

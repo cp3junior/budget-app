@@ -18,13 +18,15 @@ import {
   categories,
   COLLECTION_LOCATIONS,
   COLLECTION_TRANSACTIONS,
+  COLLECTION_WALLETS,
   transactionDirections,
   transactionTypes,
 } from "../../lib/constant";
-import { addDocument } from "../../lib/firebaseFirestore";
+import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
+import { convertToFloat } from "../../lib/helpers";
 
 const AddTransactionScreen = () => {
-  const { user, locations } = useAppContext();
+  const { user, locations, wallet } = useAppContext();
   const navigate = useNavigation();
   const notesInput = useRef<TextInput>(null);
   const locationInput = useRef<TextInput>(null);
@@ -47,6 +49,7 @@ const AddTransactionScreen = () => {
   );
 
   if (!user) return null;
+  if (!wallet) return null;
 
   const onChange = (selectedDate: Date | undefined, name: string) => {
     if (selectedDate) {
@@ -107,7 +110,23 @@ const AddTransactionScreen = () => {
       archived: false,
     };
 
+    const addTransaction = transactionDirection === 1;
+    const intAmount = convertToFloat(amount);
+    const intWallet = convertToFloat(wallet.amount);
+
+    let newAmount = 0;
+
+    if (addTransaction) {
+      newAmount = intWallet + intAmount;
+    } else {
+      newAmount = intWallet - intAmount;
+    }
+
     await addDocument<TransactionItemFirestore>(COLLECTION_TRANSACTIONS, data);
+
+    await updateDocument(COLLECTION_WALLETS, wallet.id, {
+      amount: `${newAmount}`,
+    });
 
     navigate.goBack();
   };

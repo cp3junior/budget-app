@@ -12,6 +12,8 @@ import {
 } from "../../lib/constant";
 import { capitalizeAndRemoveDash } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
+import { BlurView } from "expo-blur";
+import Text from "../../components/common/Text";
 
 const withTabsOptions: ScreenProps["options"] = {
   animation: "none",

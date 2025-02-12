@@ -13,9 +13,9 @@ import FormListContainer from "../../components/common/FormList/FormListContaine
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
 import FormListSubmitIcon from "../../components/common/FormList/FormListSubmitIcon";
 import InputForm from "../../components/common/InputForm";
-import { COLLECTION_USER } from "../../lib/constant";
+import { COLLECTION_USER, COLLECTION_WALLETS } from "../../lib/constant";
 import { signUp } from "../../lib/firebaseAuth";
-import { addDocument, fetchDocuments } from "../../lib/firebaseFirestore";
+import { addDocument } from "../../lib/firebaseFirestore";
 import { getErrorMessage } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
 
@@ -80,7 +80,15 @@ const SignUp = () => {
         createdAt: new Date(),
       };
 
+      const dataWallet: WalletItemFirestore = {
+        sharedAccounId: email,
+        amount: "0",
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      };
+
       await addDocument<UserFirestore>(COLLECTION_USER, user);
+      await addDocument<WalletItemFirestore>(COLLECTION_WALLETS, dataWallet);
 
       await updateProfile(credentials.user, {
         displayName: `${firstName} ${lastName}`,

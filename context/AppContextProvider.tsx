@@ -9,6 +9,7 @@ import {
   COLLECTION_PRODUCTS,
   COLLECTION_REQUESTS,
   COLLECTION_USER,
+  COLLECTION_WALLETS,
   COLLECTION_WISHLISTS,
 } from "../lib/constant";
 import { Alert } from "react-native";
@@ -22,6 +23,8 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [wishlists, setWishlists] = useState<WishListItem[]>([]);
+  const [wallets, setWallets] = useState<WalletItem[]>([]);
+  const [wallet, setWallet] = useState<WalletItem | null>(null);
 
   useEffect(() => {
     let userUnsubscribe: null | Unsubscribe = null;
@@ -77,10 +80,17 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   }, [user]);
 
   useEffect(() => {
-    let locationUnsubscribe: null | Unsubscribe = null;
-    if (user) {
-      locationUnsubscribe = fetchSnapshot<LocationItem>(
-        COLLECTION_LOCATIONS,
+    if (!user) return;
+
+    const subscriptions: Unsubscribe[] = [];
+
+    const fetchData = <T,>(
+      collectionName: string,
+      setter: React.Dispatch<React.SetStateAction<T[]>>,
+      transform?: (data: T[]) => T[]
+    ) => {
+      const unsubscribe = fetchSnapshot<T>(
+        collectionName,
         {
           whereClauses: [
             {
@@ -91,65 +101,29 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
           ],
         },
         (data) => {
-          setLocations(data);
+          setter(transform ? transform(data) : data);
         }
       );
-    }
 
-    return () => {
-      if (locationUnsubscribe) locationUnsubscribe();
+      subscriptions.push(unsubscribe);
     };
+
+    fetchData<LocationItem>(COLLECTION_LOCATIONS, setLocations);
+    fetchData<ProductItem>(COLLECTION_PRODUCTS, setProducts);
+    fetchData<WishListItem>(COLLECTION_WISHLISTS, setWishlists, (data) =>
+      data.sort((a, b) =>
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+      )
+    );
+    fetchData<WalletItem>(COLLECTION_WALLETS, setWallets);
+
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, [user]);
 
   useEffect(() => {
-    let productUnsubscribe: null | Unsubscribe = null;
-    if (user) {
-      productUnsubscribe = fetchSnapshot<ProductItem>(
-        COLLECTION_PRODUCTS,
-        {
-          whereClauses: [
-            {
-              field: "sharedAccounId",
-              value: user.sharedAccounId,
-              operator: "==",
-            },
-          ],
-        },
-        (data) => {
-          setProducts(data);
-        }
-      );
-    }
-
-    return () => {
-      if (productUnsubscribe) productUnsubscribe();
-    };
-  }, [user]);
-
-  useEffect(() => {
-    let wishlistUnsubscribe: null | Unsubscribe = null;
-    if (user) {
-      wishlistUnsubscribe = fetchSnapshot<WishListItem>(
-        COLLECTION_WISHLISTS,
-        {
-          whereClauses: [
-            {
-              field: "sharedAccounId",
-              value: user.sharedAccounId,
-              operator: "==",
-            },
-          ],
-        },
-        (data) => {
-          setWishlists(data);
-        }
-      );
-    }
-
-    return () => {
-      if (wishlistUnsubscribe) wishlistUnsubscribe();
-    };
-  }, [user]);
+    if (wallets.length === 1) setWallet(wallets[0]);
+    else setWallet(null);
+  }, [wallets]);
 
   const showAlert = (request: ShareRequest, userId: string) => {
     const userName = request.senderName;
@@ -207,6 +181,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
         locations,
         products,
         wishlists,
+        wallet,
       }}
     >
       {children}

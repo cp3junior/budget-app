@@ -1,9 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Spinner } from "@gluestack-ui/themed";
+import { BlurView } from "expo-blur";
 import React from "react";
-
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SFSymbol from "sweet-sfsymbols";
 import { colors } from "../lib/theme";
-import { Spinner } from "@gluestack-ui/themed";
 
 interface HeaderTitleProps {
   title: string;
@@ -13,50 +14,58 @@ interface HeaderTitleProps {
 }
 const HeaderTitle = ({
   title,
-  hasButton,
+  hasButton = false,
   onPressButton,
   isLoading = false,
 }: HeaderTitleProps) => {
+  const insets = useSafeAreaInsets();
+
   const handlePress = () => {
     onPressButton && onPressButton();
   };
 
   return (
-    <View style={styles.container}>
+    <BlurView
+      tint="dark"
+      style={[styles.container, { paddingTop: insets.top }]}
+    >
       <Text style={styles.textTitle}>{title}</Text>
-      {hasButton && isLoading ? (
-        <Spinner color={colors.blue} />
-      ) : (
-        <TouchableOpacity style={styles.addBtn} onPress={handlePress}>
-          <SFSymbol
-            size={22}
-            weight="regular"
-            name="plus"
-            colors={[colors.blue]}
-          />
-        </TouchableOpacity>
+      {hasButton && (
+        <View style={styles.addBtn}>
+          {isLoading ? (
+            <Spinner color={colors.blue} />
+          ) : (
+            <TouchableOpacity onPress={handlePress}>
+              <SFSymbol
+                size={22}
+                weight="regular"
+                name="plus"
+                colors={[colors.blue]}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       )}
-    </View>
+    </BlurView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    height: 36,
     alignItems: "center",
-    marginBottom: 10,
   },
   textTitle: {
     flex: 1,
-    textAlign: "center",
-    fontSize: 18,
+    fontSize: 34,
     color: colors.white,
     fontWeight: "900",
+    marginLeft: 20,
+    marginTop: 2,
+    marginBottom: 10,
   },
   addBtn: {
-    position: "absolute",
-    right: 0,
+    marginRight: 20,
   },
 });
 

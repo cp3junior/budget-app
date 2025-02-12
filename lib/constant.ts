@@ -6,6 +6,7 @@ export const COLLECTION_LOCATIONS = "locations";
 export const COLLECTION_PRODUCTS = "products";
 export const COLLECTION_TRANSACTIONS = "transactions";
 export const COLLECTION_WISHLISTS = "wishlists";
+export const COLLECTION_WALLETS = "wallets";
 
 export const tabsScreens = ["home", "budget", "transactions", "wishlist"];
 export const withHeaderScreens = [
@@ -16,6 +17,7 @@ export const withHeaderScreens = [
   "products",
   "account-sharing",
   "product-details",
+  "wishlist-details",
 ];
 export const modalScreens = [
   "add-transaction",
@@ -25,6 +27,7 @@ export const modalScreens = [
 ];
 
 export const transactionDirections = ["Expense", "Income"];
+export const activeTabsValues = ["Active", "Completed"];
 
 export const transactionTypes: DropdownItem[] = [
   {

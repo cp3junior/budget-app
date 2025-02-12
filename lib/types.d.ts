@@ -86,6 +86,17 @@ declare global {
     name: string;
     description: string;
     categoryId: number;
+    completed: boolean;
+    createdAt: Date | Timestamp;
+  };
+
+  type WalletItem = WalletItemFirestore & {
+    id: string;
+  };
+  type WalletItemFirestore = {
+    sharedAccounId: string;
+    amount: string;
+    updatedAt: Date | Timestamp;
     createdAt: Date | Timestamp;
   };
 

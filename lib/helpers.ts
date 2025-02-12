@@ -1,11 +1,12 @@
 import { FirebaseError } from "firebase/app";
+import { categories } from "./constant";
 
 export const getFileExtension = (filename: string): string | null => {
   const parts = filename.split(".");
   return parts.length > 1 ? parts.pop() || null : null;
 };
 
-export const formatCurrency = (
+export const formatCurrencyOld = (
   text: string
 ): [formatedValue: string, parsedValue: number] => {
   const cleanValue = text.replace(/[^0-9]/g, "");
@@ -19,8 +20,18 @@ export const formatCurrency = (
   return [formatedValue, parsedValue];
 };
 
+export const formatCurrency = (value: number | string): string => {
+  let numberValue = 0;
+  if (typeof value === "number") numberValue = value;
+  else if (typeof value === "string") numberValue = convertToFloat(value);
+
+  const formatedValue = numberFormater.format(numberValue);
+  return `$${formatedValue}`;
+};
+
 export const capitalize = (text: string): string => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
+  const lower = text.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
 };
 export const capitalizeAndRemoveDash = (text: string): string => {
   const capitalized = capitalize(text);
@@ -87,4 +98,51 @@ export const generateRandomString = (length = 10): string => {
   }
 
   return result;
+};
+
+export const convertToFloat = (value: string): number => {
+  const parsed = parseFloat(value);
+
+  if (!isNaN(parsed)) return parsed;
+
+  return 0;
+};
+
+export const numberFormater = new Intl.NumberFormat("en-US");
+
+export const calculateRemaining = (
+  fullAmount: string,
+  amount: string
+): string => {
+  const parsedFullAmount = convertToFloat(fullAmount);
+  const parsedAmount = convertToFloat(amount);
+
+  const remaining = parsedFullAmount - parsedAmount;
+  return formatCurrency(remaining);
+};
+
+export const calculateRemainingPercent = (
+  fullAmount: string,
+  amount: string
+): number => {
+  const parsedFullAmount = convertToFloat(fullAmount);
+  const parsedAmount = convertToFloat(amount);
+
+  if (parsedFullAmount <= 0) return 0;
+
+  const remainingPercent = (parsedAmount / parsedFullAmount) * 100;
+  return convertToFloat(remainingPercent.toFixed(2));
+};
+
+export const getCategoryByCategoryId = (
+  categoryId: number
+): DropdownItem | null => {
+  for (const category of categories) {
+    if (category.items) {
+      const foundItem = category.items.find((item) => item.id === categoryId);
+      if (foundItem) return foundItem;
+    }
+  }
+
+  return null;
 };
