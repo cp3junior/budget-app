@@ -137,7 +137,7 @@ const ProductDetails = () => {
           ),
         }}
       />
-      <View>
+      <View style={styles.contentScroll}>
         <Text style={styles.textTitle} fontWeight="900">
           {currentProduct.name}
         </Text>
@@ -258,6 +258,9 @@ const styles = StyleSheet.create({
   },
   textPrice: {
     fontSize: 16,
+  },
+  contentScroll: {
+    marginBottom: 60,
   },
 });
 

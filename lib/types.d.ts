@@ -64,11 +64,12 @@ declare global {
     userId: string;
     categoryId: number;
     transactionTypeId: number;
-    locationId: string;
+    locationId?: string;
     transactionDirection: number;
     amount: string;
     description?: string;
     archived: boolean;
+    origin: TransactionOrigins;
     date: Date | Timestamp;
     time: Date | Timestamp;
     createdAt: Date | Timestamp;
@@ -112,6 +113,8 @@ declare global {
     id: string;
     name: string;
   };
+
+  type TransactionOrigins = "wishlist" | "default" | "bills";
 
   //** Normal types */
   type StatusRequest = "pending" | "accepted" | "rejected" | "cancelled";

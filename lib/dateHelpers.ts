@@ -5,6 +5,10 @@ export const formatDate = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
   return format(convertedDate, "dd MMM yyyy");
 };
+export const formatDateTransaction = (date: Date | Timestamp): string => {
+  const convertedDate = convertToDate(date);
+  return format(convertedDate, "MMM d, yyyy");
+};
 
 export const formatDateSimple = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);

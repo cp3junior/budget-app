@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   DocumentData,
+  documentId,
   getDocs,
   onSnapshot,
   orderBy,
@@ -28,6 +29,7 @@ export const fetchDocuments = async <T>(
       operator: WhereFilterOp;
       value: any;
     }[];
+    ids?: string[];
   }
 ): Promise<T[]> => {
   let docs: T[] = [];
@@ -42,6 +44,10 @@ export const fetchDocuments = async <T>(
           where(clause.field, clause.operator, clause.value)
         );
       });
+    }
+
+    if (options?.ids && options.ids.length > 0) {
+      queryConstraints.push(where(documentId(), "in", options.ids));
     }
 
     if (options?.orderByField) {

@@ -1,5 +1,5 @@
 import { FirebaseError } from "firebase/app";
-import { categories } from "./constant";
+import { categories, transactionTypes } from "./constant";
 
 export const getFileExtension = (filename: string): string | null => {
   const parts = filename.split(".");
@@ -120,6 +120,16 @@ export const calculateRemaining = (
   const remaining = parsedFullAmount - parsedAmount;
   return formatCurrency(remaining);
 };
+export const calculateRemainingRaw = (
+  fullAmount: string,
+  amount: string
+): string => {
+  const parsedFullAmount = convertToFloat(fullAmount);
+  const parsedAmount = convertToFloat(amount);
+
+  const remaining = parsedFullAmount - parsedAmount;
+  return `${remaining}`;
+};
 
 export const calculateRemainingPercent = (
   fullAmount: string,
@@ -143,6 +153,13 @@ export const getCategoryByCategoryId = (
       if (foundItem) return foundItem;
     }
   }
+
+  return null;
+};
+
+export const getTransactionTypeById = (id: number): DropdownItem | null => {
+  const transactionType = transactionTypes.find((t) => t.id === id);
+  if (transactionType) return transactionType;
 
   return null;
 };
