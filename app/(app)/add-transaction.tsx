@@ -267,9 +267,9 @@ const AddTransactionScreen = () => {
           index={transactionDirection}
           isInvalid={invalidAmount}
         />
-        <FormListContainer style={styles.textInputContainer}>
-          {!wishlistId && (
-            <>
+        {!wishlistId && (
+          <>
+            <FormListContainer style={styles.textInputContainer}>
               <FormListContent>
                 <DropDownMenu
                   label="Category"
@@ -280,19 +280,15 @@ const AddTransactionScreen = () => {
                 />
               </FormListContent>
               <FormListSeparator />
-            </>
-          )}
-          <FormListContent>
-            <DropDownMenu
-              label="Transaction type"
-              id="type"
-              value={transactionType}
-              onChange={handleTypeChange}
-              data={transactionTypes}
-            />
-          </FormListContent>
-          {!wishlistId && (
-            <>
+              <FormListContent>
+                <DropDownMenu
+                  label="Transaction type"
+                  id="type"
+                  value={transactionType}
+                  onChange={handleTypeChange}
+                  data={transactionTypes}
+                />
+              </FormListContent>
               <FormListSeparator />
               <FormListContent>
                 <Text style={styles.flex}>Date</Text>
@@ -312,37 +308,35 @@ const AddTransactionScreen = () => {
                   />
                 </View>
               </FormListContent>
-            </>
-          )}
-        </FormListContainer>
-        {!wishlistId && (
-          <FormListContainer style={styles.textInputContainer}>
-            <AutoComplete
-              ref={locationInput}
-              suggestions={locations}
-              zIndex={3}
-              InputProps={{
-                placeholder: "Location",
-                value: location,
-                onChangeText: setLocation,
-                onSubmitEditing: handleFocusLocation,
-                type: "text",
-                returnKeyType: "next",
-              }}
-            />
-            <FormListSeparator />
-            <InputForm
-              ref={notesInput}
-              InputProps={{
-                placeholder: "Description",
-                value: description,
-                onChangeText: setDescription,
-                onSubmitEditing: () => handleSubmit(),
-                type: "text",
-                returnKeyType: "send",
-              }}
-            />
-          </FormListContainer>
+            </FormListContainer>
+            <FormListContainer style={styles.textInputContainer}>
+              <AutoComplete
+                ref={locationInput}
+                suggestions={locations}
+                zIndex={3}
+                InputProps={{
+                  placeholder: "Location",
+                  value: location,
+                  onChangeText: setLocation,
+                  onSubmitEditing: handleFocusLocation,
+                  type: "text",
+                  returnKeyType: "next",
+                }}
+              />
+              <FormListSeparator />
+              <InputForm
+                ref={notesInput}
+                InputProps={{
+                  placeholder: "Description",
+                  value: description,
+                  onChangeText: setDescription,
+                  onSubmitEditing: () => handleSubmit(),
+                  type: "text",
+                  returnKeyType: "send",
+                }}
+              />
+            </FormListContainer>
+          </>
         )}
       </View>
     </KeyboardAwareScrollView>

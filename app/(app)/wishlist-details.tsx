@@ -8,7 +8,7 @@ import FormListContainer from "../../components/common/FormList/FormListContaine
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
-import { COLLECTION_TRANSACTIONS } from "../../lib/constant";
+import { COLLECTION_TRANSACTIONS, COLLECTION_USER } from "../../lib/constant";
 import { convertToDate, formatDateTransaction } from "../../lib/dateHelpers";
 import { fetchDocuments } from "../../lib/firebaseFirestore";
 import {
@@ -16,23 +16,26 @@ import {
   calculateRemainingPercent,
   formatCurrency,
   getCategoryByCategoryId,
-  getTransactionTypeById,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
+import ProfileImage from "../../components/common/ProfileImage";
 
 const WishlistDetails = () => {
-  const { wishlists } = useAppContext();
+  const { wishlists, user } = useAppContext();
   const params = useLocalSearchParams();
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [transactions, setTransactions] = useState<TransactionItem[]>([]);
+  const [transactions, setTransactions] = useState<TransactionItemWithUser[]>(
+    []
+  );
 
   const wishlistId = params.wishlistId as string;
   if (!wishlistId) return null;
 
   const currentWishlist = wishlists.find((wish) => wish.id === wishlistId);
   if (!currentWishlist) return null;
+  if (!user) return null;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,7 +53,40 @@ const WishlistDetails = () => {
             convertToDate(a.date).getTime() - convertToDate(b.date).getTime()
         );
 
-        setTransactions(sortedTransactions);
+        let userIds = sortedTransactions.map((t) => t.userId);
+        userIds = [...new Set(userIds)];
+        userIds = userIds.filter((u) => u !== user.id);
+
+        let users: User[] = [];
+
+        if (userIds.length > 0) {
+          users = await fetchDocuments<User>(COLLECTION_USER, {
+            ids: userIds,
+          });
+        }
+
+        const transactionItemsWithUser: TransactionItemWithUser[] =
+          sortedTransactions.map((t) => {
+            let userTransaction = user;
+            let displayName = "You";
+            const userId = t.userId;
+
+            if (userId !== user.id) {
+              const userDB = users.find((u) => u.id === userId);
+              if (userDB) {
+                userTransaction = userDB;
+                displayName = `${userDB.firstName} ${userDB.lastName}`;
+              }
+            }
+
+            return {
+              ...t,
+              user: userTransaction,
+              displayName,
+            };
+          });
+
+        setTransactions(transactionItemsWithUser);
         setIsLoading(false);
       }
     };
@@ -186,9 +222,6 @@ const WishlistDetails = () => {
           <View style={styles.timelineContainerMain}>
             {transactions.map((transaction, index) => {
               const isLast = index === transactions.length - 1;
-              const transactionType = getTransactionTypeById(
-                transaction.transactionTypeId
-              );
               return (
                 <View key={transaction.id} style={styles.timelineContainer}>
                   <View style={styles.timeline}>
@@ -200,9 +233,17 @@ const WishlistDetails = () => {
                       <Text style={styles.title}>
                         Paid: {formatDateTransaction(transaction.date)}
                       </Text>
-                      <Text style={styles.type}>
-                        {transactionType?.label || ""}
-                      </Text>
+                      <View style={styles.containerImg}>
+                        <View style={styles.userImageContainer}>
+                          <ProfileImage
+                            style={styles.userImage}
+                            externalUser={transaction.user}
+                          />
+                        </View>
+                        <Text style={styles.type}>
+                          {transaction?.displayName || ""}
+                        </Text>
+                      </View>
                     </View>
                     <View>
                       <Text style={styles.priceText}>
@@ -299,8 +340,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   type: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.grayLight,
+    fontWeight: "600",
   },
   title: {
     fontSize: 18,
@@ -319,6 +361,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.gray,
     marginRight: 10,
+  },
+  userImage: {
+    width: 24,
+    height: 24,
+    borderRadius: 20,
+  },
+  userImageContainer: {
+    padding: 2,
+    borderWidth: 0.8,
+    borderColor: colors.purple,
+    borderRadius: 200,
+  },
+  containerImg: {
+    flexDirection: "row",
+    gap: 5,
+    alignItems: "center",
+    marginTop: 5,
   },
 });
 

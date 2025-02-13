@@ -24,6 +24,7 @@ export const modalScreens = [
   "profile-edit",
   "product-price",
   "wishlist-edit",
+  "bills-edit",
 ];
 
 export const transactionDirections = ["Expense", "Income"];

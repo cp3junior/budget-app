@@ -109,7 +109,8 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
                       </Text>
                     ) : (
                       <Text style={styles.styleSubText}>
-                        {remainingAmount} remaining
+                        {remainingAmount} remaining out of{" "}
+                        {formatCurrency(wish.fullAmount)}
                       </Text>
                     )}
                     {category && (
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
   categoryText: {
     color: colors.grayLight,
     fontSize: 14,
-    marginTop: 4,
+    marginTop: 2,
   },
 });
 

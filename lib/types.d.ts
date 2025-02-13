@@ -55,6 +55,11 @@ declare global {
     createdAt: Date | Timestamp;
   };
 
+  type TransactionItemWithUser = TransactionItem & {
+    user: User;
+    displayName: string;
+  };
+
   type TransactionItem = TransactionItemFirestore & {
     id: string;
   };
