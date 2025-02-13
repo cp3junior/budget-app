@@ -225,9 +225,7 @@ const SharingAccount = () => {
                 onPress={() => revoqueRequest(request)}
               >
                 <View style={styles.itemLeft}>
-                  <Text fontWeight="800" style={styles.itemLeftEmail}>
-                    {request.receiver}
-                  </Text>
+                  <Text style={styles.itemLeftEmail}>{request.receiver}</Text>
                   <Text style={styles.itemLeftDate}>
                     {formatDate(request.createdAt)}
                   </Text>
@@ -237,7 +235,7 @@ const SharingAccount = () => {
                       { backgroundColor: statusColor },
                     ]}
                   >
-                    <Text fontWeight="900" style={styles.itemLeftStatusText}>
+                    <Text style={styles.itemLeftStatusText}>
                       {request.status}
                     </Text>
                   </View>
@@ -278,6 +276,7 @@ const styles = StyleSheet.create({
   itemLeft: {},
   itemLeftEmail: {
     fontSize: 18,
+    fontWeight: "800",
   },
   itemLeftDate: {
     fontSize: 13,
@@ -293,6 +292,7 @@ const styles = StyleSheet.create({
   itemLeftStatusText: {
     color: colors.darker,
     fontSize: 12,
+    fontWeight: "900",
   },
   itemRight: {
     marginRight: 10,

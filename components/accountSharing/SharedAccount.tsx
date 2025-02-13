@@ -77,7 +77,7 @@ const SharedAccount = () => {
       <Text style={styles.aboutTxt}>
         You cannot share your account because{" "}
         {
-          <Text fontWeight="700" style={styles.aboutTxtEmpg}>
+          <Text style={styles.aboutTxtEmpg}>
             {user.sharedAccounName} ({user.sharedAccounId})
           </Text>
         }{" "}
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     color: colors.white,
     lineHeight: 20,
     fontSize: 16,
+    fontWeight: "700",
   },
   containerStyle: {
     paddingHorizontal: 0,

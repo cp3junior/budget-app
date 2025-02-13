@@ -139,7 +139,7 @@ const LocationsScreen = () => {
         list helps you quickly access your preferred places, making your
         experience on the DollarDazzle more efficient and personalized.
       </Text>
-      <Text fontWeight="600" style={styles.textInfoDisc}>
+      <Text style={styles.textInfoDisc}>
         Press or hold one location to Edit or Delete.
       </Text>
       <View style={styles.container}>
@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
     color: colors.grayLight,
     marginBottom: 20,
     fontSize: 14,
+    fontWeight: "600",
   },
 });
 

@@ -82,8 +82,11 @@ const SignIn = () => {
               footer={
                 <View style={styles.forgot}>
                   <ButtonLink
-                    fontWeight="500"
-                    style={{ ...styles.lnkText, fontSize: 16 }}
+                    style={{
+                      ...styles.lnkText,
+                      fontSize: 16,
+                      fontWeight: "500",
+                    }}
                     href="/forgot-password"
                     title="Forgot password ?"
                   />

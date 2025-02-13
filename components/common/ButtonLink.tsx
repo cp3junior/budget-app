@@ -6,20 +6,13 @@ import Text from "./Text";
 interface ButtonLinkProps {
   href: string;
   title: string;
-  fontWeight?: TextStyle["fontWeight"];
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
   style?: TextStyle;
 }
 
-const ButtonLink = ({
-  style,
-  href,
-  title,
-  onPress,
-  fontWeight,
-}: ButtonLinkProps) => {
+const ButtonLink = ({ style, href, title, onPress }: ButtonLinkProps) => {
   const handlePress = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => {
@@ -31,10 +24,7 @@ const ButtonLink = ({
 
   return (
     <Link href={href} onPress={handlePress}>
-      <Text
-        style={{ ...styles.lnkTxt, ...Object.assign({}, style) }}
-        fontWeight={fontWeight ?? "800"}
-      >
+      <Text style={{ ...styles.lnkTxt, ...Object.assign({}, style) }}>
         {title}
       </Text>
     </Link>
@@ -45,6 +35,7 @@ const styles = StyleSheet.create({
   lnkTxt: {
     textAlign: "center",
     color: colors.blue,
+    fontWeight: "800",
   },
 });
 

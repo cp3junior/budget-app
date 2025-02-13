@@ -12,10 +12,10 @@ const ErrorText = ({ message, isMessage }: ErrorTextProps) => {
   return (
     <View style={styles.containerTextErr}>
       <Text
-        fontWeight="600"
         style={{
           fontSize: isMessage ? 15 : 14,
           color: isMessage ? colors.grayLight : colors.redVivid,
+          fontWeight: "600",
         }}
       >
         {capitalize(message || "")}

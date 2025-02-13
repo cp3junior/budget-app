@@ -47,10 +47,10 @@ const FormListButtonLink = ({
     >
       <View style={styles.containerTop}>
         <Text
-          fontWeight={textStyle?.fontWeight || "500"}
           style={{
             ...styles.textStyle,
             color: color ? color : colors.white,
+            ...{ fontWeight: "500" },
             ...textStyle,
           }}
         >

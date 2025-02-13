@@ -23,9 +23,7 @@ const ActiveWishlist = () => {
   return (
     <View>
       <View style={styles.containerText}>
-        <Text fontWeight="900" style={styles.textTitle}>
-          {formatCurrency(balance)}
-        </Text>
+        <Text style={styles.textTitle}>{formatCurrency(balance)}</Text>
         <Text style={styles.textSubTitle}>Total balance</Text>
       </View>
       <WishlistItems wishlists={activeWishlists} />
@@ -36,7 +34,7 @@ const ActiveWishlist = () => {
 const styles = StyleSheet.create({
   container: { flexDirection: "row" },
   containerText: { marginTop: 20, marginBottom: 40 },
-  textTitle: { textAlign: "center", fontSize: 54 },
+  textTitle: { textAlign: "center", fontSize: 54, fontWeight: "900" },
   textSubTitle: { textAlign: "center", fontSize: 18, color: colors.grayLight },
   addBtn: {
     position: "absolute",

@@ -37,7 +37,7 @@ const ProfileScreen = () => {
           </View>
           <View style={styles.detContainer}>
             <View style={styles.flex}>
-              <Text style={styles.txtName} fontWeight="900">
+              <Text style={styles.txtName}>
                 {user.firstName} {user.lastName}
               </Text>
               <Text>Edit your profile</Text>
@@ -85,6 +85,7 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   txtName: {
     fontSize: 22,
+    fontWeight: "900",
   },
   container: {
     paddingBottom: 15,

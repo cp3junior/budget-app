@@ -4,11 +4,11 @@ import {
   AlertDialogBody,
   AlertDialogContent,
   Input,
+  InputField,
 } from "@gluestack-ui/themed";
-import Text from "./Text";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { colors } from "../../lib/theme";
-import { InputField } from "@gluestack-ui/themed";
+import Text from "./Text";
 
 interface DialogEditProps {
   title: string;
@@ -31,9 +31,7 @@ const DialogEdit = ({ title, show, onClose, onSubmit }: DialogEditProps) => {
       <AlertDialogContent>
         <AlertDialogBody style={styles.container}>
           <View style={styles.contentContainer}>
-            <Text style={styles.txtTitle} fontWeight="800">
-              {title}
-            </Text>
+            <Text style={styles.txtTitle}>{title}</Text>
             <Input
               w="$full"
               $focus-borderColor={colors.blue}
@@ -50,17 +48,13 @@ const DialogEdit = ({ title, show, onClose, onSubmit }: DialogEditProps) => {
               style={{ ...styles.buttonContainer, ...styles.borRight }}
               onPress={onClose}
             >
-              <Text style={styles.txtStyle} fontWeight="600">
-                Cancel
-              </Text>
+              <Text style={styles.txtStyle}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               onPress={handleSubmit}
             >
-              <Text style={styles.txtStyle} fontWeight="600">
-                Save
-              </Text>
+              <Text style={styles.txtStyle}>Save</Text>
             </TouchableOpacity>
           </View>
         </AlertDialogBody>
@@ -94,9 +88,10 @@ const styles = StyleSheet.create({
     height: 44,
     flex: 1,
   },
-  txtTitle: { textAlign: "center", marginBottom: 20 },
+  txtTitle: { textAlign: "center", marginBottom: 20, fontWeight: "800" },
   txtStyle: {
     color: colors.blue,
+    fontWeight: "600",
   },
   inptStyle: {
     height: 40,

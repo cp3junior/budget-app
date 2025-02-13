@@ -102,20 +102,23 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
               <View style={styles.containerRight}>
                 <View style={styles.containerTop}>
                   <View>
-                    <Text fontWeight="900" style={styles.styleText}>
-                      {wish.name}
-                    </Text>
+                    <Text style={styles.styleText}>{wish.name}</Text>
                     {isCompleted ? (
-                      <Text fontWeight="600" style={styles.styleSubText}>
+                      <Text style={styles.styleSubText}>
                         Paid {formatCurrency(wish.fullAmount)}
                       </Text>
                     ) : (
-                      <Text fontWeight="600" style={styles.styleSubText}>
+                      <Text style={styles.styleSubText}>
                         {remainingAmount} remaining
                       </Text>
                     )}
                     {category && (
-                      <Text fontWeight="200" style={styles.categoryText}>
+                      <Text
+                        style={{
+                          ...styles.categoryText,
+                          ...{ fontWeight: "200" },
+                        }}
+                      >
                         {capitalize(category.label)}
                       </Text>
                     )}
@@ -182,10 +185,12 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 20,
     marginBottom: 3,
+    fontWeight: "900",
   },
   styleSubText: {
     color: colors.grayLight,
     fontSize: 16,
+    fontWeight: "600",
   },
   containerChevron: {
     marginLeft: 10,

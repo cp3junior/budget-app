@@ -33,9 +33,7 @@ const CategoriesScreen = () => {
                     <Fragment key={idItem}>
                       <FormListItemList>
                         <View style={styles.itemContainer}>
-                          <Text style={styles.txtLabelItem} fontWeight="600">
-                            {labelItem}
-                          </Text>
+                          <Text style={styles.txtLabelItem}>{labelItem}</Text>
                           {iconItem && (
                             <SFSymbol
                               size={15}
@@ -85,6 +83,7 @@ const styles = StyleSheet.create({
   },
   txtLabelItem: {
     marginLeft: 8,
+    fontWeight: "600",
   },
 });
 

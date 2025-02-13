@@ -18,9 +18,7 @@ const Button = ({ onPress, title }: ButtonProps) => {
       style={styles.btn}
       onPress={onPress}
     >
-      <Text fontWeight="700" style={styles.btnTxt}>
-        {title}
-      </Text>
+      <Text style={styles.btnTxt}>{title}</Text>
     </ButtonMUI>
   );
 };
@@ -31,6 +29,7 @@ const styles = StyleSheet.create({
   },
   btnTxt: {
     color: colors.darker,
+    fontWeight: "700",
   },
 });
 

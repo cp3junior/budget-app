@@ -2,14 +2,16 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import { Formik, FormikProps } from "formik";
 import React, { useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as Yup from "yup";
+import AmountInput from "../../components/AmountInput";
 import AutoComplete from "../../components/common/AutoComplete";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
 import FormListContent from "../../components/common/FormList/FormListContent";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
-import InputForm from "../../components/common/InputForm";
 import ModalHeader from "../../components/common/ModalHeader";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
@@ -17,9 +19,6 @@ import { COLLECTION_LOCATIONS, COLLECTION_PRODUCTS } from "../../lib/constant";
 import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
 import { generateRandomString } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
-import * as Yup from "yup";
-import { Formik, FormikProps } from "formik";
-import AmountInput from "../../components/AmountInput";
 
 const ProductPriceSchema = Yup.object().shape({
   location: Yup.string().required("Required"),
@@ -146,9 +145,7 @@ const ProductPrice = () => {
               />
               <FormListSeparator />
               <FormListContent>
-                <Text fontWeight="800" style={styles.flex}>
-                  Date
-                </Text>
+                <Text style={styles.flex}>Date</Text>
                 <View style={styles.datePickerContent}>
                   <DateTimePicker
                     value={date}
@@ -178,7 +175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
-  flex: { flex: 1 },
+  flex: { flex: 1, fontWeight: "800" },
   datePickerContent: { flexDirection: "row" },
   containerMain: {
     marginTop: 20,

@@ -138,10 +138,8 @@ const ProductDetails = () => {
         }}
       />
       <View style={styles.contentScroll}>
-        <Text style={styles.textTitle} fontWeight="900">
-          {currentProduct.name}
-        </Text>
-        <Text fontWeight="600" style={styles.textSUbTitle}>
+        <Text style={styles.textTitle}>{currentProduct.name}</Text>
+        <Text style={styles.textSUbTitle}>
           Track product prices effortlessly by adding notes with price details
           and the store location. Keep a record of where and how much you paid
           to make smarter shopping decisions!
@@ -155,7 +153,7 @@ const ProductDetails = () => {
                 <View style={styles.containerList}>
                   <View style={styles.containerListLeft}>
                     <View>
-                      <Text fontWeight="700" style={styles.containerListText}>
+                      <Text style={styles.containerListText}>
                         {getLocationName(price.locationId)}
                       </Text>
                     </View>
@@ -171,16 +169,9 @@ const ProductDetails = () => {
                     </TouchableOpacity>
                   </View>
                   <View style={styles.containerListRight}>
-                    <Text
-                      fontWeight="700"
-                      style={styles.containerListSubTextPrice}
-                    >
+                    <Text style={styles.containerListSubTextPrice}>
                       Price:{" "}
-                      {
-                        <Text fontWeight="900" style={styles.textPrice}>
-                          ${price.amount}
-                        </Text>
-                      }
+                      {<Text style={styles.textPrice}>${price.amount}</Text>}
                     </Text>
                     <Text style={styles.containerListSubText}>
                       {formatDateSimple(price.date)}
@@ -224,11 +215,13 @@ const styles = StyleSheet.create({
   textTitle: {
     fontSize: 30,
     marginBottom: 10,
+    fontWeight: "900",
   },
   textSUbTitle: {
     color: colors.grayLight,
     fontSize: 14,
     marginBottom: 20,
+    fontWeight: "600",
   },
   containerList: {
     paddingVertical: 10,
@@ -246,11 +239,13 @@ const styles = StyleSheet.create({
   },
   containerListText: {
     fontSize: 17,
+    fontWeight: "700",
   },
   containerListSubTextPrice: {
     fontSize: 14,
     color: colors.grayLight,
     marginTop: -2,
+    fontWeight: "700",
   },
   containerListSubText: {
     fontSize: 14,
@@ -258,6 +253,7 @@ const styles = StyleSheet.create({
   },
   textPrice: {
     fontSize: 16,
+    fontWeight: "700",
   },
   contentScroll: {
     marginBottom: 60,

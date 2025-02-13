@@ -15,7 +15,7 @@ const tabItems: TabBarItemProps[] = [
   },
   {
     Icon: PieIcon,
-    href: "/budget",
+    href: "/bills",
     type: "tab",
   },
   {

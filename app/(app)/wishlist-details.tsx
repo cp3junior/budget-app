@@ -9,11 +9,7 @@ import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
 import { COLLECTION_TRANSACTIONS } from "../../lib/constant";
-import {
-  convertToDate,
-  formatDate,
-  formatDateTransaction,
-} from "../../lib/dateHelpers";
+import { convertToDate, formatDateTransaction } from "../../lib/dateHelpers";
 import { fetchDocuments } from "../../lib/firebaseFirestore";
 import {
   calculateRemaining,
@@ -139,15 +135,13 @@ const WishlistDetails = () => {
         }}
       />
       <View style={styles.contentScroll}>
-        <Text fontWeight="900" style={styles.nameText}>
-          {currentWishlist.name}
-        </Text>
+        <Text style={styles.nameText}>{currentWishlist.name}</Text>
         {currentWishlist.description && (
           <Text style={styles.desctText}>{currentWishlist.description}</Text>
         )}
 
         <View style={styles.progressContainer}>
-          <Text fontWeight="900" style={styles.progressAmountText}>
+          <Text style={styles.progressAmountText}>
             Total: {formatCurrency(currentWishlist.fullAmount)}
           </Text>
           <View style={styles.progressBar}>
@@ -158,7 +152,7 @@ const WishlistDetails = () => {
           <View style={styles.progressDetCOntainer}>
             <View>
               <Text style={styles.progressDetTextTop}>Paid to date</Text>
-              <Text style={styles.progressDetTextBottom} fontWeight="600">
+              <Text style={styles.progressDetTextBottom}>
                 {isCompleted
                   ? formatCurrency(currentWishlist.fullAmount)
                   : formatCurrency(currentWishlist.amount)}
@@ -174,7 +168,6 @@ const WishlistDetails = () => {
                 Remaining
               </Text>
               <Text
-                fontWeight="600"
                 style={{
                   ...styles.progressDetTextBottom,
                   ...{ textAlign: "right" },
@@ -204,7 +197,7 @@ const WishlistDetails = () => {
                   </View>
                   <View style={styles.contentTimeline}>
                     <View>
-                      <Text fontWeight="600" style={styles.title}>
+                      <Text style={styles.title}>
                         Paid: {formatDateTransaction(transaction.date)}
                       </Text>
                       <Text style={styles.type}>
@@ -212,7 +205,7 @@ const WishlistDetails = () => {
                       </Text>
                     </View>
                     <View>
-                      <Text fontWeight="900" style={styles.priceText}>
+                      <Text style={styles.priceText}>
                         {formatCurrency(transaction.amount)}
                       </Text>
                     </View>
@@ -229,15 +222,20 @@ const WishlistDetails = () => {
 
 const styles = StyleSheet.create({
   loadCOntainer: { marginTop: 40 },
-  nameText: { fontSize: 23, marginBottom: 5 },
+  nameText: { fontSize: 23, marginBottom: 5, fontWeight: "900" },
   desctText: { color: colors.grayLight, marginBottom: 20 },
   progressContainer: {
     marginTop: 10,
+    borderWidth: 0.2,
+    borderColor: colors.grayLight,
+    borderRadius: 10,
+    padding: 16,
   },
   progressAmountText: {
     textAlign: "center",
     fontSize: 18,
     marginBottom: 10,
+    fontWeight: "900",
   },
   progressBar: { marginBottom: 10 },
   progressDetCOntainer: {
@@ -252,6 +250,7 @@ const styles = StyleSheet.create({
   },
   progressDetTextBottom: {
     fontSize: 18,
+    fontWeight: "600",
   },
   footerCOntainer: {
     height: 110,
@@ -305,10 +304,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   priceText: {
     fontSize: 20,
+    fontWeight: "900",
   },
   containerIcon: {
     width: 28,

@@ -150,10 +150,7 @@ const AutoComplete = forwardRef<any, AutoCompleteProps>(
                     <View style={{ flexDirection: "row" }} key={sugg.id}>
                       <Pressable onPress={() => handlePress(sugg.name)}>
                         <Box style={styles.suggestionItemContainer}>
-                          <Text
-                            fontWeight="900"
-                            style={styles.suggestionItemText}
-                          >
+                          <Text style={styles.suggestionItemText}>
                             {sugg.name}
                           </Text>
                         </Box>
@@ -180,13 +177,11 @@ const styles = StyleSheet.create({
     flex: 1,
     top: 33,
     left: -20,
-    // right: 0,
     borderRadius: 6,
     borderStyle: "solid",
     borderWidth: 0.3,
     borderColor: colors.gray,
     backgroundColor: colors.dark,
-    // minWidth: 10,
     maxWidth: width - 40,
   },
   suggestionItemContainer: {
@@ -196,7 +191,7 @@ const styles = StyleSheet.create({
   suggestionItemText: {
     color: colors.white,
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "900",
     lineHeight: 19,
   },
   separator: {

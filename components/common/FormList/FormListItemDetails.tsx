@@ -18,7 +18,7 @@ const FormListItemDetails = ({ label, value }: FormListItemDetailsProps) => {
         height: 44,
       }}
     >
-      <Text fontWeight="500">{label}</Text>
+      <Text style={{ fontWeight: "500" }}>{label}</Text>
       <Text style={{ color: colors.grayLight }}>{value}</Text>
     </View>
   );

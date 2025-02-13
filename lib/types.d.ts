@@ -161,6 +161,7 @@ declare global {
     label: string;
     items?: DropdownItem[];
     icon?: SystemName;
+    value?: string;
   };
 }
 

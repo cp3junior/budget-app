@@ -22,9 +22,7 @@ const Home = () => {
       <View style={styles.headerContainer}>
         <View>
           <Text style={styles.txtName}>Hi, {user.firstName}!</Text>
-          <Text style={styles.txtTrack} fontWeight="800">
-            Track, Plan, Save
-          </Text>
+          <Text style={styles.txtTrack}>Track, Plan, Save</Text>
         </View>
         <TouchableOpacity
           onPress={navigateToProfileScreen}
@@ -74,7 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 200,
   },
   txtName: { fontSize: 15 },
-  txtTrack: { fontSize: 24 },
+  txtTrack: { fontSize: 24, fontWeight: "800" },
 });
 
 const HomeScreen = withTabBar(Home);

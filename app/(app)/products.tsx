@@ -125,7 +125,7 @@ const ProductsScreen = () => {
         Products are the items you buy regularly. This list helps you keep track
         of the prices quickly.
       </Text>
-      <Text fontWeight="600" style={styles.textInfoDisc}>
+      <Text style={styles.textInfoDisc}>
         Press or hold one product to View/Edit or Delete.
       </Text>
       <View style={styles.container}>
@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     color: colors.grayLight,
     marginBottom: 20,
     fontSize: 14,
+    fontWeight: "600",
   },
 });
 

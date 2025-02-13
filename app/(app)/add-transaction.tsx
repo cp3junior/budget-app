@@ -64,7 +64,6 @@ const AddTransactionScreen = () => {
   const [invalidAmount, setInvalidAmount] = useState(false);
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [invalidLocation, setInvalidLocation] = useState(false);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [category, setCategory] = useState<DropdownItem>(initialCategory);
@@ -168,34 +167,28 @@ const AddTransactionScreen = () => {
       return;
     }
 
-    if (!location) {
-      setInvalidLocation(true);
-      locationInput.current?.focus();
-      return;
-    }
-
-    setInvalidLocation(false);
     setInvalidAmount(false);
     setLoading(true);
 
-    const newLocationExists = locations.find(
-      (loc) => loc.name.trim().toLowerCase() === location.trim().toLowerCase()
-    );
-
     let locationId = "";
 
-    if (!newLocationExists) {
-      const dataLocation: LocationItemFirestore = {
-        sharedAccounId: user.sharedAccounId,
-        name: location.trim(),
-        createdAt: new Date(),
-      };
-      locationId = await addDocument<LocationItemFirestore>(
-        COLLECTION_LOCATIONS,
-        dataLocation
+    if (location) {
+      const newLocationExists = locations.find(
+        (loc) => loc.name.trim().toLowerCase() === location.trim().toLowerCase()
       );
-    } else {
-      locationId = newLocationExists.id;
+      if (!newLocationExists) {
+        const dataLocation: LocationItemFirestore = {
+          sharedAccounId: user.sharedAccounId,
+          name: location.trim(),
+          createdAt: new Date(),
+        };
+        locationId = await addDocument<LocationItemFirestore>(
+          COLLECTION_LOCATIONS,
+          dataLocation
+        );
+      } else {
+        locationId = newLocationExists.id;
+      }
     }
 
     const data: TransactionItemFirestore = {
@@ -302,9 +295,7 @@ const AddTransactionScreen = () => {
             <>
               <FormListSeparator />
               <FormListContent>
-                <Text fontWeight="800" style={styles.flex}>
-                  Date
-                </Text>
+                <Text style={styles.flex}>Date</Text>
                 <View style={styles.datePickerContent}>
                   <DateTimePicker
                     value={date}
@@ -330,7 +321,6 @@ const AddTransactionScreen = () => {
               ref={locationInput}
               suggestions={locations}
               zIndex={3}
-              isInvalid={invalidLocation}
               InputProps={{
                 placeholder: "Location",
                 value: location,
@@ -368,7 +358,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
-  flex: { flex: 1 },
+  flex: { flex: 1, fontWeight: "800" },
   datePickerContent: { flexDirection: "row" },
 });
 

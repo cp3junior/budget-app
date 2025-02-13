@@ -1,9 +1,10 @@
-import { ChevronsUpDownIcon } from "@gluestack-ui/themed";
-import { StyleSheet, View } from "react-native";
-import SFSymbol from "sweet-sfsymbols";
-import * as DropdownMenu from "zeego/dropdown-menu";
-import Text from "../Text";
 import React from "react";
+import { StyleSheet, TextStyle, View } from "react-native";
+import SFSymbol from "sweet-sfsymbols";
+import { SystemName } from "sweet-sfsymbols/src/SweetSFSymbols.types";
+import * as DropdownMenu from "zeego/dropdown-menu";
+import { colors } from "../../../lib/theme";
+import Text from "../Text";
 
 interface DropDownMenuProps {
   id: string;
@@ -11,6 +12,8 @@ interface DropDownMenuProps {
   data: DropdownItem[];
   value: DropdownItem;
   onChange: (value: DropdownItem) => void;
+  labelStyle?: TextStyle;
+  customIcon?: SystemName;
 }
 
 const DropDownMenu = ({
@@ -19,12 +22,13 @@ const DropDownMenu = ({
   onChange,
   label,
   id,
+  labelStyle,
+  customIcon,
 }: DropDownMenuProps) => {
+  const chevronIcon = customIcon ? customIcon : "chevron.up.chevron.down";
   return (
     <>
-      <Text fontWeight="800" style={styles.flex}>
-        {label}
-      </Text>
+      {label && <Text style={styles.flex}>{label}</Text>}
       <View>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
@@ -32,8 +36,15 @@ const DropDownMenu = ({
               {value?.icon && (
                 <SFSymbol size={18} colors={["white"]} name={value.icon} />
               )}
-              <Text style={styles.labelTxt}>{value.label}</Text>
-              <ChevronsUpDownIcon />
+              <Text style={{ ...styles.labelTxt, ...labelStyle }}>
+                {value.label}
+              </Text>
+              <SFSymbol
+                size={14}
+                colors={[colors.grayLight]}
+                name={chevronIcon}
+                weight="light"
+              />
             </View>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
@@ -137,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   btnStyle: { fontSize: 18 },
-  flex: { flex: 1 },
+  flex: { flex: 1, fontWeight: "800" },
   datePickerContent: { flexDirection: "row" },
   labelContainer: { flexDirection: "row", alignItems: "center" },
   labelTxt: { marginRight: 10, marginLeft: 8 },

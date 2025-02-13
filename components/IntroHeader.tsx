@@ -14,9 +14,7 @@ const IntroHeader = ({ small, text }: IntroHeaderProps) => {
     <>
       {!small && (
         <View style={styles.contTop}>
-          <Text style={styles.txtTitle} fontWeight="900">
-            💲Dazzle.
-          </Text>
+          <Text style={styles.txtTitle}>💲Dazzle.</Text>
         </View>
       )}
       <View style={small ? styles.contMiddleSmall : styles.contMiddle}>
@@ -28,9 +26,7 @@ const IntroHeader = ({ small, text }: IntroHeaderProps) => {
       </View>
       {small && (
         <View style={styles.txtContainer}>
-          <Text fontWeight="800" style={styles.txtW}>
-            {text}
-          </Text>
+          <Text style={styles.txtW}>{text}</Text>
         </View>
       )}
     </>
@@ -44,6 +40,7 @@ const styles = StyleSheet.create({
   txtTitle: {
     fontSize: 50,
     marginBottom: 20,
+    fontWeight: "900",
   },
   illuCont: {
     justifyContent: "center",
@@ -60,6 +57,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colors.blue,
     textAlign: "center",
+    fontWeight: "800",
   },
 });
 

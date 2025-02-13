@@ -4,7 +4,6 @@ import { colors } from "../../lib/theme";
 
 interface TextProps {
   children: ReactNode;
-  fontWeight?: TextStyle["fontWeight"];
   style?: TextStyle;
 }
 
@@ -25,7 +24,8 @@ const fontMapping = {
 const DEFAULT_SIZE = 17;
 const DEFAULT_COLOR = colors.white;
 
-const Text = ({ children, fontWeight, style }: TextProps) => {
+const Text = ({ children, style }: TextProps) => {
+  const fontWeight = style?.fontWeight || "normal";
   return (
     <RNText
       style={{

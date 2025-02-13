@@ -8,7 +8,7 @@ export const COLLECTION_TRANSACTIONS = "transactions";
 export const COLLECTION_WISHLISTS = "wishlists";
 export const COLLECTION_WALLETS = "wallets";
 
-export const tabsScreens = ["home", "budget", "transactions", "wishlist"];
+export const tabsScreens = ["home", "bills", "transactions", "wishlist"];
 export const withHeaderScreens = [
   "profile",
   "about",

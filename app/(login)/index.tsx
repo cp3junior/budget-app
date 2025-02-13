@@ -14,13 +14,9 @@ export default function Page() {
     <View style={styles.container}>
       <IntroHeader />
       <View style={styles.contBottom}>
-        <Text style={styles.txtCatchDet} fontWeight="700">
-          Take Control
-        </Text>
-        <Text style={styles.txtCatch} fontWeight="300">
-          of Your Finances Today!
-        </Text>
-        <Text fontWeight="300">
+        <Text style={styles.txtCatchDet}>Take Control</Text>
+        <Text style={styles.txtCatch}>of Your Finances Today!</Text>
+        <Text style={{ fontWeight: "300" }}>
           With our app, you can easily track your income and expenses, set
           financial goals, and make informed decisions about your money.
         </Text>
@@ -43,8 +39,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contBottom: { paddingHorizontal: 15, marginTop: 20 },
-  txtCatch: { fontSize: 35, marginBottom: 10 },
-  txtCatchDet: { fontSize: 35 },
+  txtCatch: { fontSize: 35, marginBottom: 10, fontWeight: "300" },
+  txtCatchDet: { fontSize: 35, fontWeight: "700" },
 
   btnGroupCont: {
     flexDirection: "row",
