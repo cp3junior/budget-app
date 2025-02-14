@@ -1,36 +1,298 @@
-import { StyleSheet, View } from "react-native";
-import React, { useState } from "react";
-import Text from "../../components/common/Text";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useRef, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
 import AmountInput from "../../components/AmountInput";
+import DropDownMenu from "../../components/common/DropDownMenu/DropDownMenu";
+import FormListContainer from "../../components/common/FormList/FormListContainer";
+import FormListContent from "../../components/common/FormList/FormListContent";
+import FormListSeparator from "../../components/common/FormList/FormListSeparator";
+import FormListSwitch from "../../components/common/FormList/FormListSwitch";
+import InputForm from "../../components/common/InputForm";
 import ModalHeader from "../../components/common/ModalHeader";
+import Text from "../../components/common/Text";
+import {
+  categories,
+  COLLECTION_EXPENSES,
+  dayOfMonth,
+  dayOfWeek,
+  frequencyList,
+} from "../../lib/constant";
+import { colors } from "../../lib/theme";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useAppContext } from "../../hook/useAppContext";
+import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
+import {
+  getCategoryByCategoryId,
+  getDropdownItemById,
+} from "../../lib/helpers";
+import { convertToDate } from "../../lib/dateHelpers";
+
+let initialCategory = categories[0]?.items?.[0] as DropdownItem;
+let initialFrequency = frequencyList[0] as DropdownItem;
+let initialRepeat = dayOfMonth[0] as DropdownItem;
+let initialDataRepeatingDay = dayOfMonth;
+let initialEndDate = new Date();
+let initialTime = new Date();
 
 const BillsEdit = () => {
-  const wishlistId = "";
-  const [isLoading, setIsLoading] = useState(false);
-  const [amount, setAmount] = useState("");
+  const navigate = useNavigation();
+  const { user, wallet, expenses } = useAppContext();
+  const params = useLocalSearchParams();
+  const amountInput = useRef<TextInput>(null);
 
-  const handleSave = () => {
-    console.log("DAV");
+  const expenseId = (params.expenseId as string) || "";
+  const currentExpense = expenses.find((wish) => wish.id === expenseId);
+
+  if (currentExpense) {
+    initialEndDate = convertToDate(currentExpense.endDate);
+    initialTime = convertToDate(currentExpense.notificationTime);
+    const category = getCategoryByCategoryId(currentExpense.categoryId);
+    if (category) initialCategory = category;
+
+    const freq = getDropdownItemById(frequencyList, currentExpense.frequency);
+    if (freq) initialFrequency = freq;
+
+    if (currentExpense.frequency === 1) {
+      const repeat = getDropdownItemById(
+        dayOfMonth,
+        currentExpense.repeatingDay
+      );
+      if (repeat) initialRepeat = repeat;
+      initialDataRepeatingDay = dayOfMonth;
+    } else {
+      const repeat = getDropdownItemById(
+        dayOfWeek,
+        currentExpense.repeatingDay
+      );
+      if (repeat) initialRepeat = repeat;
+      initialDataRepeatingDay = dayOfWeek;
+    }
+  }
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [amount, setAmount] = useState(currentExpense?.amount || "");
+  const [category, setCategory] = useState<DropdownItem>(initialCategory);
+  const [frequency, setFrequency] = useState<DropdownItem>(initialFrequency);
+  const [repeatingDay, setRepeatingDay] = useState<DropdownItem>(initialRepeat);
+  const [dataRepeatingDay, setDataRepeatingDay] = useState<DropdownItem[]>(
+    initialDataRepeatingDay
+  );
+  const [endDate, setEndDate] = useState<Date>(initialEndDate);
+  const [notificationTime, setNotificationTime] = useState<Date>(initialTime);
+  const [description, setDescription] = useState(
+    currentExpense?.description || ""
+  );
+  const [isRecurring, setIsRecurring] = useState(
+    currentExpense?.isRecurring || false
+  );
+  const [notificationEnabled, setNotificationEnabled] = useState(
+    currentExpense?.notificationEnabled || false
+  );
+  const [invalidAmount, setInvalidAmount] = useState(false);
+
+  if (!user) return null;
+  if (!wallet) return null;
+
+  const toggleRecurring = () =>
+    setIsRecurring((previousState) => !previousState);
+
+  const toggleNotification = () =>
+    setNotificationEnabled((previousState) => !previousState);
+
+  const handleDropdownChange = (item: DropdownItem, name: string) => {
+    if (name === "category") setCategory(item);
+    if (name === "frequency") {
+      if (item.id !== frequency.id) {
+        if (frequency.id === 1) {
+          setDataRepeatingDay(dayOfWeek);
+          setRepeatingDay(dayOfWeek[0]);
+        }
+        if (item.id === 1) {
+          setDataRepeatingDay(dayOfMonth);
+          setRepeatingDay(dayOfMonth[0]);
+        }
+      }
+      setFrequency(item);
+    }
+    if (name === "repeat") setRepeatingDay(item);
   };
+
+  const onChange = (selectedDate: Date | undefined, name: string) => {
+    if (selectedDate) {
+      if (name === "date") setEndDate(selectedDate);
+      if (name === "time") setNotificationTime(selectedDate);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!amount) {
+      setInvalidAmount(true);
+      amountInput.current?.focus();
+      return;
+    }
+    setInvalidAmount(false);
+
+    if (expenseId) editBill();
+    else addBill();
+  };
+
+  const editBill = async () => {
+    if (!currentExpense) return;
+    setIsLoading(true);
+
+    const dataUpdate = {
+      categoryId: category.id,
+      amount,
+      description,
+      notificationEnabled,
+      notificationTime,
+      isRecurring,
+      repeatingDay: repeatingDay.id,
+      frequency: frequency.id,
+      endDate,
+    };
+
+    await updateDocument(COLLECTION_EXPENSES, currentExpense.id, dataUpdate);
+
+    navigate.goBack();
+  };
+
+  const addBill = async () => {
+    setIsLoading(true);
+
+    const data: ExpenseItemFirestore = {
+      sharedAccounId: user.sharedAccounId,
+      categoryId: category.id,
+      amount,
+      completed: false,
+      description,
+      notificationEnabled,
+      notificationTime,
+      isRecurring,
+      repeatingDay: repeatingDay.id,
+      frequency: frequency.id,
+      endDate,
+      createdAt: new Date(),
+    };
+
+    await addDocument<ExpenseItemFirestore>(COLLECTION_EXPENSES, data);
+
+    navigate.goBack();
+  };
+
   return (
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
     >
       <ModalHeader
-        onPress={handleSave}
-        title={wishlistId ? "Save" : "Add"}
+        onPress={handleSubmit}
+        title={expenseId ? "Save" : "Add"}
         isLoading={isLoading}
       />
       <AmountInput
-        // ref={amountInput}
+        ref={amountInput}
         value={amount}
         onChange={setAmount}
         index={1}
-        isInvalid={false}
+        isInvalid={invalidAmount}
       />
+      <FormListContainer style={styles.textInputContainer}>
+        <FormListContent>
+          <DropDownMenu
+            label="Category"
+            id="category"
+            value={category}
+            onChange={(item) => handleDropdownChange(item, "category")}
+            data={categories}
+          />
+        </FormListContent>
+        <FormListSeparator />
+        <InputForm
+          InputProps={{
+            placeholder: "Description",
+            value: description,
+            onChangeText: setDescription,
+            type: "text",
+            blurOnSubmit: true,
+            returnKeyType: "next",
+          }}
+        />
+        <FormListSeparator />
+        <FormListSwitch
+          label="Set Recurring Payment"
+          onValueChange={toggleRecurring}
+          value={isRecurring}
+        />
+      </FormListContainer>
+      <Text style={styles.textExplanation}>
+        Turn this on for expenses with a fixed due date, like rent or bills, so
+        you can set reminders. Turn it off for flexible expenses like groceries.
+      </Text>
+      {isRecurring && (
+        <>
+          <FormListContainer style={styles.textInputContainer}>
+            <FormListContent>
+              <DropDownMenu
+                label="Frequency"
+                id="frequency"
+                value={frequency}
+                onChange={(item) => handleDropdownChange(item, "frequency")}
+                data={frequencyList}
+              />
+            </FormListContent>
+            <FormListSeparator />
+            <FormListContent>
+              <DropDownMenu
+                label="Repeat every"
+                id="reppeat"
+                value={repeatingDay}
+                onChange={(item) => handleDropdownChange(item, "repeat")}
+                data={dataRepeatingDay}
+              />
+            </FormListContent>
+            <FormListSeparator />
+            <FormListContent>
+              <Text style={styles.textDate}>End date</Text>
+              <View style={styles.datePickerContent}>
+                <DateTimePicker
+                  value={endDate}
+                  mode="date"
+                  onChange={(_, date) => onChange(date, "date")}
+                  themeVariant="dark"
+                />
+              </View>
+            </FormListContent>
+          </FormListContainer>
+          <FormListContainer style={styles.textInputContainer}>
+            <FormListSwitch
+              label="Enable notification"
+              onValueChange={toggleNotification}
+              value={notificationEnabled}
+            />
+            {notificationEnabled && (
+              <>
+                <FormListSeparator />
+                <FormListContent>
+                  <Text style={styles.textDate}>Time</Text>
+                  <View style={styles.datePickerContent}>
+                    <DateTimePicker
+                      value={notificationTime}
+                      mode="time"
+                      onChange={(_, date) => onChange(date, "time")}
+                      themeVariant="dark"
+                    />
+                  </View>
+                </FormListContent>
+              </>
+            )}
+          </FormListContainer>
+          <Text style={styles.textExplanation}>
+            Turn on notifications to receive a reminder for this budget item
+          </Text>
+        </>
+      )}
     </KeyboardAwareScrollView>
   );
 };
@@ -40,6 +302,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
+  textExplanation: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: colors.grayLight,
+    marginTop: -15,
+    marginLeft: 20,
+  },
+  textInputContainer: {
+    padding: 0,
+    marginBottom: 20,
+  },
+  datePickerContent: { flexDirection: "row" },
+  textDate: { flex: 1, fontWeight: "800" },
 });
 
 export default BillsEdit;

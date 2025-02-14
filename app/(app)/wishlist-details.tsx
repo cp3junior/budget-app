@@ -178,7 +178,7 @@ const WishlistDetails = () => {
 
         <View style={styles.progressContainer}>
           <Text style={styles.progressAmountText}>
-            Total: {formatCurrency(currentWishlist.fullAmount)}
+            {formatCurrency(currentWishlist.fullAmount)}
           </Text>
           <View style={styles.progressBar}>
             <Progress value={isCompleted ? 100 : remainingPercent} size="sm">

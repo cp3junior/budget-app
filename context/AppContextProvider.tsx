@@ -3,6 +3,7 @@ import { Unsubscribe } from "firebase/firestore";
 import { ReactNode, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import {
+  COLLECTION_EXPENSES,
   COLLECTION_LOCATIONS,
   COLLECTION_PRODUCTS,
   COLLECTION_REQUESTS,
@@ -24,6 +25,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [wishlists, setWishlists] = useState<WishListItem[]>([]);
   const [wallets, setWallets] = useState<WalletItem[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
   const [wallet, setWallet] = useState<WalletItem | null>(null);
 
   useEffect(() => {
@@ -116,6 +118,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
       )
     );
     fetchData<WalletItem>(COLLECTION_WALLETS, setWallets);
+    fetchData<ExpenseItem>(COLLECTION_EXPENSES, setExpenses);
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, [user]);
@@ -182,6 +185,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
         products,
         wishlists,
         wallet,
+        expenses,
       }}
     >
       {children}

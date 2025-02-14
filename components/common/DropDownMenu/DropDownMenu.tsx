@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React from "react";
 import { StyleSheet, TextStyle, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";

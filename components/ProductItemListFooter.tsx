@@ -3,17 +3,18 @@ import React from "react";
 import Text from "./common/Text";
 import { colors } from "../lib/theme";
 import { formatDateSimple } from "../lib/dateHelpers";
+import { convertToFloat } from "../lib/helpers";
 
 interface ProductItemListFooterProps {
   product: ProductItem;
 }
 const ProductItemListFooter = ({ product }: ProductItemListFooterProps) => {
-  let lowestPrice = 0;
+  let lowestPrice = "0";
   let lowestPriceDate = formatDateSimple(product.createdAt);
 
   if (product.prices.length > 0) {
     const lowestPriceProduct = product.prices.sort(
-      (a, b) => a.amount - b.amount
+      (a, b) => convertToFloat(a.amount) - convertToFloat(b.amount)
     )[0];
 
     lowestPrice = lowestPriceProduct.amount;

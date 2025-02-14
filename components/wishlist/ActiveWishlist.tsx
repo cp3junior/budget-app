@@ -34,7 +34,12 @@ const ActiveWishlist = () => {
 const styles = StyleSheet.create({
   container: { flexDirection: "row" },
   containerText: { marginTop: 20, marginBottom: 40 },
-  textTitle: { textAlign: "center", fontSize: 54, fontWeight: "900" },
+  textTitle: {
+    textAlign: "center",
+    fontSize: 54,
+    fontWeight: "900",
+    color: colors.blue,
+  },
   textSubTitle: { textAlign: "center", fontSize: 18, color: colors.grayLight },
   addBtn: {
     position: "absolute",

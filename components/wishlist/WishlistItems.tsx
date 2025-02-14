@@ -109,7 +109,7 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
                       </Text>
                     ) : (
                       <Text style={styles.styleSubText}>
-                        {remainingAmount} remaining out of{" "}
+                        {remainingAmount} remaining from{" "}
                         {formatCurrency(wish.fullAmount)}
                       </Text>
                     )}

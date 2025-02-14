@@ -15,6 +15,7 @@ import { colors } from "../../lib/theme";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
 import FormListSeparator from "../../components/common/FormList/FormListSeparator";
 import SFSymbol from "sweet-sfsymbols";
+import BillGroupItem from "../../components/bills/BillGroupItem";
 const monthsDropDown = generateMonthListDropdown(new Date());
 const currentMonthDefault = getMonthDropdown(new Date());
 
@@ -30,8 +31,6 @@ const Bills = () => {
   const handleMonthChange = (item: DropdownItem) => {
     setCurrentMonth(item);
   };
-
-  const arrays = new Array(5).fill(0);
 
   return (
     <SafeContainer hasHeader>
@@ -98,116 +97,23 @@ const Bills = () => {
             </Progress>
           </View>
         </View>
-        <View>
-          <FormListContainer style={{ paddingHorizontal: 0 }}>
-            <View
-              style={{
-                marginBottom: 10,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-                paddingRight: 10,
-                paddingTop: 10,
-              }}
-            >
-              <View>
-                <SFSymbol
-                  weight="thin"
-                  size={22}
-                  name="trash.circle"
-                  colors={[colors.redVivid]}
-                />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text>Transportation</Text>
-                <Text>30%</Text>
-              </View>
-              <View>
-                <Text>$700</Text>
-              </View>
-            </View>
-            {arrays.map((item, index) => {
-              const showSeparator: boolean = arrays.length !== index + 1;
-
-              return (
-                <Fragment key={index}>
-                  <TouchableOpacity
-                    style={{
-                      paddingRight: 10,
-                      marginVertical: 10,
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
-                  >
-                    <View>
-                      <SFSymbol
-                        weight="thin"
-                        size={24}
-                        name="alarm.waves.left.and.right"
-                        colors={[colors.grayLight]}
-                      />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <View style={{ marginBottom: 10 }}>
-                          <View style={{ flexDirection: "row", gap: 5 }}>
-                            <Text>Car gas</Text>
-                            <SFSymbol
-                              weight="thin"
-                              size={14}
-                              name="alarm.waves.left.and.right"
-                              colors={[colors.grayLight]}
-                            />
-                          </View>
-                          <Text>Due Date</Text>
-                        </View>
-                        <View>
-                          <Text>
-                            <SFSymbol
-                              weight="thin"
-                              size={24}
-                              name="alarm.waves.left.and.right"
-                              colors={[colors.grayLight]}
-                            />
-                          </Text>
-                        </View>
-                      </View>
-                      <View>
-                        <Progress value={30} size="xs">
-                          <ProgressFilledTrack bgColor={colors.purple} />
-                        </Progress>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  {showSeparator && (
-                    <View style={{ paddingLeft: 50 }}>
-                      <FormListSeparator />
-                    </View>
-                  )}
-                </Fragment>
-              );
-            })}
-          </FormListContainer>
+        <View style={{ marginTop: 20 }}>
+          <BillGroupItem />
+          <BillGroupItem />
+          <BillGroupItem />
         </View>
-        <Text>Gouped list</Text>
-        <Text>Gouped list percent</Text>
-        <Text>Gouped list due date on items</Text>
-        <Text>Gouped Icon reminder</Text>
-        <Text>Pay bill button?</Text>
       </View>
     </SafeContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  textTitle: { textAlign: "center", fontSize: 54, fontWeight: "900" },
+  textTitle: {
+    textAlign: "center",
+    fontSize: 54,
+    fontWeight: "900",
+    color: colors.blue,
+  },
   labelStyle: { fontWeight: "900", color: colors.grayLight },
   container: { marginTop: 20 },
   containerDropdown: { alignItems: "center" },

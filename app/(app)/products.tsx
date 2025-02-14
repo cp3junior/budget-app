@@ -136,6 +136,7 @@ const ProductsScreen = () => {
             return (
               <Fragment key={prod.id}>
                 <FormListButtonLink
+                  textStyle={{ fontWeight: "700" }}
                   label={prod.name}
                   href=""
                   onPress={() => navigateToDetails(prod.id)}

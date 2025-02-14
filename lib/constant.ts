@@ -1,3 +1,5 @@
+import { SystemName } from "sweet-sfsymbols/src/SweetSFSymbols.types";
+
 export const TAB_ICON_SIZE = 40;
 
 export const COLLECTION_USER = "users";
@@ -7,6 +9,7 @@ export const COLLECTION_PRODUCTS = "products";
 export const COLLECTION_TRANSACTIONS = "transactions";
 export const COLLECTION_WISHLISTS = "wishlists";
 export const COLLECTION_WALLETS = "wallets";
+export const COLLECTION_EXPENSES = "expenses";
 
 export const tabsScreens = ["home", "bills", "transactions", "wishlist"];
 export const withHeaderScreens = [
@@ -18,6 +21,7 @@ export const withHeaderScreens = [
   "account-sharing",
   "product-details",
   "wishlist-details",
+  "expense-details",
 ];
 export const modalScreens = [
   "add-transaction",
@@ -40,6 +44,62 @@ export const transactionTypes: DropdownItem[] = [
     id: 2,
     label: "Debit",
     icon: "creditcard.fill",
+  },
+];
+
+export const frequencyList: DropdownItem[] = [
+  {
+    id: 1,
+    label: "Monthly",
+    icon: "calendar",
+  },
+  {
+    id: 2,
+    label: "Bi-weekly",
+    icon: "2.brakesignal",
+  },
+  {
+    id: 3,
+    label: "Weekly",
+    icon: "1.brakesignal",
+  },
+];
+
+export const dayOfWeek: DropdownItem[] = [
+  {
+    id: 1,
+    label: "Monday",
+    icon: "sun.min.fill",
+  },
+  {
+    id: 2,
+    label: "Tuesday",
+    icon: "sun.min.fill",
+  },
+  {
+    id: 3,
+    label: "Wednesday",
+    icon: "sun.min.fill",
+  },
+  {
+    id: 4,
+    label: "Thursday",
+    icon: "sun.min.fill",
+  },
+  {
+    id: 5,
+    label: "Friday",
+    icon: "sun.min.fill",
+  },
+  {
+    id: 6,
+    label: "Saturday",
+    icon: "sun.min.fill",
+  },
+  {
+    id: 7,
+    label: "Sunday",
+    icon: "sun.min.fill",
   },
 ];
 
@@ -455,5 +515,29 @@ export const categories: DropdownItem[] = [
         icon: "exclamationmark.circle",
       },
     ],
+  },
+];
+
+const daysOfMonth: DropdownItem[] = new Array(31).fill(0).map((_, i) => {
+  const id = i + 1;
+  let th = "th";
+
+  if (id === 1 || id === 21 || id === 31) th = "st";
+  if (id === 2 || id === 22) th = "nd";
+  if (id === 3 || id === 23) th = "rd";
+
+  return {
+    id,
+    label: `${id}${th} day of the month`,
+    icon: `${id}.circle` as SystemName,
+  };
+});
+
+export const dayOfMonth: DropdownItem[] = [
+  ...daysOfMonth,
+  {
+    id: 32,
+    label: "Last day of the month",
+    icon: "calendar.circle",
   },
 ];

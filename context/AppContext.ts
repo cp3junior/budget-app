@@ -5,6 +5,7 @@ interface AppContextType {
   locations: LocationItem[];
   products: ProductItem[];
   wishlists: WishListItem[];
+  expenses: ExpenseItem[];
   wallet: WalletItem | null;
 }
 

@@ -181,8 +181,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   textStyle: {
+    fontSize: 16,
     marginBottom: 20,
     color: colors.grayLight,
+    marginTop: -15,
+    marginLeft: 20,
   },
 });
 

@@ -8,7 +8,8 @@
     "ios": "rm -rf ios/ && expo run:ios",
     "prebuild:ios": "rm -rf ios/ && expo prebuild --platform ios",
     "web": "expo start --web",
-    "build:web": "expo export -p web"
+    "build:web": "expo export -p web",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",

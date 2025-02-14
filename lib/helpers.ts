@@ -1,5 +1,5 @@
 import { FirebaseError } from "firebase/app";
-import { categories, transactionTypes } from "./constant";
+import { categories, frequencyList, transactionTypes } from "./constant";
 
 export const getFileExtension = (filename: string): string | null => {
   const parts = filename.split(".");
@@ -157,9 +157,12 @@ export const getCategoryByCategoryId = (
   return null;
 };
 
-export const getTransactionTypeById = (id: number): DropdownItem | null => {
-  const transactionType = transactionTypes.find((t) => t.id === id);
-  if (transactionType) return transactionType;
+export const getDropdownItemById = (
+  items: DropdownItem[],
+  id: number
+): DropdownItem | null => {
+  const item = items.find((t) => t.id === id);
+  if (item) return item;
 
   return null;
 };

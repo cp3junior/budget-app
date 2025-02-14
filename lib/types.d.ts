@@ -106,6 +106,25 @@ declare global {
     createdAt: Date | Timestamp;
   };
 
+  type ExpenseItem = ExpenseItemFirestore & {
+    id: string;
+  };
+
+  type ExpenseItemFirestore = {
+    sharedAccounId: string;
+    categoryId: number;
+    amount: string;
+    completed: boolean;
+    description: string;
+    notificationEnabled: boolean;
+    notificationTime: Date | Timestamp;
+    isRecurring: boolean;
+    repeatingDay: number;
+    frequency: number;
+    endDate: Date | Timestamp;
+    createdAt: Date | Timestamp;
+  };
+
   type ProductPrice = {
     id: string;
     locationId: string;
@@ -118,6 +137,12 @@ declare global {
     id: string;
     name: string;
   };
+
+  enum PeriodExpense {
+    1 = "month",
+    2 = "week",
+    3 = "2weeks",
+  }
 
   type TransactionOrigins = "wishlist" | "default" | "bills";
 
@@ -161,12 +186,12 @@ declare global {
     description: string;
   };
 
-  type DropdownItem = {
+  type DropdownItem<T = unknown> = {
     id: number;
     label: string;
     items?: DropdownItem[];
     icon?: SystemName;
-    value?: string;
+    value?: T;
   };
 }
 

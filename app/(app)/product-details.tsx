@@ -14,6 +14,7 @@ import { COLLECTION_PRODUCTS } from "../../lib/constant";
 import { formatDateSimple } from "../../lib/dateHelpers";
 import { updateDocument } from "../../lib/firebaseFirestore";
 import { colors } from "../../lib/theme";
+import { formatCurrency } from "../../lib/helpers";
 
 const ProductDetails = () => {
   const { user, products, locations } = useAppContext();
@@ -170,8 +171,7 @@ const ProductDetails = () => {
                   </View>
                   <View style={styles.containerListRight}>
                     <Text style={styles.containerListSubTextPrice}>
-                      Price:{" "}
-                      {<Text style={styles.textPrice}>${price.amount}</Text>}
+                      {formatCurrency(price.amount)}
                     </Text>
                     <Text style={styles.containerListSubText}>
                       {formatDateSimple(price.date)}
@@ -238,11 +238,11 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   containerListText: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "900",
   },
   containerListSubTextPrice: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.grayLight,
     marginTop: -2,
     fontWeight: "700",
@@ -251,10 +251,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.grayLight,
   },
-  textPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
+
   contentScroll: {
     marginBottom: 60,
   },
