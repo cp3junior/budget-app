@@ -1,8 +1,15 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import SegmentedControl, {
+  NativeSegmentedControlIOSChangeEvent,
+} from "@react-native-segmented-control/segmented-control";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import React, { useRef, useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  NativeSyntheticEvent,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AmountInput from "../../components/AmountInput";
 import AutoComplete from "../../components/common/AutoComplete";
@@ -15,30 +22,46 @@ import ModalHeader from "../../components/common/ModalHeader";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
 import {
+  baseExpenses,
   categories,
   COLLECTION_LOCATIONS,
   COLLECTION_TRANSACTIONS,
   COLLECTION_WALLETS,
   COLLECTION_WISHLISTS,
+  frequencyItem,
   transactionDirections,
   transactionTypes,
 } from "../../lib/constant";
+import {
+  formatDateSimpleMonthDate,
+  getMonthDropdown,
+  isWithinDateInterval,
+} from "../../lib/dateHelpers";
 import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
 import {
   calculateRemainingRaw,
   convertToFloat,
+  formatCurrency,
   getCategoryByCategoryId,
 } from "../../lib/helpers";
+import { colors } from "../../lib/theme";
+
+const currentMonth = getMonthDropdown(new Date());
+const defaultMessage =
+  "⚠️  Extra spending is unplanned and may impact your budget.";
 
 const AddTransactionScreen = () => {
-  const { user, locations, wallet, wishlists } = useAppContext();
+  const { user, locations, wallet, wishlists, expenses } = useAppContext();
   const navigate = useNavigation();
   const params = useLocalSearchParams();
 
   const wishlistId = (params.wishlistId as string) || "";
+  const expenseId = (params.expenseId as string) || "";
   const currentWishlist = wishlists.find((wish) => wish.id === wishlistId);
+  const currentExpense = expenses.find((exp) => exp.id === expenseId);
 
   let initialAmount = "";
+  let initialExpense = baseExpenses;
   let initialCategory = categories[0]?.items?.[0] as DropdownItem;
 
   if (currentWishlist) {
@@ -49,6 +72,24 @@ const AddTransactionScreen = () => {
 
     const category = getCategoryByCategoryId(currentWishlist.categoryId);
     if (category) initialCategory = category;
+  }
+
+  if (currentExpense) {
+    initialAmount = currentExpense.amount;
+    const category = getCategoryByCategoryId(currentExpense.categoryId);
+    if (category) initialCategory = category;
+
+    const start = formatDateSimpleMonthDate(currentExpense.startDate);
+    const end = formatDateSimpleMonthDate(currentExpense.endDate);
+    const id = parseInt(
+      `${start}-${currentExpense.categoryId}-${end}`.replaceAll("-", "")
+    );
+    initialExpense = {
+      label: currentExpense.name,
+      id,
+      value: currentExpense.id,
+      icon: category?.icon || "questionmark",
+    };
   }
 
   let buttonTitle = "Add";
@@ -67,9 +108,51 @@ const AddTransactionScreen = () => {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [category, setCategory] = useState<DropdownItem>(initialCategory);
+  const [showCategory, setShowCategory] = useState(true);
+  const [showExpense, setShowExpense] = useState(true);
+  const [expense, setExpense] = useState<DropdownItem>(initialExpense);
+  const [expensesList, setExpensesList] = useState<DropdownItem[]>([]);
   const [transactionType, setTransactionType] = useState<DropdownItem>(
     transactionTypes[0]
   );
+  const [expenseMessage, setexpenseMessage] = useState("");
+
+  useEffect(() => {
+    let filteredExpenses = expenses.filter((e) => {
+      const strToday = currentMonth.value as string;
+
+      return isWithinDateInterval(strToday, e);
+    });
+
+    if (currentWishlist) {
+      filteredExpenses = filteredExpenses.filter((e) => {
+        return e.categoryId === currentWishlist.categoryId;
+      });
+
+      if (filteredExpenses.length === 0) {
+        setexpenseMessage(
+          `\n${defaultMessage}\nThere is no allocated monthly budget for this expense.`
+        );
+      }
+    }
+
+    const dropdownExpense: DropdownItem[] = filteredExpenses.map((ex) => {
+      const start = formatDateSimpleMonthDate(ex.startDate);
+      const end = formatDateSimpleMonthDate(ex.endDate);
+      const id = parseInt(
+        `${start}-${ex.categoryId}-${end}`.replaceAll("-", "")
+      );
+      const category = getCategoryByCategoryId(ex.categoryId);
+      return {
+        label: ex.name,
+        id,
+        value: ex.id,
+        icon: category?.icon || "questionmark",
+      };
+    });
+
+    setExpensesList([baseExpenses, ...dropdownExpense]);
+  }, [expenses, currentWishlist]);
 
   if (!user) return null;
   if (!wallet) return null;
@@ -120,6 +203,7 @@ const AddTransactionScreen = () => {
         amount,
         categoryId: category.id,
         transactionTypeId: transactionType.id,
+        budgetId: expense.value as string,
         transactionDirection,
         description,
         locationId: "",
@@ -197,6 +281,7 @@ const AddTransactionScreen = () => {
       amount,
       categoryId: category.id,
       transactionTypeId: transactionType.id,
+      budgetId: expense.value as string,
       transactionDirection,
       description,
       locationId,
@@ -231,12 +316,69 @@ const AddTransactionScreen = () => {
   const handleCategoryChange = (item: DropdownItem) => {
     setCategory(item);
   };
+  const handleExpenseChange = (item: DropdownItem) => {
+    const value = item.value as string;
+    if (value) {
+      setShowCategory(false);
+      const expense = getExpenseById(value);
+      let message = "";
+      if (expense) {
+        const expenseCategory = getCategoryByCategoryId(expense.categoryId);
+        if (expenseCategory) setCategory(expenseCategory);
+
+        if (expense.isRecurring) {
+          if (expense.frequency === frequencyItem.month) {
+            message = `The limit for this expense is ${formatCurrency(
+              expense.amount
+            )} monthly.`;
+          }
+          if (expense.frequency === frequencyItem["2weeks"]) {
+            message = `This expense of ${formatCurrency(
+              expense.amount
+            )} recurs every 2 weeks.`;
+          }
+          if (expense.frequency === frequencyItem.week) {
+            message = `This expense of ${formatCurrency(
+              expense.amount
+            )} recurs every week.`;
+          }
+        } else {
+          message = `The limit for this expense is ${formatCurrency(
+            expense.amount
+          )} monthly.`;
+        }
+        setexpenseMessage(message);
+      }
+    } else {
+      setShowCategory(true);
+      setexpenseMessage(defaultMessage);
+    }
+    setExpense(item);
+  };
   const handleTypeChange = (item: DropdownItem) => {
     setTransactionType(item);
   };
 
+  const getExpenseById = (id: string): ExpenseItem | undefined =>
+    expenses.find((expense) => expense.id === id);
+
   const handleFocusLocation = () => {
     notesInput.current?.focus();
+  };
+
+  const handleExpenseIncomeChange = (
+    event: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>
+  ) => {
+    const index = event.nativeEvent.selectedSegmentIndex;
+    if (index === 1) {
+      setexpenseMessage(defaultMessage);
+      setShowCategory(true);
+      setExpense(baseExpenses);
+      setShowExpense(false);
+    } else {
+      setShowExpense(true);
+    }
+    setTransactionDirection(index);
   };
 
   return (
@@ -250,14 +392,12 @@ const AddTransactionScreen = () => {
         isLoading={loading}
       />
       <View>
-        {!wishlistId && (
+        {!wishlistId && !expenseId && (
           <SegmentedControl
             appearance="dark"
             values={transactionDirections}
             selectedIndex={transactionDirection}
-            onChange={(event) => {
-              setTransactionDirection(event.nativeEvent.selectedSegmentIndex);
-            }}
+            onChange={handleExpenseIncomeChange}
           />
         )}
         <AmountInput
@@ -267,19 +407,39 @@ const AddTransactionScreen = () => {
           index={transactionDirection}
           isInvalid={invalidAmount}
         />
+        {showExpense && !expenseId && (
+          <View>
+            <FormListContainer style={styles.expenseCOntainer}>
+              <FormListContent>
+                <DropDownMenu
+                  label="Expense"
+                  id="expense"
+                  value={expense}
+                  onChange={handleExpenseChange}
+                  data={expensesList}
+                />
+              </FormListContent>
+            </FormListContainer>
+            <Text style={styles.expenseTextWarn}>{expenseMessage}</Text>
+          </View>
+        )}
         {!wishlistId && (
           <>
             <FormListContainer style={styles.textInputContainer}>
-              <FormListContent>
-                <DropDownMenu
-                  label="Category"
-                  id="category"
-                  value={category}
-                  onChange={handleCategoryChange}
-                  data={categories}
-                />
-              </FormListContent>
-              <FormListSeparator />
+              {showCategory && !expenseId && (
+                <>
+                  <FormListContent>
+                    <DropDownMenu
+                      label="Category"
+                      id="category"
+                      value={category}
+                      onChange={handleCategoryChange}
+                      data={categories}
+                    />
+                  </FormListContent>
+                  <FormListSeparator />
+                </>
+              )}
               <FormListContent>
                 <DropDownMenu
                   label="Transaction type"
@@ -344,6 +504,16 @@ const AddTransactionScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  expenseTextWarn: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: colors.grayLight,
+    marginLeft: 20,
+  },
+  expenseCOntainer: {
+    padding: 0,
+    marginTop: 20,
+  },
   textInputContainer: {
     padding: 0,
     marginBottom: 40,

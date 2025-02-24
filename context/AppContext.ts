@@ -6,6 +6,7 @@ interface AppContextType {
   products: ProductItem[];
   wishlists: WishListItem[];
   expenses: ExpenseItem[];
+  monthlyTransactions: TransactionItem[];
   wallet: WalletItem | null;
 }
 

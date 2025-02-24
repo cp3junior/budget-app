@@ -13,12 +13,7 @@ const HeaderAddButton = ({ onPress, isLoading }: HeaderAddButtonProps) => {
 
   return (
     <TouchableOpacity onPress={onPress}>
-      <SFSymbol
-        size={22}
-        weight="regular"
-        name="plus"
-        colors={[colors.purple]}
-      />
+      <SFSymbol size={22} weight="regular" name="plus" colors={[colors.blue]} />
     </TouchableOpacity>
   );
 };

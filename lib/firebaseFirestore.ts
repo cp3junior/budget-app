@@ -13,7 +13,6 @@ import {
   Unsubscribe,
   updateDoc,
   where,
-  WhereFilterOp,
   WithFieldValue,
   writeBatch,
 } from "firebase/firestore";
@@ -21,16 +20,7 @@ import { db } from "./firebase";
 
 export const fetchDocuments = async <T>(
   collectionName: string,
-  options?: {
-    orderByField?: string;
-    orderDirection?: "asc" | "desc";
-    whereClauses?: {
-      field: string;
-      operator: WhereFilterOp;
-      value: any;
-    }[];
-    ids?: string[];
-  }
+  options?: FetchOption
 ): Promise<T[]> => {
   let docs: T[] = [];
   try {
@@ -73,15 +63,7 @@ export const fetchDocuments = async <T>(
 
 export const fetchSnapshot = <T>(
   collectionName: string,
-  options?: {
-    orderByField?: string;
-    orderDirection?: "asc" | "desc";
-    whereClauses?: {
-      field: string;
-      operator: WhereFilterOp;
-      value: any;
-    }[];
-  },
+  options?: FetchOption,
   callback?: (data: T[]) => void
 ): Unsubscribe => {
   const collectionRef = collection(db, collectionName);

@@ -1,6 +1,6 @@
+import { BlurView } from "expo-blur";
 import { Stack } from "expo-router";
 import { ScreenProps } from "expo-router/build/views/Screen";
-import { View } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -28,7 +28,7 @@ const withHeaderOptions: ScreenProps["options"] = {
   headerShown: true,
   headerBackTitle: "Back",
   headerTitleStyle: { color: colors.white },
-  headerTintColor: colors.purple,
+  headerTintColor: colors.white,
   headerTransparent: true,
   headerBlurEffect: "dark",
 };
@@ -55,9 +55,7 @@ const AppLayout = () => {
             options={{
               ...withTabsOptions,
               header: () => (
-                <View
-                  style={{ height: insets.top, backgroundColor: colors.darker }}
-                />
+                <BlurView tint="dark" style={{ height: insets.top }} />
               ),
             }}
           />

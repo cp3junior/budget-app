@@ -1,36 +1,105 @@
 import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
 import { Stack, useRouter } from "expo-router";
-import { Fragment, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import BillGroupItem from "../../components/bills/BillGroupItem";
 import DropDownMenu from "../../components/common/DropDownMenu/DropDownMenu";
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import HeaderTitle from "../../components/HeaderTitle";
 import withTabBar from "../../hoc/withTabBar";
+import { useAppContext } from "../../hook/useAppContext";
 import {
   generateMonthListDropdown,
   getMonthDropdown,
+  isWithinDateInterval,
 } from "../../lib/dateHelpers";
+import {
+  calculateRemainingPercent,
+  convertToFloat,
+  formatCurrency,
+  getExpenseGroupTotal,
+  getMainCategoryByCategoryId,
+} from "../../lib/helpers";
 import { colors } from "../../lib/theme";
-import FormListContainer from "../../components/common/FormList/FormListContainer";
-import FormListSeparator from "../../components/common/FormList/FormListSeparator";
-import SFSymbol from "sweet-sfsymbols";
-import BillGroupItem from "../../components/bills/BillGroupItem";
+
 const monthsDropDown = generateMonthListDropdown(new Date());
 const currentMonthDefault = getMonthDropdown(new Date());
 
 const Bills = () => {
   const router = useRouter();
+  const { expenses, monthlyTransactions } = useAppContext();
 
   const [currentMonth, setCurrentMonth] =
     useState<DropdownItem>(currentMonthDefault);
+  const [isCurrentMonth, setIsCurrentMonth] = useState(true);
 
   const navigateToAddBills = () => {
     router.push("/bills-edit");
   };
+
   const handleMonthChange = (item: DropdownItem) => {
+    if (item.id === currentMonthDefault.id) {
+      setIsCurrentMonth(true);
+    } else {
+      setIsCurrentMonth(false);
+    }
     setCurrentMonth(item);
   };
+
+  const filteredExpenses = expenses.filter((e) => {
+    const strToday = currentMonth.value as string;
+
+    return isWithinDateInterval(strToday, e);
+  });
+
+  const grouppedExpenses: GroupedExpenseItem[] = [];
+  let grandTotal = 0;
+
+  filteredExpenses.map((e) => {
+    const mainCategory = getMainCategoryByCategoryId(e.categoryId);
+    if (mainCategory) {
+      const group = grouppedExpenses.find((x) => x.id === mainCategory?.id);
+      if (group) {
+        group.data.push(e);
+      } else {
+        grouppedExpenses.push({ ...mainCategory, data: [e] });
+      }
+    }
+  });
+
+  const grouppedExpensesFront: GroupedExpenseItemFront[] = grouppedExpenses.map(
+    (expenseGroup) => {
+      const [total, expenseFront] = getExpenseGroupTotal(
+        expenseGroup.data,
+        currentMonth.value as string
+      );
+      grandTotal += total;
+      return { ...expenseGroup, total, data: expenseFront };
+    }
+  );
+
+  const unbudgeted: TransactionItem[] = [];
+  const budgeted: TransactionItem[] = [];
+  let totalUnbudgeted = 0;
+  let totalBudgeted = 0;
+
+  monthlyTransactions.map((transaction) => {
+    if (transaction.budgetId === "") {
+      unbudgeted.push(transaction);
+      totalUnbudgeted += convertToFloat(transaction.amount);
+    } else {
+      budgeted.push(transaction);
+      totalBudgeted += convertToFloat(transaction.amount);
+    }
+  });
+
+  const leftToSpend = grandTotal - totalBudgeted;
+
+  const remainingPercent = calculateRemainingPercent(
+    grandTotal.toString(),
+    totalBudgeted.toString()
+  );
 
   return (
     <SafeContainer hasHeader>
@@ -56,8 +125,9 @@ const Bills = () => {
             labelStyle={styles.labelStyle}
           />
         </View>
-        <Text style={styles.textTitle}>$1,000.00</Text>
+        <Text style={styles.textTitle}>{formatCurrency(grandTotal)}</Text>
         <Text style={styles.textSub}>This Month’s Budget</Text>
+
         <View style={styles.progressContainer}>
           <View style={styles.progressDetCOntainer}>
             <View>
@@ -68,7 +138,9 @@ const Bills = () => {
                   ...{ color: colors.red },
                 }}
               >
-                $100
+                {isCurrentMonth
+                  ? formatCurrency(totalBudgeted + totalUnbudgeted)
+                  : "$0"}
               </Text>
             </View>
             <View>
@@ -87,20 +159,36 @@ const Bills = () => {
                   ...{ color: colors.green },
                 }}
               >
-                $10
+                {isCurrentMonth
+                  ? formatCurrency(leftToSpend)
+                  : formatCurrency(grandTotal)}
               </Text>
             </View>
           </View>
           <View>
-            <Progress value={50} size="sm">
+            <Progress value={isCurrentMonth ? remainingPercent : 0} size="sm">
               <ProgressFilledTrack bgColor={colors.purple} />
             </Progress>
           </View>
+          {totalUnbudgeted > 0 && isCurrentMonth && (
+            <View>
+              <Text style={styles.unbudText}>
+                {formatCurrency(totalUnbudgeted)} of unbudgeted expense
+              </Text>
+            </View>
+          )}
         </View>
         <View style={{ marginTop: 20 }}>
-          <BillGroupItem />
-          <BillGroupItem />
-          <BillGroupItem />
+          {grouppedExpensesFront.map((g) => (
+            <BillGroupItem
+              key={g.id}
+              groupedExpense={g}
+              grandTotal={grandTotal}
+              isCurrentMonth={isCurrentMonth}
+              currentMonth={currentMonth.value as string}
+              transactions={budgeted}
+            />
+          ))}
         </View>
       </View>
     </SafeContainer>
@@ -138,6 +226,12 @@ const styles = StyleSheet.create({
   progressDetTextBottom: {
     fontSize: 24,
     fontWeight: "900",
+  },
+  unbudText: {
+    textAlign: "center",
+    marginTop: 5,
+    fontWeight: "900",
+    color: colors.redVivid,
   },
 });
 

@@ -1,54 +1,68 @@
 import { Progress, ProgressFilledTrack, Spinner } from "@gluestack-ui/themed";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
+import FormListSeparator from "../../components/common/FormList/FormListSeparator";
+import ProfileImage from "../../components/common/ProfileImage";
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
-import { COLLECTION_TRANSACTIONS, COLLECTION_USER } from "../../lib/constant";
-import { convertToDate, formatDateTransaction } from "../../lib/dateHelpers";
+import {
+  COLLECTION_USER,
+  frequencyItem,
+  transactionTypes,
+} from "../../lib/constant";
+import {
+  convertToDate,
+  formatDateExpense,
+  formatDateSimple,
+  formatDateTransaction,
+  formatHour,
+} from "../../lib/dateHelpers";
 import { fetchDocuments } from "../../lib/firebaseFirestore";
 import {
-  calculateRemaining,
   calculateRemainingPercent,
+  convertToFloat,
   formatCurrency,
   getCategoryByCategoryId,
+  getDropdownItemById,
+  getExpenseTotal,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
-import ProfileImage from "../../components/common/ProfileImage";
 
-const WishlistDetails = () => {
-  const { wishlists, user, expenses } = useAppContext();
-  const params = useLocalSearchParams();
+const BillsDetails = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const { expenses, user, monthlyTransactions } = useAppContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [transactions, setTransactions] = useState<TransactionItemWithUser[]>(
     []
   );
 
-  const wishlistId = params.wishlistId as string;
+  let message = "";
+  const billsId = params.billsId as string;
+  const isCurrentMonthStr = params.isCurrentMonth as string;
+  const currentMonth = params.currentMonth as string;
+  const isCurrentMonth = isCurrentMonthStr === "true" ? true : false;
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!wishlistId) return null;
-      const currentWishlist = wishlists.find((wish) => wish.id === wishlistId);
-      if (!currentWishlist) return null;
       if (!user) return null;
+      if (!billsId) return null;
 
-      const currentTransactions = currentWishlist.transactions;
-      if (currentTransactions.length > 0) {
+      const currentExpense = expenses.find((exp) => exp.id === billsId);
+      if (!currentExpense) return null;
+      const budgetTransactions = monthlyTransactions.filter(
+        (tr) => tr.budgetId === currentExpense.id
+      );
+
+      if (budgetTransactions.length > 0) {
         setIsLoading(true);
-        const transactionItems = await fetchDocuments<TransactionItem>(
-          COLLECTION_TRANSACTIONS,
-          {
-            ids: currentTransactions,
-          }
-        );
-        const sortedTransactions = transactionItems.sort(
+        const sortedTransactions = budgetTransactions.sort(
           (a, b) =>
             convertToDate(a.date).getTime() - convertToDate(b.date).getTime()
         );
@@ -90,41 +104,54 @@ const WishlistDetails = () => {
         setIsLoading(false);
       }
     };
-
     fetchData();
-  }, [wishlists, wishlistId]);
+  }, [monthlyTransactions, expenses]);
 
-  if (!wishlistId) return null;
-
-  const currentWishlist = wishlists.find((wish) => wish.id === wishlistId);
-  if (!currentWishlist) return null;
+  if (!billsId) return null;
   if (!user) return null;
 
-  const remainingAmount = calculateRemaining(
-    currentWishlist.fullAmount,
-    currentWishlist.amount
+  const currentExpense = expenses.find((exp) => exp.id === billsId);
+  if (!currentExpense) return null;
+
+  const category = getCategoryByCategoryId(currentExpense.categoryId);
+
+  if (currentExpense.isRecurring) {
+    if (currentExpense.frequency === frequencyItem["2weeks"]) {
+      message = `${formatCurrency(currentExpense.amount)} every 2 weeks`;
+    }
+    if (currentExpense.frequency === frequencyItem.week) {
+      message = `${formatCurrency(currentExpense.amount)} every week`;
+    }
+  }
+
+  const budgetTransactions = monthlyTransactions.filter(
+    (tr) => tr.budgetId === currentExpense.id
   );
 
+  const [expenseTotal, dates] = getExpenseTotal(currentExpense, currentMonth);
+  const spent = budgetTransactions.reduce(
+    (total, transaction) => total + convertToFloat(transaction.amount),
+    0
+  );
+  const remaining = expenseTotal - spent;
   const remainingPercent = calculateRemainingPercent(
-    currentWishlist.fullAmount,
-    currentWishlist.amount
+    expenseTotal.toString(),
+    spent.toString()
   );
 
-  const isCompleted = currentWishlist.completed;
-
-  const category = getCategoryByCategoryId(currentWishlist.categoryId);
+  const time = formatHour(currentExpense.notificationTime);
 
   const navigateToAddTransaction = () => {
     router.push({
       pathname: "/add-transaction",
-      params: { wishlistId },
+      params: { expenseId: currentExpense.id },
     });
   };
 
-  const handleEditWishlist = () => {
+  const handleEditExpense = () => {
     router.push({
-      pathname: "/wishlist-edit",
-      params: { wishlistId },
+      pathname: "/bills-edit",
+      params: { expenseId: currentExpense.id },
     });
   };
 
@@ -132,19 +159,19 @@ const WishlistDetails = () => {
     <SafeContainer
       hasHeader
       footerView={
-        !isCompleted && (
-          <View style={styles.containerBtns}>
-            <View style={styles.footerCOntainer}>
-              <FormListContainer style={styles.containerStyle}>
-                <FormListButtonLink
-                  label="Edit"
-                  hasIcon={false}
-                  color={colors.blue}
-                  textStyle={{ ...styles.textStyle, ...{ fontWeight: "500" } }}
-                  onPress={handleEditWishlist}
-                />
-              </FormListContainer>
-            </View>
+        <View style={styles.containerBtns}>
+          <View style={styles.footerCOntainer}>
+            <FormListContainer style={styles.containerStyle}>
+              <FormListButtonLink
+                label="Edit"
+                hasIcon={false}
+                color={colors.blue}
+                textStyle={{ ...styles.textStyle, ...{ fontWeight: "500" } }}
+                onPress={handleEditExpense}
+              />
+            </FormListContainer>
+          </View>
+          {isCurrentMonth && (
             <View style={[styles.footerCOntainer, { flex: 2 }]}>
               <FormListContainer style={styles.containerStyle}>
                 <FormListButtonLink
@@ -156,12 +183,13 @@ const WishlistDetails = () => {
                 />
               </FormListContainer>
             </View>
-          </View>
-        )
+          )}
+        </View>
       }
     >
       <Stack.Screen
         options={{
+          headerTitle: "Expense details",
           headerRight: () => (
             <View style={styles.containerIcon}>
               <SFSymbol
@@ -175,27 +203,28 @@ const WishlistDetails = () => {
         }}
       />
       <View style={styles.contentScroll}>
-        <Text style={styles.nameText}>{currentWishlist.name}</Text>
-        {currentWishlist.description && (
-          <Text style={styles.desctText}>{currentWishlist.description}</Text>
+        <Text style={styles.nameText}>{currentExpense.name}</Text>
+        {currentExpense.description && (
+          <Text style={styles.desctText}>{currentExpense.description}</Text>
         )}
 
         <View style={styles.progressContainer}>
           <Text style={styles.progressAmountText}>
-            {formatCurrency(currentWishlist.fullAmount)}
+            {formatCurrency(expenseTotal)}
+            {message && (
+              <Text style={{ color: colors.grayLight }}> ({message})</Text>
+            )}
           </Text>
           <View style={styles.progressBar}>
-            <Progress value={isCompleted ? 100 : remainingPercent} size="sm">
+            <Progress value={isCurrentMonth ? remainingPercent : 0} size="sm">
               <ProgressFilledTrack bgColor={colors.purple} />
             </Progress>
           </View>
           <View style={styles.progressDetCOntainer}>
             <View>
-              <Text style={styles.progressDetTextTop}>Paid to date</Text>
+              <Text style={styles.progressDetTextTop}>Spent</Text>
               <Text style={styles.progressDetTextBottom}>
-                {isCompleted
-                  ? formatCurrency(currentWishlist.fullAmount)
-                  : formatCurrency(currentWishlist.amount)}
+                {isCurrentMonth ? formatCurrency(spent) : "$0"}
               </Text>
             </View>
             <View>
@@ -205,7 +234,7 @@ const WishlistDetails = () => {
                   ...{ textAlign: "right" },
                 }}
               >
-                Remaining
+                Left to spend
               </Text>
               <Text
                 style={{
@@ -213,11 +242,43 @@ const WishlistDetails = () => {
                   ...{ textAlign: "right" },
                 }}
               >
-                {isCompleted ? "$0" : remainingAmount}
+                {isCurrentMonth
+                  ? formatCurrency(remaining)
+                  : formatCurrency(expenseTotal)}
               </Text>
             </View>
           </View>
         </View>
+        {currentExpense.isRecurring && (
+          <View>
+            <Text style={styles.devStyle}>Due dates</Text>
+            <FormListContainer style={styles.containerDates}>
+              {dates.map((date, index) => {
+                const key = formatDateSimple(date);
+                const showSeparator: boolean = dates.length !== index + 1;
+                return (
+                  <Fragment key={key}>
+                    <Text style={styles.dateStyleText}>
+                      {formatDateExpense(date)}
+                    </Text>
+                    {showSeparator && <FormListSeparator />}
+                  </Fragment>
+                );
+              })}
+            </FormListContainer>
+          </View>
+        )}
+        {currentExpense.notificationEnabled && (
+          <View style={styles.notifIcon}>
+            <SFSymbol
+              weight="medium"
+              size={20}
+              name="alarm.waves.left.and.right"
+              colors={[colors.blue]}
+            />
+            <Text style={styles.textNotif}>Reminder set at {time}</Text>
+          </View>
+        )}
         {isLoading ? (
           <View style={styles.loadCOntainer}>
             <Spinner color={colors.purple} />
@@ -226,8 +287,9 @@ const WishlistDetails = () => {
           <View style={styles.timelineContainerMain}>
             {transactions.map((transaction, index) => {
               const isLast = index === transactions.length - 1;
-              const expense = expenses.find(
-                (expense) => expense.id === transaction.budgetId
+              const transacType = getDropdownItemById(
+                transactionTypes,
+                transaction.transactionTypeId
               );
               return (
                 <View key={transaction.id} style={styles.timelineContainer}>
@@ -241,7 +303,7 @@ const WishlistDetails = () => {
                         Paid: {formatDateTransaction(transaction.date)}
                       </Text>
                       <Text style={styles.type}>
-                        {expense?.name || "Unbudgeted expense"}
+                        {transacType?.label || ""}
                       </Text>
                       <View style={styles.containerImg}>
                         <View style={styles.userImageContainer}>
@@ -272,8 +334,45 @@ const WishlistDetails = () => {
 };
 
 const styles = StyleSheet.create({
+  notifIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 20,
+    paddingLeft: 20,
+  },
+  textNotif: {
+    marginLeft: 20,
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.blue,
+  },
+  containerDates: {
+    padding: 0,
+  },
+  devStyle: {
+    marginTop: 20,
+    textTransform: "uppercase",
+    fontSize: 17,
+    fontWeight: "500",
+    color: colors.grayLight,
+    paddingLeft: 20,
+    marginBottom: 8,
+  },
+  dateStyleText: {
+    paddingVertical: 10,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  contentScroll: {
+    marginBottom: 60,
+  },
   loadCOntainer: { marginTop: 40 },
-  nameText: { fontSize: 23, marginBottom: 5, fontWeight: "900" },
+  nameText: {
+    fontSize: 23,
+    marginBottom: 5,
+    fontWeight: "900",
+  },
   desctText: { color: colors.grayLight, marginBottom: 20 },
   progressContainer: {
     marginTop: 10,
@@ -307,17 +406,28 @@ const styles = StyleSheet.create({
     height: 110,
     flex: 1,
   },
-  containerStyle: {
-    paddingHorizontal: 0,
-    marginBottom: 20,
-  },
-  textStyle: { textAlign: "center", fontWeight: "900" },
   containerBtns: {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 20,
   },
-  contentScroll: {
+
+  containerStyle: {
+    paddingHorizontal: 0,
+    marginBottom: 20,
+  },
+  textStyle: { textAlign: "center", fontWeight: "900" },
+  containerIcon: {
+    width: 28,
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 40,
+    borderWidth: 1,
+    borderColor: colors.gray,
+    marginRight: 10,
+  },
+  ontentScroll: {
     marginBottom: 60,
   },
   timelineContainerMain: { marginTop: 40 },
@@ -362,16 +472,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "900",
   },
-  containerIcon: {
-    width: 28,
-    height: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 40,
-    borderWidth: 1,
-    borderColor: colors.gray,
-    marginRight: 10,
-  },
   userImage: {
     width: 24,
     height: 24,
@@ -391,4 +491,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WishlistDetails;
+export default BillsDetails;

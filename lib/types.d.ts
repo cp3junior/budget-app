@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, WhereFilterOp } from "firebase/firestore";
 import { SystemName } from "sweet-sfsymbols/src/SweetSFSymbols.types";
 
 declare global {
@@ -69,6 +69,7 @@ declare global {
     userId: string;
     categoryId: number;
     transactionTypeId: number;
+    budgetId: string;
     locationId?: string;
     transactionDirection: number;
     amount: string;
@@ -111,6 +112,7 @@ declare global {
   };
 
   type ExpenseItemFirestore = {
+    name: string;
     sharedAccounId: string;
     categoryId: number;
     amount: string;
@@ -121,6 +123,7 @@ declare global {
     isRecurring: boolean;
     repeatingDay: number;
     frequency: number;
+    startDate: Date | Timestamp;
     endDate: Date | Timestamp;
     createdAt: Date | Timestamp;
   };
@@ -143,10 +146,14 @@ declare global {
     2 = "week",
     3 = "2weeks",
   }
+  enum PeriodExpenseStr {
+    "month" = 1,
+    "week" = 2,
+    "2weeks" = 3,
+  }
 
   type TransactionOrigins = "wishlist" | "default" | "bills";
 
-  //** Normal types */
   type StatusRequest = "pending" | "accepted" | "rejected" | "cancelled";
 
   type ToggleItem = {
@@ -192,6 +199,34 @@ declare global {
     items?: DropdownItem[];
     icon?: SystemName;
     value?: T;
+  };
+
+  type ExpenseItemFront = ExpenseItem & {
+    total: number;
+    category: DropdownItem | null;
+    dates: Date[];
+  };
+
+  type GroupedExpenseItem = DropdownItem & {
+    data: ExpenseItem[];
+  };
+
+  type GroupedExpenseItemFront = DropdownItem & {
+    data: ExpenseItemFront[];
+    total: number;
+  };
+
+  type FetchOption = {
+    orderByField?: string;
+    orderDirection?: "asc" | "desc";
+    whereClauses?: WhereClause[];
+    ids?: string[];
+  };
+
+  type WhereClause = {
+    field: string;
+    operator: WhereFilterOp;
+    value: any;
   };
 }
 

@@ -33,7 +33,9 @@ let initialFrequency = frequencyList[0] as DropdownItem;
 let initialRepeat = dayOfMonth[0] as DropdownItem;
 let initialDataRepeatingDay = dayOfMonth;
 let initialEndDate = new Date();
+let initialStartDate = new Date();
 let initialTime = new Date();
+let initialRecurring = true;
 
 const BillsEdit = () => {
   const navigate = useNavigation();
@@ -45,7 +47,9 @@ const BillsEdit = () => {
   const currentExpense = expenses.find((wish) => wish.id === expenseId);
 
   if (currentExpense) {
+    initialRecurring = currentExpense.isRecurring;
     initialEndDate = convertToDate(currentExpense.endDate);
+    initialStartDate = convertToDate(currentExpense.startDate);
     initialTime = convertToDate(currentExpense.notificationTime);
     const category = getCategoryByCategoryId(currentExpense.categoryId);
     if (category) initialCategory = category;
@@ -72,6 +76,7 @@ const BillsEdit = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState(currentExpense?.amount || "");
+  const [name, setName] = useState(currentExpense?.name || "");
   const [category, setCategory] = useState<DropdownItem>(initialCategory);
   const [frequency, setFrequency] = useState<DropdownItem>(initialFrequency);
   const [repeatingDay, setRepeatingDay] = useState<DropdownItem>(initialRepeat);
@@ -79,17 +84,17 @@ const BillsEdit = () => {
     initialDataRepeatingDay
   );
   const [endDate, setEndDate] = useState<Date>(initialEndDate);
+  const [startDate, setStartDate] = useState<Date>(initialStartDate);
   const [notificationTime, setNotificationTime] = useState<Date>(initialTime);
   const [description, setDescription] = useState(
     currentExpense?.description || ""
   );
-  const [isRecurring, setIsRecurring] = useState(
-    currentExpense?.isRecurring || false
-  );
+  const [isRecurring, setIsRecurring] = useState(initialRecurring);
   const [notificationEnabled, setNotificationEnabled] = useState(
     currentExpense?.notificationEnabled || false
   );
   const [invalidAmount, setInvalidAmount] = useState(false);
+  const [invalidName, setInvalidName] = useState(false);
 
   if (!user) return null;
   if (!wallet) return null;
@@ -120,7 +125,11 @@ const BillsEdit = () => {
 
   const onChange = (selectedDate: Date | undefined, name: string) => {
     if (selectedDate) {
-      if (name === "date") setEndDate(selectedDate);
+      if (name === "startDate") {
+        setStartDate(selectedDate);
+        setEndDate(selectedDate);
+      }
+      if (name === "endDate") setEndDate(selectedDate);
       if (name === "time") setNotificationTime(selectedDate);
     }
   };
@@ -131,7 +140,16 @@ const BillsEdit = () => {
       amountInput.current?.focus();
       return;
     }
+    if (!name) {
+      setInvalidName(true);
+      return;
+    }
+    if (endDate < startDate) {
+      alert("End date cannot be before start date");
+      return;
+    }
     setInvalidAmount(false);
+    setInvalidName(false);
 
     if (expenseId) editBill();
     else addBill();
@@ -142,6 +160,7 @@ const BillsEdit = () => {
     setIsLoading(true);
 
     const dataUpdate = {
+      name,
       categoryId: category.id,
       amount,
       description,
@@ -151,6 +170,7 @@ const BillsEdit = () => {
       repeatingDay: repeatingDay.id,
       frequency: frequency.id,
       endDate,
+      startDate,
     };
 
     await updateDocument(COLLECTION_EXPENSES, currentExpense.id, dataUpdate);
@@ -162,6 +182,7 @@ const BillsEdit = () => {
     setIsLoading(true);
 
     const data: ExpenseItemFirestore = {
+      name,
       sharedAccounId: user.sharedAccounId,
       categoryId: category.id,
       amount,
@@ -172,6 +193,7 @@ const BillsEdit = () => {
       isRecurring,
       repeatingDay: repeatingDay.id,
       frequency: frequency.id,
+      startDate,
       endDate,
       createdAt: new Date(),
     };
@@ -195,10 +217,22 @@ const BillsEdit = () => {
         ref={amountInput}
         value={amount}
         onChange={setAmount}
-        index={1}
+        index={0}
         isInvalid={invalidAmount}
       />
       <FormListContainer style={styles.textInputContainer}>
+        <InputForm
+          isInvalid={invalidName}
+          InputProps={{
+            placeholder: "Name",
+            value: name,
+            onChangeText: setName,
+            type: "text",
+            blurOnSubmit: true,
+            returnKeyType: "next",
+          }}
+        />
+        <FormListSeparator />
         <FormListContent>
           <DropDownMenu
             label="Category"
@@ -220,15 +254,41 @@ const BillsEdit = () => {
           }}
         />
         <FormListSeparator />
+        <FormListContent>
+          <Text style={styles.textDate}>Start date</Text>
+          <View style={styles.datePickerContent}>
+            <DateTimePicker
+              value={startDate}
+              mode="date"
+              onChange={(_, date) => onChange(date, "startDate")}
+              themeVariant="dark"
+            />
+          </View>
+        </FormListContent>
+        <FormListSeparator />
+        <FormListContent>
+          <Text style={styles.textDate}>End date</Text>
+          <View style={styles.datePickerContent}>
+            <DateTimePicker
+              value={endDate}
+              mode="date"
+              onChange={(_, date) => onChange(date, "endDate")}
+              themeVariant="dark"
+            />
+          </View>
+        </FormListContent>
+        <FormListSeparator />
+
         <FormListSwitch
-          label="Set Recurring Payment"
+          label="Recurring Payment"
           onValueChange={toggleRecurring}
           value={isRecurring}
         />
       </FormListContainer>
       <Text style={styles.textExplanation}>
         Turn this on for expenses with a fixed due date, like rent or bills, so
-        you can set reminders. Turn it off for flexible expenses like groceries.
+        you can set reminders. Turn it off for monthly flexible expenses like
+        groceries.
       </Text>
       {isRecurring && (
         <>
@@ -251,18 +311,6 @@ const BillsEdit = () => {
                 onChange={(item) => handleDropdownChange(item, "repeat")}
                 data={dataRepeatingDay}
               />
-            </FormListContent>
-            <FormListSeparator />
-            <FormListContent>
-              <Text style={styles.textDate}>End date</Text>
-              <View style={styles.datePickerContent}>
-                <DateTimePicker
-                  value={endDate}
-                  mode="date"
-                  onChange={(_, date) => onChange(date, "date")}
-                  themeVariant="dark"
-                />
-              </View>
             </FormListContent>
           </FormListContainer>
           <FormListContainer style={styles.textInputContainer}>

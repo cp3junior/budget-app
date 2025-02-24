@@ -7,10 +7,12 @@ import {
   COLLECTION_LOCATIONS,
   COLLECTION_PRODUCTS,
   COLLECTION_REQUESTS,
+  COLLECTION_TRANSACTIONS,
   COLLECTION_USER,
   COLLECTION_WALLETS,
   COLLECTION_WISHLISTS,
 } from "../lib/constant";
+import { getStartEndMonthDays } from "../lib/dateHelpers";
 import { authStateListener } from "../lib/firebaseAuth";
 import { fetchSnapshot, updateDocument } from "../lib/firebaseFirestore";
 import { AppContext } from "./AppContext";
@@ -26,6 +28,9 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [wishlists, setWishlists] = useState<WishListItem[]>([]);
   const [wallets, setWallets] = useState<WalletItem[]>([]);
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
+  const [monthlyTransactions, setMonthlyTransactions] = useState<
+    TransactionItem[]
+  >([]);
   const [wallet, setWallet] = useState<WalletItem | null>(null);
 
   useEffect(() => {
@@ -89,7 +94,8 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     const fetchData = <T,>(
       collectionName: string,
       setter: React.Dispatch<React.SetStateAction<T[]>>,
-      transform?: (data: T[]) => T[]
+      transform?: (data: T[]) => T[],
+      whereClauses: WhereClause[] = []
     ) => {
       const unsubscribe = fetchSnapshot<T>(
         collectionName,
@@ -100,6 +106,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
               value: user.sharedAccounId,
               operator: "==",
             },
+            ...whereClauses,
           ],
         },
         (data) => {
@@ -119,6 +126,25 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     );
     fetchData<WalletItem>(COLLECTION_WALLETS, setWallets);
     fetchData<ExpenseItem>(COLLECTION_EXPENSES, setExpenses);
+
+    const [start, end] = getStartEndMonthDays(new Date());
+    fetchData<TransactionItem>(
+      COLLECTION_TRANSACTIONS,
+      setMonthlyTransactions,
+      (data) => data,
+      [
+        {
+          field: "date",
+          operator: ">=",
+          value: start,
+        },
+        {
+          field: "date",
+          operator: "<=",
+          value: end,
+        },
+      ]
+    );
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, [user]);
@@ -180,6 +206,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   return (
     <AppContext.Provider
       value={{
+        monthlyTransactions,
         user,
         locations,
         products,

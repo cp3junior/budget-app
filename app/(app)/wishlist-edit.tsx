@@ -152,7 +152,7 @@ const WishlistEdit = () => {
         ref={amountInput}
         value={amount}
         onChange={setAmount}
-        index={1}
+        index={0}
         isInvalid={invalidAmount}
       />
       <Formik

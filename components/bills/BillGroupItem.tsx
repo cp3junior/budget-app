@@ -1,21 +1,53 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
+import { useRouter } from "expo-router";
 import React, { Fragment } from "react";
-import Text from "../common/Text";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import SFSymbol from "sweet-sfsymbols";
+import { formatDateMonthDate, getNextDate } from "../../lib/dateHelpers";
+import {
+  calculateRemainingPercent,
+  convertToFloat,
+  formatCurrency,
+  getPercentage,
+} from "../../lib/helpers";
 import { colors } from "../../lib/theme";
 import FormListContainer from "../common/FormList/FormListContainer";
-import SFSymbol from "sweet-sfsymbols";
-import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
 import FormListSeparator from "../common/FormList/FormListSeparator";
-import { useRouter } from "expo-router";
-const BillGroupItem = () => {
+import Text from "../common/Text";
+
+interface BillGroupItemProps {
+  groupedExpense: GroupedExpenseItemFront;
+  grandTotal: number;
+  currentMonth: string;
+  isCurrentMonth: boolean;
+  transactions: TransactionItem[];
+}
+const BillGroupItem = ({
+  groupedExpense,
+  grandTotal,
+  isCurrentMonth,
+  transactions,
+  currentMonth,
+}: BillGroupItemProps) => {
   const router = useRouter();
 
-  const arrays = new Array(3).fill(0);
+  if (!groupedExpense) return null;
+  if (groupedExpense.total === 0) return null;
+
+  const percentage = getPercentage(grandTotal, groupedExpense.total);
+  const filteredTransactions = transactions.filter((transaction) =>
+    groupedExpense.items?.find((item) => item.id === transaction.categoryId)
+  );
+  const spentTotal = filteredTransactions.reduce(
+    (total, transaction) => total + convertToFloat(transaction.amount),
+    0
+  );
+  const remainingTotal = groupedExpense.total - spentTotal;
 
   const navigateToDetails = (id: string) => {
     router.push({
-      pathname: "/expense-details",
-      params: { billsId: id },
+      pathname: "/bills-details",
+      params: { billsId: id, isCurrentMonth, currentMonth },
     });
   };
 
@@ -26,52 +58,92 @@ const BillGroupItem = () => {
           <SFSymbol
             weight="medium"
             size={21}
-            name={"creditcard"}
+            name={groupedExpense.icon || "questionmark"}
             colors={[colors.grayLight]}
           />
         </View>
         <View style={styles.containerTopText}>
-          <Text style={styles.containerTopTextLabel}>Transportation</Text>
-          <Text style={styles.containerTopTextPercent}>30% of budget</Text>
+          <Text style={styles.containerTopTextLabel}>
+            {groupedExpense.label}
+          </Text>
+          <Text style={styles.containerTopTextPercent}>
+            {percentage}% of budget
+          </Text>
         </View>
         <View style={styles.containerTopAmount}>
-          <Text style={styles.containerTopAmountText}>$700</Text>
-          <Text style={styles.containerTopAmountSubText}>Left $300</Text>
+          <Text style={styles.containerTopAmountText}>
+            {formatCurrency(groupedExpense.total)}
+          </Text>
+          <Text style={styles.containerTopAmountSubText}>
+            {isCurrentMonth
+              ? formatCurrency(remainingTotal)
+              : formatCurrency(groupedExpense.total)}{" "}
+            remaining
+          </Text>
         </View>
       </View>
       <View>
-        {arrays.map((item, index) => {
-          const showSeparator: boolean = arrays.length !== index + 1;
+        {groupedExpense.data.map((expense, index) => {
+          if (expense.total === 0) return null;
+
+          const showSeparator: boolean =
+            groupedExpense.data.length !== index + 1;
+
+          const isRecurring = expense.isRecurring;
+          const nextDueDate = getNextDate(expense.dates);
+
+          const budgetTransactions = filteredTransactions.filter(
+            (tr) => tr.budgetId === expense.id
+          );
+
+          const spent = budgetTransactions.reduce(
+            (total, transaction) => total + convertToFloat(transaction.amount),
+            0
+          );
+          const remaining = expense.total - spent;
+          const remainingPercent = calculateRemainingPercent(
+            expense.total.toString(),
+            spent.toString()
+          );
 
           return (
-            <Fragment key={index}>
+            <Fragment key={expense.id}>
               <TouchableOpacity
                 style={styles.cont}
-                onPress={() => navigateToDetails("ID")}
+                onPress={() => navigateToDetails(expense.id)}
               >
                 <View style={styles.contIcon}>
                   <SFSymbol
                     weight="thin"
                     size={17}
-                    name="fork.knife"
+                    name={expense?.category?.icon || "questionmark"}
                     colors={[colors.grayLight]}
                   />
-                  <View style={styles.notifIcon}>
-                    <SFSymbol
-                      weight="medium"
-                      size={10}
-                      name="alarm.waves.left.and.right"
-                      colors={[colors.blue]}
-                    />
-                  </View>
+                  {expense.notificationEnabled && (
+                    <View style={styles.notifIcon}>
+                      <SFSymbol
+                        weight="medium"
+                        size={10}
+                        name="alarm.waves.left.and.right"
+                        colors={[colors.blue]}
+                      />
+                    </View>
+                  )}
                 </View>
                 <View style={styles.contData}>
                   <View style={styles.contDataTexts}>
                     <View style={styles.contTextTop}>
-                      <Text style={styles.contTextTopTitle}>Car gas</Text>
+                      <Text style={styles.contTextTopTitle}>
+                        {expense.name}
+                      </Text>
                       <Text style={styles.contTextTopSub}>
-                        $20 left from{" "}
-                        <Text style={styles.contTextTopSubSub}>$100</Text>
+                        {isCurrentMonth
+                          ? formatCurrency(remaining)
+                          : formatCurrency(expense.total)}{" "}
+                        left from{" "}
+                        <Text style={styles.contTextTopSubSub}>
+                          {formatCurrency(expense.total)}
+                        </Text>
                       </Text>
                     </View>
                     <View style={styles.chevronCont}>
@@ -81,13 +153,18 @@ const BillGroupItem = () => {
                         name="chevron.right"
                         colors={[colors.grayLight]}
                       />
-                      <Text style={styles.chevronContText}>
-                        Due: 2025-12-11
-                      </Text>
+                      {isRecurring && nextDueDate && (
+                        <Text style={styles.chevronContText}>
+                          Due on: {formatDateMonthDate(nextDueDate)}
+                        </Text>
+                      )}
                     </View>
                   </View>
                   <View>
-                    <Progress value={30} size="xs">
+                    <Progress
+                      value={isCurrentMonth ? remainingPercent : 0}
+                      size="xs"
+                    >
                       <ProgressFilledTrack bgColor={colors.purple} />
                     </Progress>
                   </View>
@@ -204,7 +281,7 @@ const styles = StyleSheet.create({
     color: colors.blue,
   },
   containerTopAmountSubText: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.grayLight,
   },
 });

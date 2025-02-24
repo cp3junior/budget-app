@@ -106,12 +106,7 @@ const ProductPrice = () => {
       style={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <ModalHeader
-        isSettingPage
-        onPress={handleSave}
-        title="Add"
-        isLoading={isLoading}
-      />
+      <ModalHeader onPress={handleSave} title="Add" isLoading={isLoading} />
       <View style={styles.containerMain}>
         <View>
           <AmountInput

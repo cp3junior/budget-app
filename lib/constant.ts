@@ -21,7 +21,7 @@ export const withHeaderScreens = [
   "account-sharing",
   "product-details",
   "wishlist-details",
-  "expense-details",
+  "bills-details",
 ];
 export const modalScreens = [
   "add-transaction",
@@ -65,6 +65,19 @@ export const frequencyList: DropdownItem[] = [
   },
 ];
 
+export const frequencyItem = {
+  month: 1,
+  "2weeks": 2,
+  week: 3,
+};
+
+export const baseExpenses: DropdownItem = {
+  id: 0,
+  label: "Extra spending",
+  icon: "creditcard.trianglebadge.exclamationmark",
+  value: "",
+};
+
 export const dayOfWeek: DropdownItem[] = [
   {
     id: 1,
@@ -97,7 +110,7 @@ export const dayOfWeek: DropdownItem[] = [
     icon: "sun.min.fill",
   },
   {
-    id: 7,
+    id: 0,
     label: "Sunday",
     icon: "sun.min.fill",
   },

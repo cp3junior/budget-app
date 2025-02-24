@@ -1,5 +1,10 @@
 import { FirebaseError } from "firebase/app";
-import { categories, frequencyList, transactionTypes } from "./constant";
+import { categories, frequencyItem } from "./constant";
+import {
+  countBiweeklyDays,
+  countWeekdaysInMonth,
+  getMonthDate,
+} from "./dateHelpers";
 
 export const getFileExtension = (filename: string): string | null => {
   const parts = filename.split(".");
@@ -157,6 +162,19 @@ export const getCategoryByCategoryId = (
   return null;
 };
 
+export const getMainCategoryByCategoryId = (
+  categoryId: number
+): DropdownItem | null => {
+  for (const category of categories) {
+    if (category.items) {
+      const foundItem = category.items.find((item) => item.id === categoryId);
+      if (foundItem) return category;
+    }
+  }
+
+  return null;
+};
+
 export const getDropdownItemById = (
   items: DropdownItem[],
   id: number
@@ -165,4 +183,55 @@ export const getDropdownItemById = (
   if (item) return item;
 
   return null;
+};
+
+export const getExpenseTotal = (
+  expense: ExpenseItem,
+  currentMonth: string
+): [number, Date[]] => {
+  const amount = convertToFloat(expense.amount);
+
+  if (expense.isRecurring) {
+    if (expense.frequency === frequencyItem.month) {
+      const date = getMonthDate(currentMonth, expense.repeatingDay);
+
+      return [amount, [date]];
+    }
+    if (expense.frequency === frequencyItem["2weeks"]) {
+      const dates = countBiweeklyDays(
+        currentMonth,
+        expense.startDate,
+        expense.repeatingDay
+      );
+      return [dates.length * amount, dates];
+    }
+    if (expense.frequency === frequencyItem.week) {
+      const dates = countWeekdaysInMonth(currentMonth, expense.repeatingDay);
+      return [dates.length * amount, dates];
+    }
+  }
+
+  return [amount, []];
+};
+
+export const getExpenseGroupTotal = (
+  expense: ExpenseItem[],
+  currentMonth: string
+): [number, ExpenseItemFront[]] => {
+  let total = 0;
+  const expenseFront: ExpenseItemFront[] = [];
+
+  for (const ex of expense) {
+    const [amount, dates] = getExpenseTotal(ex, currentMonth);
+    const category = getCategoryByCategoryId(ex.categoryId);
+    expenseFront.push({ ...ex, total: amount, dates, category });
+    total += amount;
+  }
+
+  return [total, expenseFront];
+};
+
+export const getPercentage = (grandTotal: number, subTotal: number): number => {
+  if (grandTotal === 0) return 0;
+  return Math.ceil((subTotal / grandTotal) * 100);
 };
