@@ -1,3 +1,4 @@
+import * as Notifications from "expo-notifications";
 import { router, Slot } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, View } from "react-native";
@@ -20,6 +21,24 @@ const AppEntry = () => {
       }, 200);
     }
   }, [authReady, currentUser]);
+
+  useEffect(() => {
+    const requestNotification = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+
+      if (status === "granted") {
+        Notifications.setNotificationHandler({
+          handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: false,
+          }),
+        });
+      }
+    };
+
+    requestNotification();
+  }, []);
 
   return (
     <>

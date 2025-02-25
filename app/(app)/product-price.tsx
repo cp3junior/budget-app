@@ -105,6 +105,8 @@ const ProductPrice = () => {
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
     >
       <ModalHeader onPress={handleSave} title="Add" isLoading={isLoading} />
       <View style={styles.containerMain}>

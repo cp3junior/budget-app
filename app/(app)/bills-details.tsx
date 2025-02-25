@@ -258,9 +258,22 @@ const BillsDetails = () => {
                 const showSeparator: boolean = dates.length !== index + 1;
                 return (
                   <Fragment key={key}>
-                    <Text style={styles.dateStyleText}>
-                      {formatDateExpense(date)}
-                    </Text>
+                    <View style={styles.dateStyleContainer}>
+                      <Text style={styles.dateStyleText}>
+                        {formatDateExpense(date)}
+                      </Text>
+                      {currentExpense.notificationEnabled && (
+                        <View style={styles.notifIcon}>
+                          <Text style={styles.textNotif}>{time}</Text>
+                          <SFSymbol
+                            weight="medium"
+                            size={14}
+                            name="alarm.waves.left.and.right"
+                            colors={[colors.blue]}
+                          />
+                        </View>
+                      )}
+                    </View>
                     {showSeparator && <FormListSeparator />}
                   </Fragment>
                 );
@@ -268,17 +281,7 @@ const BillsDetails = () => {
             </FormListContainer>
           </View>
         )}
-        {currentExpense.notificationEnabled && (
-          <View style={styles.notifIcon}>
-            <SFSymbol
-              weight="medium"
-              size={20}
-              name="alarm.waves.left.and.right"
-              colors={[colors.blue]}
-            />
-            <Text style={styles.textNotif}>Reminder set at {time}</Text>
-          </View>
-        )}
+
         {isLoading ? (
           <View style={styles.loadCOntainer}>
             <Spinner color={colors.purple} />
@@ -337,14 +340,12 @@ const styles = StyleSheet.create({
   notifIcon: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
-    marginTop: 20,
-    paddingLeft: 20,
+    paddingRight: 20,
   },
   textNotif: {
-    marginLeft: 20,
+    marginRight: 14,
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.blue,
   },
   containerDates: {
@@ -359,8 +360,13 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     marginBottom: 8,
   },
-  dateStyleText: {
+  dateStyleContainer: {
     paddingVertical: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  dateStyleText: {
     fontSize: 16,
     fontWeight: "700",
   },

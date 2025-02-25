@@ -142,6 +142,7 @@ const AutoComplete = forwardRef<any, AutoCompleteProps>(
                 keyboardShouldPersistTaps="always"
                 horizontal
                 showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
               >
                 {filteredSuggestions.map((sugg, idx) => {
                   const showSeparator: boolean =

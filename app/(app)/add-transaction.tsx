@@ -34,7 +34,7 @@ import {
 } from "../../lib/constant";
 import {
   formatDateSimpleMonthDate,
-  getMonthDropdown,
+  getCurrentMonthString,
   isWithinDateInterval,
 } from "../../lib/dateHelpers";
 import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
@@ -46,7 +46,7 @@ import {
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
 
-const currentMonth = getMonthDropdown(new Date());
+const currentMonth = getCurrentMonthString(new Date());
 const defaultMessage =
   "⚠️  Extra spending is unplanned and may impact your budget.";
 
@@ -119,7 +119,7 @@ const AddTransactionScreen = () => {
 
   useEffect(() => {
     let filteredExpenses = expenses.filter((e) => {
-      const strToday = currentMonth.value as string;
+      const strToday = currentMonth;
 
       return isWithinDateInterval(strToday, e);
     });
@@ -165,6 +165,13 @@ const AddTransactionScreen = () => {
   };
 
   const handleSubmit = () => {
+    if (!amount) {
+      setInvalidAmount(true);
+      amountInput.current?.focus();
+      return;
+    }
+    setInvalidAmount(false);
+
     if (wishlistId) {
       handleSaveWishlist();
       return;
@@ -175,11 +182,6 @@ const AddTransactionScreen = () => {
 
   const handleSaveWishlist = async () => {
     if (currentWishlist) {
-      if (!amount) {
-        setInvalidAmount(true);
-        amountInput.current?.focus();
-        return;
-      }
       const intAmount = convertToFloat(amount);
       const intWishlistAmount = convertToFloat(currentWishlist.amount);
       const intLimitAmount = convertToFloat(initialAmount);
@@ -194,7 +196,6 @@ const AddTransactionScreen = () => {
         return;
       }
 
-      setInvalidAmount(false);
       setLoading(true);
 
       const data: TransactionItemFirestore = {
@@ -245,13 +246,6 @@ const AddTransactionScreen = () => {
   };
 
   const handleSaveRegular = async () => {
-    if (!amount) {
-      setInvalidAmount(true);
-      amountInput.current?.focus();
-      return;
-    }
-
-    setInvalidAmount(false);
     setLoading(true);
 
     let locationId = "";
@@ -288,7 +282,7 @@ const AddTransactionScreen = () => {
       date,
       time,
       createdAt: new Date(),
-      origin: "default",
+      origin: expenseId ? "bills" : "default",
       archived: false,
     };
 
@@ -385,6 +379,8 @@ const AddTransactionScreen = () => {
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
     >
       <ModalHeader
         onPress={handleSubmit}

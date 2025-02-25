@@ -28,11 +28,12 @@ const currentMonthDefault = getMonthDropdown(new Date());
 
 const Bills = () => {
   const router = useRouter();
-  const { expenses, monthlyTransactions } = useAppContext();
+  const { expenses, monthlyTransactions, wallet } = useAppContext();
 
   const [currentMonth, setCurrentMonth] =
     useState<DropdownItem>(currentMonthDefault);
   const [isCurrentMonth, setIsCurrentMonth] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigateToAddBills = () => {
     router.push("/bills-edit");
@@ -110,6 +111,7 @@ const Bills = () => {
               onPressButton={navigateToAddBills}
               hasButton
               title="Expenses"
+              isLoading={isLoading}
             />
           ),
         }}
@@ -177,10 +179,15 @@ const Bills = () => {
               </Text>
             </View>
           )}
+          <Text style={styles.monthlyText}>
+            Your monthly income is{" "}
+            {wallet ? formatCurrency(wallet.monthlyIncome) : "$0"}
+          </Text>
         </View>
         <View style={{ marginTop: 20 }}>
           {grouppedExpensesFront.map((g) => (
             <BillGroupItem
+              setIsLoading={setIsLoading}
               key={g.id}
               groupedExpense={g}
               grandTotal={grandTotal}
@@ -232,6 +239,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontWeight: "900",
     color: colors.redVivid,
+  },
+  monthlyText: {
+    textAlign: "center",
+    marginTop: 5,
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.grayLight,
   },
 });
 

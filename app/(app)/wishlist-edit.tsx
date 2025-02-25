@@ -142,6 +142,8 @@ const WishlistEdit = () => {
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
     >
       <ModalHeader
         onPress={handleSave}

@@ -13,8 +13,8 @@ import { useAppContext } from "../../hook/useAppContext";
 import { COLLECTION_PRODUCTS } from "../../lib/constant";
 import { formatDateSimple } from "../../lib/dateHelpers";
 import { updateDocument } from "../../lib/firebaseFirestore";
-import { colors } from "../../lib/theme";
 import { formatCurrency } from "../../lib/helpers";
+import { colors } from "../../lib/theme";
 
 const ProductDetails = () => {
   const { user, products, locations } = useAppContext();

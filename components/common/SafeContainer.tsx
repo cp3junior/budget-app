@@ -28,6 +28,8 @@ const SafeContainer = ({
         style={{
           paddingTop: hasHeader ? 50 : 0,
         }}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
       >
         {children}
       </ScrollView>

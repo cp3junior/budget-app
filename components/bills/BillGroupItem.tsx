@@ -1,9 +1,18 @@
 import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
 import React, { Fragment } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";
+import {
+  COLLECTION_EXPENSES,
+  COLLECTION_TRANSACTIONS,
+} from "../../lib/constant";
 import { formatDateMonthDate, getNextDate } from "../../lib/dateHelpers";
+import {
+  deleteDocument,
+  fetchDocuments,
+  updateDocument,
+} from "../../lib/firebaseFirestore";
 import {
   calculateRemainingPercent,
   convertToFloat,
@@ -21,6 +30,7 @@ interface BillGroupItemProps {
   currentMonth: string;
   isCurrentMonth: boolean;
   transactions: TransactionItem[];
+  setIsLoading: (val: boolean) => void;
 }
 const BillGroupItem = ({
   groupedExpense,
@@ -28,6 +38,7 @@ const BillGroupItem = ({
   isCurrentMonth,
   transactions,
   currentMonth,
+  setIsLoading,
 }: BillGroupItemProps) => {
   const router = useRouter();
 
@@ -49,6 +60,72 @@ const BillGroupItem = ({
       pathname: "/bills-details",
       params: { billsId: id, isCurrentMonth, currentMonth },
     });
+  };
+
+  const showDeletePrompt = (expense: ExpenseItem) => {
+    let message = "Are you sure you want to delete this?";
+
+    Alert.alert("Delete expense", message, [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: () => handleCheckDelete(expense),
+        style: "destructive",
+      },
+    ]);
+  };
+
+  const handleCheckDelete = async (expense: ExpenseItem) => {
+    setIsLoading(true);
+    const concernedTransactions = await fetchDocuments<TransactionItem>(
+      COLLECTION_TRANSACTIONS,
+      {
+        whereClauses: [
+          { field: "budgetId", value: expense.id, operator: "==" },
+        ],
+      }
+    );
+
+    if (concernedTransactions.length > 0) {
+      setIsLoading(false);
+      Alert.alert(
+        "Delete expense",
+        "⚠️ This expense is associated with some transactions.\n Deleting it will set the concerned transactions to Unbudgeted which is not adviced. Instead just modify the ending date to any past date.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Proceed",
+            onPress: () => handleDelete(expense, concernedTransactions),
+            style: "destructive",
+          },
+        ]
+      );
+    } else {
+      handleDelete(expense, concernedTransactions);
+    }
+  };
+  const handleDelete = async (
+    expense: ExpenseItem,
+    concernedTransactions: TransactionItem[]
+  ) => {
+    setIsLoading(true);
+
+    if (concernedTransactions.length > 0) {
+      for (const transac of concernedTransactions) {
+        await updateDocument(COLLECTION_TRANSACTIONS, transac.id, {
+          budgetId: "",
+        });
+      }
+    }
+
+    await deleteDocument(COLLECTION_EXPENSES, expense.id);
+    setIsLoading(false);
   };
 
   return (
@@ -111,6 +188,7 @@ const BillGroupItem = ({
               <TouchableOpacity
                 style={styles.cont}
                 onPress={() => navigateToDetails(expense.id)}
+                onLongPress={() => showDeletePrompt(expense)}
               >
                 <View style={styles.contIcon}>
                   <SFSymbol

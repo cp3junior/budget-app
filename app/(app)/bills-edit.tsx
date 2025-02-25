@@ -1,4 +1,5 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -11,6 +12,7 @@ import FormListSwitch from "../../components/common/FormList/FormListSwitch";
 import InputForm from "../../components/common/InputForm";
 import ModalHeader from "../../components/common/ModalHeader";
 import Text from "../../components/common/Text";
+import { useAppContext } from "../../hook/useAppContext";
 import {
   categories,
   COLLECTION_EXPENSES,
@@ -18,15 +20,13 @@ import {
   dayOfWeek,
   frequencyList,
 } from "../../lib/constant";
-import { colors } from "../../lib/theme";
-import { useLocalSearchParams, useNavigation } from "expo-router";
-import { useAppContext } from "../../hook/useAppContext";
+import { convertToDate } from "../../lib/dateHelpers";
 import { addDocument, updateDocument } from "../../lib/firebaseFirestore";
 import {
   getCategoryByCategoryId,
   getDropdownItemById,
 } from "../../lib/helpers";
-import { convertToDate } from "../../lib/dateHelpers";
+import { colors } from "../../lib/theme";
 
 let initialCategory = categories[0]?.items?.[0] as DropdownItem;
 let initialFrequency = frequencyList[0] as DropdownItem;
@@ -207,6 +207,8 @@ const BillsEdit = () => {
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
     >
       <ModalHeader
         onPress={handleSubmit}

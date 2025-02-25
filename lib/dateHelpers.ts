@@ -22,6 +22,10 @@ export const formatHour = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
   return format(convertedDate, "HH:mm");
 };
+export const getHourMinute = (date: Date | Timestamp): [string, string] => {
+  const convertedDate = convertToDate(date);
+  return [format(convertedDate, "HH"), format(convertedDate, "mm")];
+};
 
 export const formatDateMonthDate = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
@@ -77,6 +81,11 @@ export const getMonthDropdown = (date: Date): DropdownItem => {
     label: monthName,
     value: month,
   };
+};
+
+export const getCurrentMonthString = (date: Date): string => {
+  const dateBegin = startOfMonth(date);
+  return format(dateBegin, "yyyy-MM-dd");
 };
 
 export const countWeekdaysInMonth = (

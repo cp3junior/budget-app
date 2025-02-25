@@ -113,6 +113,8 @@ const ProfileEditScreen = () => {
     <KeyboardAwareScrollView
       style={styles.container}
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
     >
       <ModalHeader onPress={handleSave} title="Save" isLoading={isLoading} />
       <View>

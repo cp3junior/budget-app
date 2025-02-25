@@ -46,7 +46,11 @@ const ForgotPassword = () => {
 
   return (
     <View style={styles.flex}>
-      <KeyboardAwareScrollView style={styles.flex}>
+      <KeyboardAwareScrollView
+        style={styles.flex}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
         <IntroHeader small text="Reset your password" />
         <Formik
           initialValues={initialFormValues}

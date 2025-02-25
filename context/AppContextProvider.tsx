@@ -12,10 +12,24 @@ import {
   COLLECTION_WALLETS,
   COLLECTION_WISHLISTS,
 } from "../lib/constant";
-import { getStartEndMonthDays } from "../lib/dateHelpers";
+import {
+  formatHour,
+  getCurrentMonthString,
+  getHourMinute,
+  getStartEndMonthDays,
+} from "../lib/dateHelpers";
 import { authStateListener } from "../lib/firebaseAuth";
 import { fetchSnapshot, updateDocument } from "../lib/firebaseFirestore";
 import { AppContext } from "./AppContext";
+import * as Notifications from "expo-notifications";
+import {
+  addMinutes,
+  addMonths,
+  isBefore,
+  setHours,
+  setMinutes,
+} from "date-fns";
+import { getExpenseTotal } from "../lib/helpers";
 
 interface AppContextProviderProps {
   children: ReactNode;
@@ -153,6 +167,47 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     if (wallets.length === 1) setWallet(wallets[0]);
     else setWallet(null);
   }, [wallets]);
+
+  useEffect(() => {
+    const updateNotifications = async () => {
+      console.log("STT");
+      await Notifications.cancelAllScheduledNotificationsAsync();
+      for (const exp of expenses) {
+        if (exp.notificationEnabled) {
+          const [h, m] = getHourMinute(exp.notificationTime);
+          const thisMonth = getCurrentMonthString(new Date());
+          const [, datesThisMonth] = getExpenseTotal(exp, thisMonth);
+          const nextMonth = getCurrentMonthString(addMonths(new Date(), 1));
+          const [, datesNextMonth] = getExpenseTotal(exp, nextMonth);
+
+          const allDates = [...datesThisMonth, ...datesNextMonth];
+          let dateTimes = allDates.map((dat) =>
+            setMinutes(setHours(dat, parseInt(h)), parseInt(m))
+          );
+
+          console.log("Beff", exp.name, dateTimes);
+          dateTimes = dateTimes.filter((dat) =>
+            isBefore(addMinutes(new Date(), 1), dat)
+          );
+          console.log("aftd?", exp.name, dateTimes, addMinutes(new Date(), 1));
+
+          for (const date of dateTimes) {
+            await Notifications.scheduleNotificationAsync({
+              content: {
+                title: `Reminder ⏰: Payment due for ${exp.name}.`,
+                body: "Your expense payment is due. Plan ahead to stay on track! 💰",
+                sound: "default",
+              },
+              trigger: { date },
+            });
+            console.log("EXP", exp.name, dateTimes);
+          }
+        }
+      }
+    };
+
+    updateNotifications();
+  }, [expenses]);
 
   const showAlert = (request: ShareRequest, userId: string) => {
     const userName = request.senderName;

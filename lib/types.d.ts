@@ -103,6 +103,7 @@ declare global {
   type WalletItemFirestore = {
     sharedAccounId: string;
     amount: string;
+    monthlyIncome: string;
     updatedAt: Date | Timestamp;
     createdAt: Date | Timestamp;
   };
@@ -120,6 +121,7 @@ declare global {
     description: string;
     notificationEnabled: boolean;
     notificationTime: Date | Timestamp;
+    notificationIds?: string[];
     isRecurring: boolean;
     repeatingDay: number;
     frequency: number;

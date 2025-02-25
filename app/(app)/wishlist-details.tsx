@@ -5,6 +5,7 @@ import { StyleSheet, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
+import ProfileImage from "../../components/common/ProfileImage";
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
@@ -18,7 +19,6 @@ import {
   getCategoryByCategoryId,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
-import ProfileImage from "../../components/common/ProfileImage";
 
 const WishlistDetails = () => {
   const { wishlists, user, expenses } = useAppContext();

@@ -83,6 +83,7 @@ const SignUp = () => {
       const dataWallet: WalletItemFirestore = {
         sharedAccounId: email,
         amount: "0",
+        monthlyIncome: "0",
         updatedAt: new Date(),
         createdAt: new Date(),
       };
@@ -102,7 +103,11 @@ const SignUp = () => {
 
   return (
     <View style={styles.flex}>
-      <KeyboardAwareScrollView style={styles.flex}>
+      <KeyboardAwareScrollView
+        style={styles.flex}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
         <IntroHeader small text="Create your account to start" />
         <Formik
           initialValues={initialFormValues}

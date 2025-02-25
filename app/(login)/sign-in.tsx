@@ -63,7 +63,11 @@ const SignIn = () => {
 
   return (
     <View style={styles.flex}>
-      <KeyboardAwareScrollView style={styles.flex}>
+      <KeyboardAwareScrollView
+        style={styles.flex}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
         <IntroHeader small text="Login to continue" />
         <Formik
           initialValues={initialFormValues}
