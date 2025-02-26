@@ -235,3 +235,7 @@ export const getPercentage = (grandTotal: number, subTotal: number): number => {
   if (grandTotal === 0) return 0;
   return Math.ceil((subTotal / grandTotal) * 100);
 };
+
+export const isValidNumber = (value: string): boolean => {
+  return !isNaN(Number(value)) && value.trim() !== "";
+};

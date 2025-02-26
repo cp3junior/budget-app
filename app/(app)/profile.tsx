@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import SFSymbol from "sweet-sfsymbols";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
@@ -9,13 +9,54 @@ import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import { useAppContext } from "../../hook/useAppContext";
 import { logOut } from "../../lib/firebaseAuth";
+import { formatCurrency, isValidNumber } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
+import { updateDocument } from "../../lib/firebaseFirestore";
+import { COLLECTION_WALLETS } from "../../lib/constant";
 
 const ProfileScreen = () => {
   const router = useRouter();
-  const { user } = useAppContext();
+  const { user, wallet } = useAppContext();
 
   if (!user) return null;
+  if (!wallet) return null;
+
+  const showPrompt = () => {
+    Alert.prompt(
+      "Monthly income",
+      "Update your monthly income.\n For shared accounts, ensure the total reflects all linked accounts.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Update",
+          onPress: (text: string | undefined) => handleUpdate(text),
+          style: "default",
+          isPreferred: true,
+        },
+      ],
+      "plain-text",
+      wallet.monthlyIncome
+    );
+  };
+
+  const handleUpdate = async (value: string | undefined) => {
+    if (!value) return;
+    const isValid = isValidNumber(value);
+    if (!isValid) {
+      Alert.alert(
+        "Monthly income",
+        "Invalid amount: please enter a valid number and try again."
+      );
+      return;
+    }
+
+    await updateDocument(COLLECTION_WALLETS, wallet.id, {
+      monthlyIncome: value,
+    });
+  };
 
   const navigateToProfileEditScreen = () => {
     router.navigate("/profile-edit");
@@ -56,13 +97,21 @@ const ProfileScreen = () => {
         <FormListButtonLink label="Account sharing" href="/account-sharing" />
       </FormListContainer>
       <FormListContainer style={styles.containerStyle}>
-        <FormListButtonLink
-          label="Website"
-          href="https://www.railala.com"
-          hasIcon={false}
-          value="www.railala.com"
-          hasExternal
-        />
+        <TouchableOpacity style={styles.containerInc} onPress={showPrompt}>
+          <Text style={styles.incText}>Monthly income</Text>
+          <View style={styles.containerIncRigt}>
+            <Text style={styles.incAmount}>
+              {formatCurrency(wallet.monthlyIncome)}
+            </Text>
+            <View>
+              <SFSymbol
+                size={12}
+                name="chevron.right"
+                colors={[colors.white]}
+              />
+            </View>
+          </View>
+        </TouchableOpacity>
       </FormListContainer>
       <FormListContainer style={styles.containerStyle}>
         <FormListButtonLink label="Locations" href="/locations" />
@@ -92,6 +141,29 @@ const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  containerIncRigt: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+  },
+  containerInc: {
+    minHeight: 44,
+    flex: 1,
+    paddingRight: 20,
+    paddingVertical: 10,
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+  },
+  incText: {
+    fontWeight: "500",
+  },
+  incAmount: {
+    fontWeight: "700",
+    fontSize: 18,
+    color: colors.blue,
+  },
   txtName: {
     fontSize: 22,
     fontWeight: "900",
