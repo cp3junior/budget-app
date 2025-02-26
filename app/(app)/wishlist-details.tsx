@@ -1,7 +1,8 @@
-import { Progress, ProgressFilledTrack, Spinner } from "@gluestack-ui/themed";
+import { Spinner } from "@gluestack-ui/themed";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
 import SFSymbol from "sweet-sfsymbols";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
@@ -19,6 +20,7 @@ import {
   getCategoryByCategoryId,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
+import Autolink from "react-native-autolink";
 
 const WishlistDetails = () => {
   const { wishlists, user, expenses } = useAppContext();
@@ -175,47 +177,62 @@ const WishlistDetails = () => {
         }}
       />
       <View style={styles.contentScroll}>
-        <Text style={styles.nameText}>{currentWishlist.name}</Text>
-        {currentWishlist.description && (
-          <Text style={styles.desctText}>{currentWishlist.description}</Text>
-        )}
-
-        <View style={styles.progressContainer}>
-          <Text style={styles.progressAmountText}>
-            {formatCurrency(currentWishlist.fullAmount)}
-          </Text>
-          <View style={styles.progressBar}>
-            <Progress value={isCompleted ? 100 : remainingPercent} size="sm">
-              <ProgressFilledTrack bgColor={colors.purple} />
-            </Progress>
+        <View style={styles.cont}>
+          <View style={{ flex: 1, alignItems: "center" }}>
+            <Text style={styles.nameText}>{currentWishlist.name}</Text>
+            {currentWishlist.description && (
+              <Autolink
+                linkStyle={styles.desctText}
+                url
+                text={currentWishlist.description}
+              />
+            )}
           </View>
-          <View style={styles.progressDetCOntainer}>
-            <View>
-              <Text style={styles.progressDetTextTop}>Paid to date</Text>
-              <Text style={styles.progressDetTextBottom}>
-                {isCompleted
-                  ? formatCurrency(currentWishlist.fullAmount)
-                  : formatCurrency(currentWishlist.amount)}
+          <View>
+            <AnimatedCircularProgress
+              size={150}
+              width={10}
+              lineCap="round"
+              fill={isCompleted ? 100 : remainingPercent}
+              tintColor={colors.purple}
+              backgroundColor={colors.gray}
+              arcSweepAngle={280}
+              rotation={220}
+            >
+              {() => (
+                <View style={styles.progressViewCont}>
+                  <Text style={styles.progressText}>Paid to date</Text>
+                  <Text
+                    style={{
+                      ...styles.progressPrice,
+                      ...{ color: colors.green },
+                    }}
+                  >
+                    {isCompleted
+                      ? formatCurrency(currentWishlist.fullAmount)
+                      : formatCurrency(currentWishlist.amount)}
+                  </Text>
+                  <View style={styles.progressSeparator} />
+                  <Text
+                    style={{
+                      ...styles.progressPrice,
+                      ...{ color: colors.red },
+                    }}
+                  >
+                    {isCompleted ? "$0" : remainingAmount}
+                  </Text>
+                  <Text style={styles.progressText}>Remaining</Text>
+                </View>
+              )}
+            </AnimatedCircularProgress>
+            <Text style={styles.progressAmountText}>
+              {formatCurrency(currentWishlist.fullAmount)}
+
+              <Text style={{ fontSize: 13, color: colors.grayLight }}>
+                {" "}
+                (item total)
               </Text>
-            </View>
-            <View>
-              <Text
-                style={{
-                  ...styles.progressDetTextTop,
-                  ...{ textAlign: "right" },
-                }}
-              >
-                Remaining
-              </Text>
-              <Text
-                style={{
-                  ...styles.progressDetTextBottom,
-                  ...{ textAlign: "right" },
-                }}
-              >
-                {isCompleted ? "$0" : remainingAmount}
-              </Text>
-            </View>
+            </Text>
           </View>
         </View>
         {isLoading ? (
@@ -272,9 +289,45 @@ const WishlistDetails = () => {
 };
 
 const styles = StyleSheet.create({
+  cont: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+  },
+  progressViewCont: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressText: {
+    color: colors.grayLight,
+    textTransform: "uppercase",
+    textAlign: "center",
+    fontSize: 11,
+  },
+  progressPrice: {
+    fontSize: 21,
+    fontWeight: "900",
+  },
+  progressSeparator: {
+    height: 1,
+    width: 35,
+    backgroundColor: colors.grayLight,
+    marginVertical: 5,
+  },
   loadCOntainer: { marginTop: 40 },
-  nameText: { fontSize: 23, marginBottom: 5, fontWeight: "900" },
-  desctText: { color: colors.grayLight, marginBottom: 20 },
+  nameText: {
+    fontSize: 22,
+    marginBottom: 5,
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  desctText: {
+    color: colors.grayLight,
+    marginBottom: 20,
+    fontSize: 16,
+    textAlign: "center",
+  },
   progressContainer: {
     marginTop: 10,
     borderWidth: 0.2,
@@ -320,7 +373,7 @@ const styles = StyleSheet.create({
   contentScroll: {
     marginBottom: 60,
   },
-  timelineContainerMain: { marginTop: 40 },
+  timelineContainerMain: { marginTop: 20 },
   timelineContainer: {
     flexDirection: "row",
     alignItems: "flex-start",

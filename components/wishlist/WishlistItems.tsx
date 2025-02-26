@@ -1,7 +1,7 @@
-import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
 import React, { Fragment } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import ProgressBar from "react-native-animated-progress";
 import SFSymbol from "sweet-sfsymbols";
 import { useAppContext } from "../../hook/useAppContext";
 import { COLLECTION_WALLETS, COLLECTION_WISHLISTS } from "../../lib/constant";
@@ -105,7 +105,7 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
                     <Text style={styles.styleText}>{wish.name}</Text>
                     {isCompleted ? (
                       <Text style={styles.styleSubText}>
-                        Paid {formatCurrency(wish.fullAmount)}
+                        {formatCurrency(wish.fullAmount)}
                       </Text>
                     ) : (
                       <Text style={styles.styleSubText}>
@@ -135,9 +135,12 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
                 </View>
                 {!isCompleted && (
                   <View style={styles.containerProgress}>
-                    <Progress value={remainingPercent} size="xs">
-                      <ProgressFilledTrack bgColor={colors.purple} />
-                    </Progress>
+                    <ProgressBar
+                      progress={remainingPercent}
+                      height={3}
+                      backgroundColor={colors.purple}
+                      trackColor={colors.gray}
+                    />
                   </View>
                 )}
               </View>
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: "row",
-    paddingVertical: 10,
+    paddingVertical: 7,
     paddingRight: 10,
     alignItems: "center",
   },
@@ -205,7 +208,7 @@ const styles = StyleSheet.create({
   categoryText: {
     color: colors.grayLight,
     fontSize: 14,
-    marginTop: 2,
+    marginTop: 1,
   },
 });
 

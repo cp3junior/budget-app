@@ -1,7 +1,8 @@
-import { Progress, ProgressFilledTrack, Spinner } from "@gluestack-ui/themed";
+import { Spinner } from "@gluestack-ui/themed";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { Fragment, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
 import SFSymbol from "sweet-sfsymbols";
 import FormListButtonLink from "../../components/common/FormList/FormListButtonLink";
 import FormListContainer from "../../components/common/FormList/FormListContainer";
@@ -32,6 +33,7 @@ import {
   getExpenseTotal,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
+import Autolink from "react-native-autolink";
 
 const BillsDetails = () => {
   const router = useRouter();
@@ -43,7 +45,7 @@ const BillsDetails = () => {
     []
   );
 
-  let message = "";
+  let message = "per month";
   const billsId = params.billsId as string;
   const isCurrentMonthStr = params.isCurrentMonth as string;
   const currentMonth = params.currentMonth as string;
@@ -203,50 +205,63 @@ const BillsDetails = () => {
         }}
       />
       <View style={styles.contentScroll}>
-        <Text style={styles.nameText}>{currentExpense.name}</Text>
-        {currentExpense.description && (
-          <Text style={styles.desctText}>{currentExpense.description}</Text>
-        )}
-
-        <View style={styles.progressContainer}>
-          <Text style={styles.progressAmountText}>
-            {formatCurrency(expenseTotal)}
-            {message && (
-              <Text style={{ color: colors.grayLight }}> ({message})</Text>
+        <View style={styles.cont}>
+          <View style={{ flex: 1, alignItems: "center" }}>
+            <Text style={styles.nameText}>{currentExpense.name}</Text>
+            {currentExpense.description && (
+              <Autolink
+                linkStyle={styles.desctText}
+                url
+                text={currentExpense.description}
+              />
             )}
-          </Text>
-          <View style={styles.progressBar}>
-            <Progress value={isCurrentMonth ? remainingPercent : 0} size="sm">
-              <ProgressFilledTrack bgColor={colors.purple} />
-            </Progress>
           </View>
-          <View style={styles.progressDetCOntainer}>
-            <View>
-              <Text style={styles.progressDetTextTop}>Spent</Text>
-              <Text style={styles.progressDetTextBottom}>
-                {isCurrentMonth ? formatCurrency(spent) : "$0"}
-              </Text>
-            </View>
-            <View>
-              <Text
-                style={{
-                  ...styles.progressDetTextTop,
-                  ...{ textAlign: "right" },
-                }}
-              >
-                Left to spend
-              </Text>
-              <Text
-                style={{
-                  ...styles.progressDetTextBottom,
-                  ...{ textAlign: "right" },
-                }}
-              >
-                {isCurrentMonth
-                  ? formatCurrency(remaining)
-                  : formatCurrency(expenseTotal)}
-              </Text>
-            </View>
+          <View>
+            <AnimatedCircularProgress
+              size={150}
+              width={10}
+              lineCap="round"
+              fill={isCurrentMonth ? remainingPercent : 0}
+              tintColor={colors.purple}
+              backgroundColor={colors.gray}
+              arcSweepAngle={280}
+              rotation={220}
+            >
+              {() => (
+                <View style={styles.progressViewCont}>
+                  <Text style={styles.progressText}>spent</Text>
+                  <Text
+                    style={{
+                      ...styles.progressPrice,
+                      ...{ color: colors.red },
+                    }}
+                  >
+                    {isCurrentMonth ? formatCurrency(spent) : "$0"}
+                  </Text>
+                  <View style={styles.progressSeparator} />
+                  <Text
+                    style={{
+                      ...styles.progressPrice,
+                      ...{ color: colors.green },
+                    }}
+                  >
+                    {isCurrentMonth
+                      ? formatCurrency(remaining)
+                      : formatCurrency(expenseTotal)}
+                  </Text>
+                  <Text style={styles.progressText}>left to spend</Text>
+                </View>
+              )}
+            </AnimatedCircularProgress>
+            <Text style={styles.progressAmountText}>
+              {formatCurrency(expenseTotal)}
+              {message && (
+                <Text style={{ fontSize: 13, color: colors.grayLight }}>
+                  {" "}
+                  ({message})
+                </Text>
+              )}
+            </Text>
           </View>
         </View>
         {currentExpense.isRecurring && (
@@ -337,6 +352,32 @@ const BillsDetails = () => {
 };
 
 const styles = StyleSheet.create({
+  cont: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+  },
+  progressViewCont: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressText: {
+    color: colors.grayLight,
+    textTransform: "uppercase",
+    textAlign: "center",
+    fontSize: 11,
+  },
+  progressPrice: {
+    fontSize: 21,
+    fontWeight: "900",
+  },
+  progressSeparator: {
+    height: 1,
+    width: 35,
+    backgroundColor: colors.grayLight,
+    marginVertical: 5,
+  },
   notifIcon: {
     flexDirection: "row",
     alignItems: "center",
@@ -375,11 +416,17 @@ const styles = StyleSheet.create({
   },
   loadCOntainer: { marginTop: 40 },
   nameText: {
-    fontSize: 23,
+    fontSize: 22,
     marginBottom: 5,
     fontWeight: "900",
+    textAlign: "center",
   },
-  desctText: { color: colors.grayLight, marginBottom: 20 },
+  desctText: {
+    color: colors.grayLight,
+    marginBottom: 20,
+    fontSize: 16,
+    textAlign: "center",
+  },
   progressContainer: {
     marginTop: 10,
     borderWidth: 0.2,
@@ -389,9 +436,9 @@ const styles = StyleSheet.create({
   },
   progressAmountText: {
     textAlign: "center",
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 13,
     fontWeight: "900",
+    marginTop: -5,
   },
   progressBar: { marginBottom: 10 },
   progressDetCOntainer: {

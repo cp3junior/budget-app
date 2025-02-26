@@ -170,7 +170,6 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
   useEffect(() => {
     const updateNotifications = async () => {
-      console.log("STT");
       await Notifications.cancelAllScheduledNotificationsAsync();
       for (const exp of expenses) {
         if (exp.notificationEnabled) {
@@ -185,11 +184,9 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
             setMinutes(setHours(dat, parseInt(h)), parseInt(m))
           );
 
-          console.log("Beff", exp.name, dateTimes);
           dateTimes = dateTimes.filter((dat) =>
             isBefore(addMinutes(new Date(), 1), dat)
           );
-          console.log("aftd?", exp.name, dateTimes, addMinutes(new Date(), 1));
 
           for (const date of dateTimes) {
             await Notifications.scheduleNotificationAsync({
@@ -200,7 +197,6 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
               },
               trigger: { date },
             });
-            console.log("EXP", exp.name, dateTimes);
           }
         }
       }

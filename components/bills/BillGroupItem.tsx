@@ -1,7 +1,7 @@
-import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
 import { useRouter } from "expo-router";
 import React, { Fragment } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import ProgressBar from "react-native-animated-progress";
 import SFSymbol from "sweet-sfsymbols";
 import {
   COLLECTION_EXPENSES,
@@ -239,12 +239,12 @@ const BillGroupItem = ({
                     </View>
                   </View>
                   <View>
-                    <Progress
-                      value={isCurrentMonth ? remainingPercent : 0}
-                      size="xs"
-                    >
-                      <ProgressFilledTrack bgColor={colors.purple} />
-                    </Progress>
+                    <ProgressBar
+                      progress={isCurrentMonth ? remainingPercent : 0}
+                      height={3}
+                      backgroundColor={colors.purple}
+                      trackColor={colors.gray}
+                    />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -264,7 +264,7 @@ const BillGroupItem = ({
 const styles = StyleSheet.create({
   cont: {
     paddingRight: 10,
-    marginVertical: 10,
+    marginVertical: 8,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   contDataTexts: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 6,
   },
   chevronCont: {
     alignItems: "flex-end",
@@ -299,18 +299,18 @@ const styles = StyleSheet.create({
   contTextTop: {},
   contTextTopTitle: {
     color: colors.white,
-    fontSize: 20,
+    fontSize: 18,
     marginBottom: 2,
     fontWeight: "900",
   },
   contTextTopSub: {
     color: colors.grayLight,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
   },
   contTextTopSubSub: {
     color: colors.blue,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
   },
   notifIcon: {
@@ -319,9 +319,9 @@ const styles = StyleSheet.create({
     right: -3,
   },
   containerSeparator: { paddingLeft: 50 },
-  container: { paddingHorizontal: 0, paddingVertical: 14 },
+  container: { paddingHorizontal: 0, paddingVertical: 8 },
   containerTop: {
-    marginBottom: 16,
+    marginBottom: 6,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   containerTopTextPercent: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.grayLight,
   },
   containerTopAmount: {

@@ -1,7 +1,7 @@
-import { Progress, ProgressFilledTrack } from "@gluestack-ui/themed";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
 import BillGroupItem from "../../components/bills/BillGroupItem";
 import DropDownMenu from "../../components/common/DropDownMenu/DropDownMenu";
 import SafeContainer from "../../components/common/SafeContainer";
@@ -20,6 +20,7 @@ import {
   formatCurrency,
   getExpenseGroupTotal,
   getMainCategoryByCategoryId,
+  getPercentage,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
 
@@ -102,6 +103,14 @@ const Bills = () => {
     totalBudgeted.toString()
   );
 
+  const income = wallet?.monthlyIncome || "0";
+
+  const percentage = getPercentage(convertToFloat(income), grandTotal);
+
+  let colorPercentage = colors.green;
+  if (percentage > 75) colorPercentage = colors.red;
+  if (percentage > 90) colorPercentage = colors.redVivid;
+
   return (
     <SafeContainer hasHeader>
       <Stack.Screen
@@ -117,74 +126,72 @@ const Bills = () => {
         }}
       />
       <View style={styles.container}>
-        <View style={styles.containerDropdown}>
-          <DropDownMenu
-            label=""
-            id="type"
-            value={currentMonth}
-            onChange={handleMonthChange}
-            data={monthsDropDown}
-            labelStyle={styles.labelStyle}
-          />
-        </View>
-        <Text style={styles.textTitle}>{formatCurrency(grandTotal)}</Text>
-        <Text style={styles.textSub}>This Month’s Budget</Text>
-
-        <View style={styles.progressContainer}>
-          <View style={styles.progressDetCOntainer}>
-            <View>
-              <Text style={styles.progressDetTextTop}>Spent</Text>
-              <Text
-                style={{
-                  ...styles.progressDetTextBottom,
-                  ...{ color: colors.red },
-                }}
-              >
-                {isCurrentMonth
-                  ? formatCurrency(totalBudgeted + totalUnbudgeted)
-                  : "$0"}
-              </Text>
+        <View style={styles.topContainer}>
+          <View style={{ flex: 1 }}>
+            <View style={styles.containerDropdown}>
+              <DropDownMenu
+                label=""
+                id="type"
+                value={currentMonth}
+                onChange={handleMonthChange}
+                data={monthsDropDown}
+                labelStyle={styles.labelStyle}
+              />
             </View>
-            <View>
-              <Text
-                style={{
-                  ...styles.progressDetTextTop,
-                  ...{ textAlign: "right" },
-                }}
-              >
-                Left to spend
-              </Text>
-              <Text
-                style={{
-                  ...styles.progressDetTextBottom,
-                  ...{ textAlign: "right" },
-                  ...{ color: colors.green },
-                }}
-              >
-                {isCurrentMonth
-                  ? formatCurrency(leftToSpend)
-                  : formatCurrency(grandTotal)}
-              </Text>
-            </View>
+            <Text style={styles.textTitle}>{formatCurrency(grandTotal)}</Text>
+            <Text style={{ ...styles.textSub, ...{ color: colorPercentage } }}>
+              {percentage}% of your monthly income.
+            </Text>
+            {totalUnbudgeted > 0 && isCurrentMonth && (
+              <View>
+                <Text style={styles.unbudText}>
+                  {formatCurrency(totalUnbudgeted)} of unbudgeted expense
+                </Text>
+              </View>
+            )}
           </View>
           <View>
-            <Progress value={isCurrentMonth ? remainingPercent : 0} size="sm">
-              <ProgressFilledTrack bgColor={colors.purple} />
-            </Progress>
+            <AnimatedCircularProgress
+              size={150}
+              width={10}
+              lineCap="round"
+              fill={isCurrentMonth ? remainingPercent : 0}
+              tintColor={colors.purple}
+              backgroundColor={colors.gray}
+              arcSweepAngle={280}
+              rotation={220}
+            >
+              {() => (
+                <View style={styles.progressViewCont}>
+                  <Text style={styles.progressText}>spent</Text>
+                  <Text
+                    style={{
+                      ...styles.progressPrice,
+                      ...{ color: colors.red },
+                    }}
+                  >
+                    {isCurrentMonth
+                      ? formatCurrency(totalBudgeted + totalUnbudgeted)
+                      : "$0"}
+                  </Text>
+                  <View style={styles.progressSeparator} />
+                  <Text
+                    style={{
+                      ...styles.progressPrice,
+                      ...{ color: colors.green },
+                    }}
+                  >
+                    {isCurrentMonth
+                      ? formatCurrency(leftToSpend)
+                      : formatCurrency(grandTotal)}
+                  </Text>
+                  <Text style={styles.progressText}>left to spend</Text>
+                </View>
+              )}
+            </AnimatedCircularProgress>
           </View>
-          {totalUnbudgeted > 0 && isCurrentMonth && (
-            <View>
-              <Text style={styles.unbudText}>
-                {formatCurrency(totalUnbudgeted)} of unbudgeted expense
-              </Text>
-            </View>
-          )}
-          <Text style={styles.monthlyText}>
-            Your monthly income is{" "}
-            {wallet ? formatCurrency(wallet.monthlyIncome) : "$0"}
-          </Text>
         </View>
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: 10 }}>
           {grouppedExpensesFront.map((g) => (
             <BillGroupItem
               setIsLoading={setIsLoading}
@@ -203,16 +210,36 @@ const Bills = () => {
 };
 
 const styles = StyleSheet.create({
+  progressViewCont: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressText: {
+    color: colors.grayLight,
+    textTransform: "uppercase",
+    textAlign: "center",
+    fontSize: 11,
+  },
+  progressPrice: {
+    fontSize: 21,
+    fontWeight: "900",
+  },
+  progressSeparator: {
+    height: 1,
+    width: 35,
+    backgroundColor: colors.grayLight,
+    marginVertical: 5,
+  },
   textTitle: {
     textAlign: "center",
-    fontSize: 54,
+    fontSize: 50,
     fontWeight: "900",
     color: colors.blue,
   },
   labelStyle: { fontWeight: "900", color: colors.grayLight },
-  container: { marginTop: 20 },
+  container: { marginTop: 8 },
   containerDropdown: { alignItems: "center" },
-  textSub: { fontSize: 14, color: colors.grayLight, textAlign: "center" },
+  textSub: { fontSize: 14, textAlign: "center" },
   progressContainer: {
     marginTop: 40,
     borderWidth: 0.2,
@@ -236,9 +263,10 @@ const styles = StyleSheet.create({
   },
   unbudText: {
     textAlign: "center",
-    marginTop: 5,
-    fontWeight: "900",
+    marginTop: 3,
+    fontWeight: "800",
     color: colors.redVivid,
+    fontSize: 15,
   },
   monthlyText: {
     textAlign: "center",
@@ -246,6 +274,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     color: colors.grayLight,
+  },
+  topContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
   },
 });
 
