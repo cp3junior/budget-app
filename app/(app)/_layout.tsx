@@ -1,6 +1,8 @@
 import { BlurView } from "expo-blur";
 import { Stack } from "expo-router";
 import { ScreenProps } from "expo-router/build/views/Screen";
+import { useState } from "react";
+import { View } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -38,6 +40,7 @@ const withModalOptions: ScreenProps["options"] = {
 
 const AppLayout = () => {
   const insets = useSafeAreaInsets();
+  const [showBlur, setShowBlur] = useState(false);
 
   return (
     <SafeAreaProvider>
@@ -55,7 +58,14 @@ const AppLayout = () => {
             options={{
               ...withTabsOptions,
               header: () => (
-                <BlurView tint="dark" style={{ height: insets.top }} />
+                <View onLayout={() => setShowBlur(true)}>
+                  {showBlur && (
+                    <BlurView
+                      tint="dark"
+                      style={{ height: insets.top }}
+                    ></BlurView>
+                  )}
+                </View>
               ),
             }}
           />

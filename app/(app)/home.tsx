@@ -6,12 +6,24 @@ import Text from "../../components/common/Text";
 import withTabBar from "../../hoc/withTabBar";
 import { useAppContext } from "../../hook/useAppContext";
 import { colors } from "../../lib/theme";
+import { convertToDate, formatDate } from "../../lib/dateHelpers";
 
 const Home = () => {
   const router = useRouter();
-  const { user } = useAppContext();
+  const { user, monthlyTransactions } = useAppContext();
 
   if (!user) return null;
+
+  const recentTransactions = monthlyTransactions
+    .sort(
+      (a, b) =>
+        convertToDate(b.date).getTime() - convertToDate(a.date).getTime()
+    )
+    .slice(0, 10);
+
+  const navigateToTransactions = () => {
+    router.navigate("/transactions");
+  };
 
   const navigateToProfileScreen = () => {
     router.navigate("/profile");
@@ -45,7 +57,24 @@ const Home = () => {
         <Text>Percentage budget left, list</Text>
         <Text>Upcoming bills</Text>
         <Text style={{ textAlign: "center" }}>========================</Text>
-        <Text>Month spending transactions (last 10 seeall)</Text>
+        <View>
+          <View>
+            <Text>Latest transactions</Text>
+            <TouchableOpacity onPress={navigateToTransactions}>
+              <Text>See more</Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            {recentTransactions.map((tr) => {
+              return (
+                <View key={tr.id}>
+                  <Text>{tr.amount}</Text>
+                  <Text>{formatDate(tr.date)}</Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
         <Text style={{ textAlign: "center" }}>========================</Text>
       </View>
       <Text style={{ color: "red" }}>Home Page???</Text>

@@ -64,7 +64,7 @@ export const convertToDate = (date: Date | Timestamp): Date => {
 export const generateMonthListDropdown = (date: Date): DropdownItem[] => {
   const months: DropdownItem[] = [];
 
-  for (let i = -4; i <= 8; i++) {
+  for (let i = -3; i <= 8; i++) {
     const month = addMonths(date, i);
     months.push(getMonthDropdown(month));
   }

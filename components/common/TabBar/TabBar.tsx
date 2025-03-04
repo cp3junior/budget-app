@@ -20,7 +20,7 @@ const tabItems: TabBarItemProps[] = [
   },
   {
     Icon: DollarTransactionIcon,
-    href: "/transactions",
+    href: "/analytics",
     type: "tab",
   },
   {

@@ -1,4 +1,12 @@
 import { User as UserFirebase } from "@firebase/auth";
+import {
+  addMinutes,
+  addMonths,
+  isBefore,
+  setHours,
+  setMinutes,
+} from "date-fns";
+import * as Notifications from "expo-notifications";
 import { Unsubscribe } from "firebase/firestore";
 import { ReactNode, useEffect, useState } from "react";
 import { Alert } from "react-native";
@@ -13,23 +21,14 @@ import {
   COLLECTION_WISHLISTS,
 } from "../lib/constant";
 import {
-  formatHour,
   getCurrentMonthString,
   getHourMinute,
   getStartEndMonthDays,
 } from "../lib/dateHelpers";
 import { authStateListener } from "../lib/firebaseAuth";
 import { fetchSnapshot, updateDocument } from "../lib/firebaseFirestore";
-import { AppContext } from "./AppContext";
-import * as Notifications from "expo-notifications";
-import {
-  addMinutes,
-  addMonths,
-  isBefore,
-  setHours,
-  setMinutes,
-} from "date-fns";
 import { getExpenseTotal } from "../lib/helpers";
+import { AppContext } from "./AppContext";
 
 interface AppContextProviderProps {
   children: ReactNode;

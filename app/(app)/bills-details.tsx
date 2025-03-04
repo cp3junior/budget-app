@@ -210,8 +210,9 @@ const BillsDetails = () => {
             <Text style={styles.nameText}>{currentExpense.name}</Text>
             {currentExpense.description && (
               <Autolink
-                linkStyle={styles.desctText}
                 url
+                linkStyle={{ color: colors.blue }}
+                textProps={{ style: styles.desctText }}
                 text={currentExpense.description}
               />
             )}

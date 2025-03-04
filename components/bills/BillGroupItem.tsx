@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { Fragment } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
-import ProgressBar from "react-native-animated-progress";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
 import SFSymbol from "sweet-sfsymbols";
 import {
   COLLECTION_EXPENSES,
@@ -54,6 +54,11 @@ const BillGroupItem = ({
     0
   );
   const remainingTotal = groupedExpense.total - spentTotal;
+
+  const remainingPercentTotal = calculateRemainingPercent(
+    groupedExpense.total.toString(),
+    spentTotal.toString()
+  );
 
   const navigateToDetails = (id: string) => {
     router.push({
@@ -132,12 +137,24 @@ const BillGroupItem = ({
     <FormListContainer style={styles.container}>
       <View style={styles.containerTop}>
         <View style={styles.containerTopIcon}>
-          <SFSymbol
-            weight="medium"
-            size={21}
-            name={groupedExpense.icon || "questionmark"}
-            colors={[colors.grayLight]}
-          />
+          <AnimatedCircularProgress
+            size={50}
+            width={4}
+            lineCap="round"
+            fill={remainingPercentTotal}
+            tintColor={colors.purple}
+            backgroundColor={colors.gray}
+            rotation={180}
+          >
+            {() => (
+              <SFSymbol
+                weight="regular"
+                size={21}
+                name={groupedExpense.icon || "questionmark"}
+                colors={[colors.grayLight]}
+              />
+            )}
+          </AnimatedCircularProgress>
         </View>
         <View style={styles.containerTopText}>
           <Text style={styles.containerTopTextLabel}>
@@ -191,12 +208,24 @@ const BillGroupItem = ({
                 onLongPress={() => showDeletePrompt(expense)}
               >
                 <View style={styles.contIcon}>
-                  <SFSymbol
-                    weight="thin"
-                    size={17}
-                    name={expense?.category?.icon || "questionmark"}
-                    colors={[colors.grayLight]}
-                  />
+                  <AnimatedCircularProgress
+                    size={36}
+                    width={2}
+                    lineCap="round"
+                    fill={isCurrentMonth ? remainingPercent : 0}
+                    tintColor={colors.purple}
+                    backgroundColor={colors.gray}
+                    rotation={180}
+                  >
+                    {() => (
+                      <SFSymbol
+                        weight="regular"
+                        size={16}
+                        name={expense?.category?.icon || "questionmark"}
+                        colors={[colors.grayLight]}
+                      />
+                    )}
+                  </AnimatedCircularProgress>
                   {expense.notificationEnabled && (
                     <View style={styles.notifIcon}>
                       <SFSymbol
@@ -218,9 +247,8 @@ const BillGroupItem = ({
                         {isCurrentMonth
                           ? formatCurrency(remaining)
                           : formatCurrency(expense.total)}{" "}
-                        left from{" "}
                         <Text style={styles.contTextTopSubSub}>
-                          {formatCurrency(expense.total)}
+                          left from {formatCurrency(expense.total)}
                         </Text>
                       </Text>
                     </View>
@@ -232,19 +260,13 @@ const BillGroupItem = ({
                         colors={[colors.grayLight]}
                       />
                       {isRecurring && nextDueDate && (
-                        <Text style={styles.chevronContText}>
-                          Due on: {formatDateMonthDate(nextDueDate)}
-                        </Text>
+                        <View style={styles.chevronContTextCont}>
+                          <Text style={styles.chevronContText}>
+                            Due on: {formatDateMonthDate(nextDueDate)}
+                          </Text>
+                        </View>
                       )}
                     </View>
-                  </View>
-                  <View>
-                    <ProgressBar
-                      progress={isCurrentMonth ? remainingPercent : 0}
-                      height={3}
-                      backgroundColor={colors.purple}
-                      trackColor={colors.gray}
-                    />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -275,9 +297,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 40,
-    borderWidth: 1,
-    borderColor: colors.gray,
     position: "relative",
     marginRight: 3,
   },
@@ -289,14 +308,17 @@ const styles = StyleSheet.create({
   },
   chevronCont: {
     alignItems: "flex-end",
-    justifyContent: "space-between",
-    marginTop: 3,
+    justifyContent: "center",
   },
   chevronContText: {
     fontSize: 13,
     color: colors.grayLight,
   },
   contTextTop: {},
+  chevronContTextCont: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
   contTextTopTitle: {
     color: colors.white,
     fontSize: 18,
@@ -304,13 +326,13 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   contTextTopSub: {
-    color: colors.grayLight,
+    color: colors.red,
     fontSize: 14,
     fontWeight: "600",
   },
   contTextTopSubSub: {
-    color: colors.blue,
-    fontSize: 14,
+    color: colors.grayLight,
+    fontSize: 12,
     fontWeight: "700",
   },
   notifIcon: {
@@ -333,9 +355,6 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: colors.gray,
   },
   containerTopText: {
     flex: 1,

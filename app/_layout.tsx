@@ -8,8 +8,10 @@ import AppEntry from "../components/AppEntry";
 import { AuthContextProvider } from "../context/AuthContextProvider";
 import { colors } from "../lib/theme";
 import { AppContextProvider } from "../context/AppContextProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 SplashScreen.preventAutoHideAsync();
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -33,17 +35,21 @@ export default function RootLayout() {
     return null;
   }
 
+  console.log("RENDER");
+
   return (
     <GluestackUIProvider colorMode="dark" config={config}>
       <AuthContextProvider>
         <AppContextProvider>
-          <View
-            style={{ flex: 1, backgroundColor: colors.darker }}
-            onLayout={onLayoutRootView}
-          >
-            <StatusBar barStyle="light-content" />
-            <AppEntry />
-          </View>
+          <QueryClientProvider client={queryClient}>
+            <View
+              style={{ flex: 1, backgroundColor: colors.darker }}
+              onLayout={onLayoutRootView}
+            >
+              <StatusBar barStyle="light-content" />
+              <AppEntry />
+            </View>
+          </QueryClientProvider>
         </AppContextProvider>
       </AuthContextProvider>
     </GluestackUIProvider>

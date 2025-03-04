@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { Fragment } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
-import ProgressBar from "react-native-animated-progress";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
 import SFSymbol from "sweet-sfsymbols";
 import { useAppContext } from "../../hook/useAppContext";
 import { COLLECTION_WALLETS, COLLECTION_WISHLISTS } from "../../lib/constant";
@@ -92,12 +92,24 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
               onLongPress={() => showDeletePrompt(wish)}
             >
               <View style={styles.containerLeft}>
-                <SFSymbol
-                  weight="regular"
-                  size={17}
-                  name={category?.icon ? category.icon : "questionmark"}
-                  colors={[colors.grayLight]}
-                />
+                <AnimatedCircularProgress
+                  size={40}
+                  width={2}
+                  lineCap="round"
+                  fill={isCompleted ? 100 : remainingPercent}
+                  tintColor={colors.purple}
+                  backgroundColor={colors.gray}
+                  rotation={180}
+                >
+                  {() => (
+                    <SFSymbol
+                      weight="regular"
+                      size={16}
+                      name={category?.icon ? category.icon : "questionmark"}
+                      colors={[colors.grayLight]}
+                    />
+                  )}
+                </AnimatedCircularProgress>
               </View>
               <View style={styles.containerRight}>
                 <View style={styles.containerTop}>
@@ -109,8 +121,10 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
                       </Text>
                     ) : (
                       <Text style={styles.styleSubText}>
-                        {remainingAmount} remaining from{" "}
-                        {formatCurrency(wish.fullAmount)}
+                        {remainingAmount}{" "}
+                        <Text style={styles.styleSubSubText}>
+                          left from {formatCurrency(wish.fullAmount)}
+                        </Text>
                       </Text>
                     )}
                     {category && (
@@ -133,16 +147,6 @@ const WishlistItems = ({ wishlists }: WishlistItemsProps) => {
                     />
                   </View>
                 </View>
-                {!isCompleted && (
-                  <View style={styles.containerProgress}>
-                    <ProgressBar
-                      progress={remainingPercent}
-                      height={3}
-                      backgroundColor={colors.purple}
-                      trackColor={colors.gray}
-                    />
-                  </View>
-                )}
               </View>
             </TouchableOpacity>
             {showSeparator && (
@@ -172,9 +176,6 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 40,
-    borderWidth: 1,
-    borderColor: colors.gray,
     marginRight: 10,
   },
   containerRight: {
@@ -193,14 +194,19 @@ const styles = StyleSheet.create({
   },
   styleSubText: {
     color: colors.grayLight,
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  styleSubSubText: {
+    color: colors.grayLight,
+    fontSize: 12,
     fontWeight: "600",
   },
   containerChevron: {
     marginLeft: 10,
   },
   containerProgress: {
-    marginTop: 10,
+    marginTop: 4,
   },
   containerSeparator: {
     paddingLeft: 50,

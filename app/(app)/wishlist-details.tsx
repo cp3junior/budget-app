@@ -182,8 +182,9 @@ const WishlistDetails = () => {
             <Text style={styles.nameText}>{currentWishlist.name}</Text>
             {currentWishlist.description && (
               <Autolink
-                linkStyle={styles.desctText}
                 url
+                linkStyle={{ color: colors.blue }}
+                textProps={{ style: styles.desctText }}
                 text={currentWishlist.description}
               />
             )}
@@ -226,12 +227,7 @@ const WishlistDetails = () => {
               )}
             </AnimatedCircularProgress>
             <Text style={styles.progressAmountText}>
-              {formatCurrency(currentWishlist.fullAmount)}
-
-              <Text style={{ fontSize: 13, color: colors.grayLight }}>
-                {" "}
-                (item total)
-              </Text>
+              Total: {formatCurrency(currentWishlist.fullAmount)}
             </Text>
           </View>
         </View>
@@ -337,7 +333,7 @@ const styles = StyleSheet.create({
   },
   progressAmountText: {
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 10,
     fontWeight: "900",
   },

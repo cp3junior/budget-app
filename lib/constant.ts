@@ -11,7 +11,7 @@ export const COLLECTION_WISHLISTS = "wishlists";
 export const COLLECTION_WALLETS = "wallets";
 export const COLLECTION_EXPENSES = "expenses";
 
-export const tabsScreens = ["home", "bills", "transactions", "wishlist"];
+export const tabsScreens = ["home", "bills", "analytics", "wishlist"];
 export const withHeaderScreens = [
   "profile",
   "about",
@@ -22,6 +22,7 @@ export const withHeaderScreens = [
   "product-details",
   "wishlist-details",
   "bills-details",
+  "transactions",
 ];
 export const modalScreens = [
   "add-transaction",
