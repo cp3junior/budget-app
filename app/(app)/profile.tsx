@@ -114,9 +114,9 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </FormListContainer>
       <FormListContainer style={styles.containerStyle}>
-        <FormListButtonLink label="Locations" href="/locations" />
-        <FormListSeparator />
         <FormListButtonLink label="Products" href="/products" />
+        <FormListSeparator />
+        <FormListButtonLink label="Locations" href="/locations" />
         <FormListSeparator />
         <FormListButtonLink label="List of Categories" href="/categories" />
       </FormListContainer>

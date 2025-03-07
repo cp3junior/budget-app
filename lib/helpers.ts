@@ -31,6 +31,11 @@ export const formatCurrency = (value: number | string): string => {
   else if (typeof value === "string") numberValue = convertToFloat(value);
 
   const formatedValue = numberFormater.format(numberValue);
+
+  if (formatedValue.includes("-")) {
+    const newFormatedValue = formatedValue.replace("-", "");
+    return `- $${newFormatedValue}`;
+  }
   return `$${formatedValue}`;
 };
 

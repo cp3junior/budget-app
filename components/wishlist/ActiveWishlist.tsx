@@ -80,7 +80,6 @@ const ActiveWishlist = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flexDirection: "row" },
   containerText: {
     marginTop: 20,
     marginBottom: 40,

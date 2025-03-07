@@ -31,6 +31,10 @@ export const formatDateMonthDate = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
   return format(convertedDate, "MMM. do");
 };
+export const formatDateMonthDateFull = (date: Date | Timestamp): string => {
+  const convertedDate = convertToDate(date);
+  return format(convertedDate, "MMMM do");
+};
 
 export const formatDate = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
@@ -39,6 +43,10 @@ export const formatDate = (date: Date | Timestamp): string => {
 export const formatDateTransaction = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
   return format(convertedDate, "MMM d, yyyy");
+};
+export const formatDateTransactionTh = (date: Date | Timestamp): string => {
+  const convertedDate = convertToDate(date);
+  return format(convertedDate, "MMMM do, yyyy");
 };
 export const formatDateExpense = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
@@ -178,4 +186,31 @@ export const getStartEndMonthDays = (currentDate: Date): [Date, Date] => {
   const start = startOfMonth(currentDate);
   const end = endOfMonth(currentDate);
   return [startOfDay(start), endOfDay(end)];
+};
+
+export const groupTransactionByDate = (
+  transactions: TransactionItem[]
+): GroupedTransactions[] => {
+  const grouped = transactions.reduce<{ [key: string]: TransactionItem[] }>(
+    (acc, transaction) => {
+      const keyDate = formatDateSimple(transaction.date);
+
+      if (!acc[keyDate]) {
+        acc[keyDate] = [];
+      }
+
+      acc[keyDate].push(transaction);
+      return acc;
+    },
+    {}
+  );
+
+  return Object.keys(grouped).map((date) => {
+    const dateStr = parseISO(date);
+    return {
+      id: date,
+      formatedDate: formatDateMonthDateFull(dateStr),
+      data: grouped[date],
+    };
+  });
 };

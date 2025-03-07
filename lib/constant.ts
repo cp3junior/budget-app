@@ -23,6 +23,7 @@ export const withHeaderScreens = [
   "wishlist-details",
   "bills-details",
   "transactions",
+  "transaction-details",
 ];
 export const modalScreens = [
   "add-transaction",

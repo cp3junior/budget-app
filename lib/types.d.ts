@@ -230,6 +230,12 @@ declare global {
     operator: WhereFilterOp;
     value: any;
   };
+
+  type GroupedTransactions = {
+    id: string;
+    formatedDate: string;
+    data: TransactionItem[];
+  };
 }
 
 export {};

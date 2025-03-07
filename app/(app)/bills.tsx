@@ -86,7 +86,11 @@ const Bills = () => {
   let totalUnbudgeted = 0;
   let totalBudgeted = 0;
 
-  monthlyTransactions.map((transaction) => {
+  const expenseTransactions = monthlyTransactions.filter(
+    (transaction) => transaction.transactionDirection === 0
+  );
+
+  expenseTransactions.map((transaction) => {
     if (transaction.budgetId === "") {
       unbudgeted.push(transaction);
       totalUnbudgeted += convertToFloat(transaction.amount);

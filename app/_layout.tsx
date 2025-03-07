@@ -35,8 +35,6 @@ export default function RootLayout() {
     return null;
   }
 
-  console.log("RENDER");
-
   return (
     <GluestackUIProvider colorMode="dark" config={config}>
       <AuthContextProvider>
