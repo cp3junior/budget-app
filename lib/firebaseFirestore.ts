@@ -6,6 +6,7 @@ import {
   DocumentData,
   documentId,
   getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
@@ -46,6 +47,10 @@ export const fetchDocuments = async <T>(
       );
     }
 
+    if (options?.limit && options?.limit > 0) {
+      queryConstraints.push(limit(options.limit));
+    }
+
     const q = query(collectionRef, ...queryConstraints);
 
     const querySnapshot = await getDocs(q);
@@ -80,6 +85,10 @@ export const fetchSnapshot = <T>(
     queryConstraints.push(
       orderBy(options.orderByField, options.orderDirection || "desc")
     );
+  }
+
+  if (options?.limit && options?.limit > 0) {
+    queryConstraints.push(limit(options.limit));
   }
 
   const q = query(collectionRef, ...queryConstraints);

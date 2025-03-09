@@ -31,10 +31,29 @@ export const modalScreens = [
   "product-price",
   "wishlist-edit",
   "bills-edit",
+  "transaction-filter",
 ];
 
 export const transactionDirections = ["Expense", "Income"];
 export const activeTabsValues = ["Active", "Completed"];
+
+export const transactionDirectionsDropdown: DropdownItem[] = [
+  {
+    id: 2,
+    label: "All",
+    icon: "timelapse",
+  },
+  {
+    id: 0,
+    label: "Expense",
+    icon: "minus.square",
+  },
+  {
+    id: 1,
+    label: "Income",
+    icon: "plus.square",
+  },
+];
 
 export const transactionTypes: DropdownItem[] = [
   {

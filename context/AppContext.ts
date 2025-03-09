@@ -7,6 +7,7 @@ interface AppContextType {
   wishlists: WishListItem[];
   expenses: ExpenseItem[];
   monthlyTransactions: TransactionItem[];
+  lastTenDaysTransactions: TransactionItem[];
   wallet: WalletItem | null;
 }
 

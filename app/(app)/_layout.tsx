@@ -7,6 +7,7 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { FilterContextProvider } from "../../context/FilterContextProvider";
 import {
   modalScreens,
   tabsScreens,
@@ -44,50 +45,52 @@ const AppLayout = () => {
 
   return (
     <SafeAreaProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.darker },
-        }}
-      >
-        {/* Static screens, used for tabs */}
-        {tabsScreens.map((name) => (
-          <Stack.Screen
-            key={name}
-            name={name}
-            options={{
-              ...withTabsOptions,
-              header: () => (
-                <View onLayout={() => setShowBlur(true)}>
-                  {showBlur && (
-                    <BlurView
-                      tint="dark"
-                      style={{ height: insets.top }}
-                    ></BlurView>
-                  )}
-                </View>
-              ),
-            }}
-          />
-        ))}
+      <FilterContextProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.darker },
+          }}
+        >
+          {/* Static screens, used for tabs */}
+          {tabsScreens.map((name) => (
+            <Stack.Screen
+              key={name}
+              name={name}
+              options={{
+                ...withTabsOptions,
+                header: () => (
+                  <View onLayout={() => setShowBlur(true)}>
+                    {showBlur && (
+                      <BlurView
+                        tint="dark"
+                        style={{ height: insets.top }}
+                      ></BlurView>
+                    )}
+                  </View>
+                ),
+              }}
+            />
+          ))}
 
-        {/* With Header */}
-        {withHeaderScreens.map((name) => (
-          <Stack.Screen
-            key={name}
-            name={name}
-            options={{
-              ...withHeaderOptions,
-              headerTitle: capitalizeAndRemoveDash(name),
-            }}
-          />
-        ))}
+          {/* With Header */}
+          {withHeaderScreens.map((name) => (
+            <Stack.Screen
+              key={name}
+              name={name}
+              options={{
+                ...withHeaderOptions,
+                headerTitle: capitalizeAndRemoveDash(name),
+              }}
+            />
+          ))}
 
-        {/* Modal Screens */}
-        {modalScreens.map((name) => (
-          <Stack.Screen key={name} name={name} options={withModalOptions} />
-        ))}
-      </Stack>
+          {/* Modal Screens */}
+          {modalScreens.map((name) => (
+            <Stack.Screen key={name} name={name} options={withModalOptions} />
+          ))}
+        </Stack>
+      </FilterContextProvider>
     </SafeAreaProvider>
   );
 };

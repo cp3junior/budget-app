@@ -31,6 +31,10 @@ export const formatDateMonthDate = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
   return format(convertedDate, "MMM. do");
 };
+export const formatDateMonthDateGraph = (date: Date | Timestamp): string => {
+  const convertedDate = convertToDate(date);
+  return format(convertedDate, "d MMM");
+};
 export const formatDateMonthDateFull = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
   return format(convertedDate, "MMMM do");
@@ -78,6 +82,18 @@ export const generateMonthListDropdown = (date: Date): DropdownItem[] => {
   }
 
   return months;
+};
+
+export const generateLastTenDays = (): string[] => {
+  const currentDate = new Date();
+  const lastTenDays: string[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    const day = addDays(currentDate, -i);
+    lastTenDays.push(formatDateSimple(day));
+  }
+
+  return lastTenDays;
 };
 
 export const getMonthDropdown = (date: Date): DropdownItem => {
@@ -210,6 +226,7 @@ export const groupTransactionByDate = (
     return {
       id: date,
       formatedDate: formatDateMonthDateFull(dateStr),
+      formatedDateShort: formatDateSimple(dateStr),
       data: grouped[date],
     };
   });

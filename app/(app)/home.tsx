@@ -1,7 +1,8 @@
+import { parseISO } from "date-fns";
 import { Stack } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { LineChart } from "react-native-gifted-charts";
+import { BarChart, lineDataItem } from "react-native-gifted-charts";
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import HeaderHome from "../../components/HeaderHome";
@@ -9,8 +10,10 @@ import Transactions from "../../components/transactions/Transactions";
 import withTabBar from "../../hoc/withTabBar";
 import { useAppContext } from "../../hook/useAppContext";
 import {
-  convertToDate,
+  formatDateMonthDateGraph,
+  generateLastTenDays,
   getMonthDropdown,
+  groupTransactionByDate,
   isWithinDateInterval,
 } from "../../lib/dateHelpers";
 import {
@@ -24,123 +27,35 @@ import { colors } from "../../lib/theme";
 
 const currentMonth = getMonthDropdown(new Date());
 
-const lcomp = (val: string) => {
+const LabelComponent = (val: string) => {
+  const date = parseISO(val);
+  const value = formatDateMonthDateGraph(date);
+
   return (
-    <View style={{ width: 70 }}>
+    <View>
       <Text
         style={{
           color: colors.grayLight,
-          fontSize: 11,
-          transform: [{ translateY: 23 }, { rotate: "30deg" }],
+          fontSize: 10,
+          textAlign: "center",
         }}
       >
-        {val}
+        {value}
       </Text>
     </View>
   );
 };
 
-const currentData = [
-  {
-    value: 100,
-
-    labelComponent: () => lcomp("22 Nov"),
-  },
-
-  {
-    value: 320,
-
-    labelComponent: () => lcomp("24 Nov"),
-  },
-
-  {
-    value: 310,
-
-    hideDataPoint: true,
-  },
-
-  {
-    value: 270,
-  },
-
-  {
-    value: 240,
-
-    hideDataPoint: true,
-  },
-
-  {
-    value: 130,
-
-    labelComponent: () => lcomp("26 Nov"),
-  },
-
-  {
-    value: 120,
-
-    hideDataPoint: true,
-  },
-
-  {
-    value: 100,
-  },
-
-  {
-    value: 210,
-
-    hideDataPoint: true,
-  },
-
-  {
-    value: 270,
-
-    labelComponent: () => lcomp("28 Nov"),
-  },
-
-  {
-    value: 240,
-
-    hideDataPoint: true,
-  },
-
-  {
-    value: 120,
-
-    hideDataPoint: true,
-  },
-
-  {
-    value: 100,
-  },
-
-  {
-    value: 210,
-
-    labelComponent: () => lcomp("28 Nov"),
-  },
-
-  {
-    value: 20,
-
-    hideDataPoint: true,
-  },
-
-  {
-    value: 100,
-  },
-];
-
 const Home = () => {
-  const { user, monthlyTransactions, wallet, expenses } = useAppContext();
+  const {
+    user,
+    monthlyTransactions,
+    lastTenDaysTransactions,
+    wallet,
+    expenses,
+  } = useAppContext();
 
   if (!user) return null;
-
-  const recentTransactions = monthlyTransactions
-    .sort(
-      (a, b) =>
-        convertToDate(b.date).getTime() - convertToDate(a.date).getTime()
-    )
-    .slice(0, 10);
 
   const filteredExpenses = expenses.filter((e) => {
     const strToday = currentMonth.value as string;
@@ -184,6 +99,40 @@ const Home = () => {
     totalIncome.toString()
   );
 
+  const groupedTransactions = groupTransactionByDate(lastTenDaysTransactions);
+  const latTen = generateLastTenDays();
+
+  let dataGraph: lineDataItem[] = [];
+  for (const transaction of groupedTransactions) {
+    const totalData = transaction.data.reduce(
+      (acc, transaction) => acc + convertToFloat(transaction.amount),
+      0
+    );
+    const dataItem = {
+      value: totalData,
+      labelComponent: () => LabelComponent(transaction.formatedDateShort),
+      label: transaction.formatedDateShort,
+      frontColor: colors.green,
+    };
+    dataGraph.push(dataItem);
+  }
+  const merged = latTen
+    .map((date) => {
+      const found = dataGraph.find((v) => v.label === date);
+      if (found) return found;
+      return {
+        value: 0,
+        labelComponent: () => LabelComponent(date),
+        label: date,
+        frontColor: colors.green,
+      };
+    })
+    .reverse();
+
+  dataGraph = merged;
+
+  const maxValue = Math.max(...dataGraph.map((item) => item.value || 0));
+
   return (
     <SafeContainer hasHeader>
       <Stack.Screen
@@ -191,7 +140,6 @@ const Home = () => {
           header: () => <HeaderHome />,
         }}
       />
-
       <View>
         <View style={styles.cont}>
           <View style={styles.containerText}>
@@ -242,88 +190,42 @@ const Home = () => {
             </AnimatedCircularProgress>
           </View>
         </View>
-        <View style={{ marginBottom: 20 }}>
-          <LineChart
-            areaChart
-            curved
-            isAnimated
-            animateOnDataChange
-            animationDuration={1500}
-            onDataChangeAnimationDuration={300}
-            thickness={3}
-            noOfSections={1}
-            color={colors.purple}
-            yAxisColor="transparent"
-            xAxisColor="transparent"
-            hideYAxisText
-            data={currentData}
-            hideDataPoints
-            startFillColor={colors.purple}
-            endFillColor={colors.purple}
-            startOpacity={0.5}
-            endOpacity={0}
-            spacing={24}
-            backgroundColor="transparent"
-            rulesColor="transparent"
-            rulesType="solid"
-            initialSpacing={10}
-            pointerConfig={{
-              pointerStripHeight: 100,
-              pointerStripColor: "lightgray",
-              pointerStripWidth: 2,
-              pointerColor: "lightgray",
-              radius: 6,
-              pointerLabelWidth: 100,
-              pointerLabelHeight: 90,
-              activatePointersOnLongPress: true,
-              autoAdjustPointerLabelPosition: false,
-              pointerLabelComponent: (items) => {
+
+        {dataGraph.length > 0 && (
+          <View>
+            <BarChart
+              isAnimated
+              data={dataGraph}
+              initialSpacing={0}
+              spacing={16}
+              barWidth={23}
+              barBorderRadius={4}
+              maxValue={maxValue + 110}
+              showGradient
+              hideRules
+              hideAxesAndRules
+              yAxisThickness={0}
+              xAxisThickness={0}
+              hideYAxisText
+              gradientColor={colors.blue}
+              renderTooltip={(item: lineDataItem) => {
                 return (
-                  <View
-                    style={{
-                      height: 90,
-                      width: 100,
-                      justifyContent: "center",
-                      marginTop: -30,
-                      marginLeft: -40,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "red",
-                        fontSize: 14,
-                        marginBottom: 6,
-                        textAlign: "center",
-                      }}
-                    >
-                      {items[0].date} ds
+                  <View style={styles.tooltip}>
+                    <Text style={styles.toolText}>
+                      {formatCurrency(item.value as number)}
                     </Text>
-                    <View
-                      style={{
-                        paddingHorizontal: 14,
-                        paddingVertical: 6,
-                        borderRadius: 16,
-                        backgroundColor: "white",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontWeight: "bold",
-                          textAlign: "center",
-                          color: "blue",
-                        }}
-                      >
-                        {"$" + items[0].value + ".0"} ??
-                      </Text>
-                    </View>
                   </View>
                 );
-              },
-            }}
-          />
-        </View>
+              }}
+            />
+          </View>
+        )}
         <View style={styles.transacCont}>
-          <Transactions showFooter showTitle data={recentTransactions} />
+          <Transactions
+            showFooter
+            showTitle
+            data={lastTenDaysTransactions.slice(0, 10)}
+          />
         </View>
       </View>
     </SafeContainer>
@@ -331,6 +233,18 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
+  toolText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: colors.black,
+  },
+  tooltip: {
+    marginBottom: 4,
+    backgroundColor: colors.white,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
   transacCont: {
     marginVertical: 20,
   },
@@ -390,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     gap: 10,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   progressViewCont: {
     justifyContent: "center",

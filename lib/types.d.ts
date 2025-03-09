@@ -223,6 +223,7 @@ declare global {
     orderDirection?: "asc" | "desc";
     whereClauses?: WhereClause[];
     ids?: string[];
+    limit?: number;
   };
 
   type WhereClause = {
@@ -234,6 +235,7 @@ declare global {
   type GroupedTransactions = {
     id: string;
     formatedDate: string;
+    formatedDateShort: string;
     data: TransactionItem[];
   };
 }

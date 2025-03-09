@@ -1,10 +1,13 @@
 import { User as UserFirebase } from "@firebase/auth";
 import {
+  addDays,
   addMinutes,
   addMonths,
+  endOfDay,
   isBefore,
   setHours,
   setMinutes,
+  startOfDay,
 } from "date-fns";
 import * as Notifications from "expo-notifications";
 import { Unsubscribe } from "firebase/firestore";
@@ -21,6 +24,7 @@ import {
   COLLECTION_WISHLISTS,
 } from "../lib/constant";
 import {
+  convertToDate,
   getCurrentMonthString,
   getHourMinute,
   getStartEndMonthDays,
@@ -42,6 +46,9 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [wallets, setWallets] = useState<WalletItem[]>([]);
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
   const [monthlyTransactions, setMonthlyTransactions] = useState<
+    TransactionItem[]
+  >([]);
+  const [lastTenDaysTransactions, setLastTenDaysTransactions] = useState<
     TransactionItem[]
   >([]);
   const [wallet, setWallet] = useState<WalletItem | null>(null);
@@ -107,12 +114,17 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
     const fetchData = <T,>(
       collectionName: string,
       setter: React.Dispatch<React.SetStateAction<T[]>>,
-      transform?: (data: T[]) => T[],
-      whereClauses: WhereClause[] = []
+      options?: FetchOption | null,
+      transform?: (data: T[]) => T[]
     ) => {
+      const whereClauses = options?.whereClauses || [];
       const unsubscribe = fetchSnapshot<T>(
         collectionName,
         {
+          limit: options?.limit || undefined,
+          ids: options?.ids || undefined,
+          orderByField: options?.orderByField || undefined,
+          orderDirection: options?.orderDirection || undefined,
           whereClauses: [
             {
               field: "sharedAccounId",
@@ -132,31 +144,59 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
     fetchData<LocationItem>(COLLECTION_LOCATIONS, setLocations);
     fetchData<ProductItem>(COLLECTION_PRODUCTS, setProducts);
-    fetchData<WishListItem>(COLLECTION_WISHLISTS, setWishlists, (data) =>
+    fetchData<WalletItem>(COLLECTION_WALLETS, setWallets);
+    fetchData<ExpenseItem>(COLLECTION_EXPENSES, setExpenses);
+    fetchData<WishListItem>(COLLECTION_WISHLISTS, setWishlists, null, (data) =>
       data.sort((a, b) =>
         a.name.toLowerCase().localeCompare(b.name.toLowerCase())
       )
     );
-    fetchData<WalletItem>(COLLECTION_WALLETS, setWallets);
-    fetchData<ExpenseItem>(COLLECTION_EXPENSES, setExpenses);
 
     const [start, end] = getStartEndMonthDays(new Date());
     fetchData<TransactionItem>(
       COLLECTION_TRANSACTIONS,
       setMonthlyTransactions,
-      (data) => data,
-      [
-        {
-          field: "date",
-          operator: ">=",
-          value: start,
-        },
-        {
-          field: "date",
-          operator: "<=",
-          value: end,
-        },
-      ]
+      {
+        whereClauses: [
+          {
+            field: "date",
+            operator: ">=",
+            value: start,
+          },
+          {
+            field: "date",
+            operator: "<=",
+            value: end,
+          },
+        ],
+      }
+    );
+
+    const today = new Date();
+    const lastTenDays = addDays(today, -10);
+    fetchData<TransactionItem>(
+      COLLECTION_TRANSACTIONS,
+      setLastTenDaysTransactions,
+      {
+        orderByField: "date",
+        whereClauses: [
+          {
+            field: "date",
+            operator: ">=",
+            value: startOfDay(lastTenDays),
+          },
+          {
+            field: "date",
+            operator: "<=",
+            value: endOfDay(today),
+          },
+        ],
+      },
+      (data) =>
+        data.sort(
+          (a, b) =>
+            convertToDate(b.date).getTime() - convertToDate(a.date).getTime()
+        )
     );
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
@@ -263,6 +303,7 @@ export const AppContextProvider = ({ children }: AppContextProviderProps) => {
         wishlists,
         wallet,
         expenses,
+        lastTenDaysTransactions,
       }}
     >
       {children}
