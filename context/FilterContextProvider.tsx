@@ -10,7 +10,7 @@ export const FilterContextProvider = ({
   children,
 }: FilterContextProviderProps) => {
   const today = new Date();
-  const lastTenDays = addDays(today, -10);
+  const lastTenDays = addDays(today, -30);
   const [startDate, setStartDate] = useState(lastTenDays);
   const [endDate, setEndDate] = useState(today);
   const [categoryId, setCategoryId] = useState(0);

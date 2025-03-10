@@ -90,7 +90,7 @@ const TransactionFilter = () => {
   };
   const onReset = () => {
     const today = new Date();
-    const lastTenDays = addDays(today, -10);
+    const lastTenDays = addDays(today, -30);
     setStartDate(lastTenDays);
     setEndDate(today);
     setCategoryId(0);

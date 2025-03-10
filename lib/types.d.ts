@@ -1,4 +1,5 @@
 import { Timestamp, WhereFilterOp } from "firebase/firestore";
+import { pieDataItem } from "react-native-gifted-charts";
 import { SystemName } from "sweet-sfsymbols/src/SweetSFSymbols.types";
 
 declare global {
@@ -237,6 +238,12 @@ declare global {
     formatedDate: string;
     formatedDateShort: string;
     data: TransactionItem[];
+  };
+
+  type PieItem = pieDataItem & {
+    percentage: number;
+    label: string;
+    color: string;
   };
 }
 

@@ -244,3 +244,59 @@ export const getPercentage = (grandTotal: number, subTotal: number): number => {
 export const isValidNumber = (value: string): boolean => {
   return !isNaN(Number(value)) && value.trim() !== "";
 };
+
+export const generateColors = (count: number): string[] => {
+  const colors: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const hue = (i * 360) / count;
+    const color = `hsl(${hue}, 70%, 50%)`;
+    colors.push(color);
+  }
+
+  return colors;
+};
+
+export const getGroupedTransactionsByCategory = (
+  transactions: TransactionItem[]
+): PieItem[] => {
+  const pieItems: PieItem[] = [];
+
+  const grandTotal = transactions.reduce(
+    (acc, item) => acc + convertToFloat(item.amount),
+    0
+  );
+
+  const grouped = transactions.reduce((acc, item) => {
+    if (!acc[item.categoryId]) {
+      acc[item.categoryId] = [];
+    }
+    acc[item.categoryId].push(item);
+    return acc;
+  }, {} as Record<number, typeof transactions>);
+
+  const groupedKeys = Object.keys(grouped);
+  const colors = generateColors(groupedKeys.length);
+
+  groupedKeys.forEach((key: string, index) => {
+    const id = convertToFloat(key);
+    const items = grouped[id];
+    const subTotal = items.reduce(
+      (acc, item) => acc + convertToFloat(item.amount),
+      0
+    );
+    const category = getCategoryByCategoryId(id);
+
+    const pieDataItem: PieItem = {
+      value: subTotal,
+      color: colors[index],
+      percentage: getPercentage(grandTotal, subTotal),
+      gradientCenterColor: "#fff",
+      label: category?.label ?? "Unknown",
+      focused: index === 0,
+    };
+    pieItems.push(pieDataItem);
+  });
+
+  return pieItems;
+};

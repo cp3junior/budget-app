@@ -14,6 +14,7 @@ import { COLLECTION_TRANSACTIONS } from "../../lib/constant";
 import { convertToDate, groupTransactionByDate } from "../../lib/dateHelpers";
 import { fetchDocuments } from "../../lib/firebaseFirestore";
 import { colors } from "../../lib/theme";
+import TransactionPie from "../../components/transactions/TransactionPie";
 
 const TransactionsScreen = () => {
   const router = useRouter();
@@ -30,6 +31,9 @@ const TransactionsScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [groupedTransactions, setGroupedTransactions] = useState<
     GroupedTransactions[]
+  >([]);
+  const [availableTransactions, setAvailableTransactions] = useState<
+    TransactionItem[]
   >([]);
 
   useEffect(() => {
@@ -92,6 +96,7 @@ const TransactionsScreen = () => {
       setFilterNumber(newFilterNumber);
       setGroupedTransactions(grouped);
       setIsLoading(false);
+      setAvailableTransactions(transactions);
     };
 
     fetchData();
@@ -146,10 +151,8 @@ const TransactionsScreen = () => {
           </Text>
         </View>
       )}
-      {groupedTransactions.length > 0 && (
-        <View style={{ height: 200 }}>
-          <Text>Datat</Text>
-        </View>
+      {availableTransactions.length > 0 && (
+        <TransactionPie transactions={availableTransactions} />
       )}
       <View style={styles.itemCOnt}>
         <SectionList
