@@ -1,3 +1,4 @@
+import { isBefore, parseISO } from "date-fns";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -9,11 +10,14 @@ import Text from "../../components/common/Text";
 import HeaderTitle from "../../components/HeaderTitle";
 import withTabBar from "../../hoc/withTabBar";
 import { useAppContext } from "../../hook/useAppContext";
+import { COLLECTION_TRANSACTIONS } from "../../lib/constant";
 import {
   generateMonthListDropdown,
   getMonthDropdown,
+  getStartEndMonthDays,
   isWithinDateInterval,
 } from "../../lib/dateHelpers";
+import { fetchDocuments } from "../../lib/firebaseFirestore";
 import {
   calculateRemainingPercent,
   convertToFloat,
@@ -23,6 +27,8 @@ import {
   getPercentage,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
+import FormListContainer from "../../components/common/FormList/FormListContainer";
+import TransactionPie from "../../components/transactions/TransactionPie";
 
 const monthsDropDown = generateMonthListDropdown(new Date());
 const currentMonthDefault = getMonthDropdown(new Date());
@@ -35,16 +41,48 @@ const Bills = () => {
     useState<DropdownItem>(currentMonthDefault);
   const [isCurrentMonth, setIsCurrentMonth] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [transactions, setTransactions] =
+    useState<TransactionItem[]>(monthlyTransactions);
 
   const navigateToAddBills = () => {
     router.push("/bills-edit");
   };
 
-  const handleMonthChange = (item: DropdownItem) => {
+  const handleMonthChange = async (item: DropdownItem) => {
+    const currMonth = parseISO(currentMonthDefault.value as string);
+    const newMonth = parseISO(item.value as string);
     if (item.id === currentMonthDefault.id) {
       setIsCurrentMonth(true);
+      setTransactions(monthlyTransactions);
     } else {
-      setIsCurrentMonth(false);
+      if (isBefore(newMonth, currMonth)) {
+        setIsCurrentMonth(true);
+        setIsLoading(true);
+        const [start, end] = getStartEndMonthDays(newMonth);
+
+        const newTransactions = await fetchDocuments<TransactionItem>(
+          COLLECTION_TRANSACTIONS,
+          {
+            whereClauses: [
+              {
+                field: "date",
+                operator: ">=",
+                value: start,
+              },
+              {
+                field: "date",
+                operator: "<=",
+                value: end,
+              },
+            ],
+          }
+        );
+
+        setTransactions(newTransactions);
+        setIsLoading(false);
+      } else {
+        setIsCurrentMonth(false);
+      }
     }
     setCurrentMonth(item);
   };
@@ -86,7 +124,7 @@ const Bills = () => {
   let totalUnbudgeted = 0;
   let totalBudgeted = 0;
 
-  const expenseTransactions = monthlyTransactions.filter(
+  const expenseTransactions = transactions.filter(
     (transaction) => transaction.transactionDirection === 0
   );
 
@@ -146,13 +184,6 @@ const Bills = () => {
             <Text style={{ ...styles.textSub, ...{ color: colorPercentage } }}>
               {percentage}% of your monthly income.
             </Text>
-            {totalUnbudgeted > 0 && isCurrentMonth && (
-              <View>
-                <Text style={styles.unbudText}>
-                  {formatCurrency(totalUnbudgeted)} of unbudgeted expense
-                </Text>
-              </View>
-            )}
           </View>
           <View>
             <AnimatedCircularProgress
@@ -195,7 +226,15 @@ const Bills = () => {
             </AnimatedCircularProgress>
           </View>
         </View>
-        <View style={{ marginTop: 10 }}>
+        {totalUnbudgeted > 0 && isCurrentMonth && unbudgeted.length > 0 && (
+          <View>
+            <TransactionPie isSmall transactions={unbudgeted} />
+            <Text style={styles.unbudText}>
+              {formatCurrency(totalUnbudgeted)} of unbudgeted expense
+            </Text>
+          </View>
+        )}
+        <View>
           {grouppedExpensesFront.map((g) => (
             <BillGroupItem
               setIsLoading={setIsLoading}
@@ -267,10 +306,11 @@ const styles = StyleSheet.create({
   },
   unbudText: {
     textAlign: "center",
-    marginTop: 3,
+    marginTop: -8,
+    marginBottom: 10,
     fontWeight: "800",
     color: colors.redVivid,
-    fontSize: 15,
+    fontSize: 12,
   },
   monthlyText: {
     textAlign: "center",

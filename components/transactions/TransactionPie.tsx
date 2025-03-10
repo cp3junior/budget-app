@@ -10,9 +10,10 @@ import Text from "../common/Text";
 
 interface TransactionPieProps {
   transactions: TransactionItem[];
+  isSmall?: boolean;
 }
 
-const TransactionPie = ({ transactions }: TransactionPieProps) => {
+const TransactionPie = ({ transactions, isSmall }: TransactionPieProps) => {
   const [currentData, setCurrentData] = useState<PieItem | null>(null);
   const [data, setData] = useState<PieItem[]>([]);
 
@@ -33,8 +34,8 @@ const TransactionPie = ({ transactions }: TransactionPieProps) => {
         donut
         showGradient
         sectionAutoFocus
-        radius={90}
-        innerRadius={60}
+        radius={isSmall ? 60 : 90}
+        innerRadius={isSmall ? 40 : 60}
         innerCircleColor={colors.darker}
         showText
         isAnimated
@@ -45,13 +46,30 @@ const TransactionPie = ({ transactions }: TransactionPieProps) => {
             <View style={styles.txtCenterCont}>
               {currentData && (
                 <View>
-                  <Text style={styles.txtPercentage}>
+                  <Text
+                    style={{
+                      ...styles.txtPercentage,
+                      ...{ fontSize: isSmall ? 16 : 20 },
+                    }}
+                  >
                     {currentData.percentage}%
                   </Text>
-                  <Text style={styles.txtPrice}>
+                  <Text
+                    style={{
+                      ...styles.txtPrice,
+                      ...{ fontSize: isSmall ? 16 : 18 },
+                    }}
+                  >
                     {formatCurrency(currentData.value)}
                   </Text>
-                  <Text style={styles.txtLabel}>{currentData.label}</Text>
+                  <Text
+                    style={{
+                      ...styles.txtLabel,
+                      ...{ fontSize: isSmall ? 13 : 16 },
+                    }}
+                  >
+                    {currentData.label}
+                  </Text>
                 </View>
               )}
             </View>
@@ -65,18 +83,16 @@ const TransactionPie = ({ transactions }: TransactionPieProps) => {
 
 const styles = StyleSheet.create({
   txtPercentage: {
-    fontSize: 18,
-    color: colors.white,
+    color: colors.blue,
     fontWeight: "900",
     textAlign: "center",
   },
   txtPrice: {
-    fontSize: 20,
     color: colors.white,
-    fontWeight: "600",
+    fontWeight: "900",
     textAlign: "center",
   },
-  txtLabel: { fontSize: 18, color: colors.grayLight, textAlign: "center" },
+  txtLabel: { color: colors.grayLight, textAlign: "center" },
   txtCenterCont: { justifyContent: "center", alignItems: "center" },
   container: { padding: 10, alignItems: "center" },
 });
