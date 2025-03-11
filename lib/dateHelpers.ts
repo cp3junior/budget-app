@@ -11,12 +11,13 @@ import {
   isEqual,
   isSameMonth,
   isWithinInterval,
+  lastDayOfMonth,
   parseISO,
   setDate,
   startOfDay,
   startOfMonth,
 } from "date-fns";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, Transaction } from "firebase/firestore";
 
 export const formatHour = (date: Date | Timestamp): string => {
   const convertedDate = convertToDate(date);
@@ -77,6 +78,16 @@ export const generateMonthListDropdown = (date: Date): DropdownItem[] => {
   const months: DropdownItem[] = [];
 
   for (let i = -4; i <= 8; i++) {
+    const month = addMonths(date, i);
+    months.push(getMonthDropdown(month));
+  }
+
+  return months;
+};
+export const generateSixMonthListDropdown = (date: Date): DropdownItem[] => {
+  const months: DropdownItem[] = [];
+
+  for (let i = -6; i <= 0; i++) {
     const month = addMonths(date, i);
     months.push(getMonthDropdown(month));
   }
@@ -228,6 +239,43 @@ export const groupTransactionByDate = (
       formatedDate: formatDateMonthDateFull(dateStr),
       formatedDateShort: formatDateSimple(dateStr),
       data: grouped[date],
+    };
+  });
+};
+
+export const getIntervalMonthDropdown = (
+  data: DropdownItem[]
+): [Date, Date] => {
+  const start = parseISO(data[0].value as string);
+  const end = parseISO(data[data.length - 1].value as string);
+  const endDate = lastDayOfMonth(end);
+  return [startOfDay(start), endOfDay(endDate)];
+};
+
+export const groupTransactionByMonth = (
+  transactions: TransactionItem[],
+  months: DropdownItem[]
+): GroupedTransactions[] => {
+  const groupedMonth: { [key: string]: TransactionItem[] } = {};
+
+  for (const item of months) {
+    const month = item.value as string;
+    const monthTransactions = transactions.filter((transaction) => {
+      const dateStr = formatDateSimple(transaction.date);
+      const givenDate = parseISO(dateStr);
+      const monthDate = parseISO(month);
+      return isSameMonth(givenDate, monthDate);
+    });
+    groupedMonth[month] = monthTransactions;
+  }
+
+  return Object.keys(groupedMonth).map((date) => {
+    const dateStr = parseISO(date);
+    return {
+      id: date,
+      formatedDate: formatDateMonthDateFull(dateStr),
+      formatedDateShort: formatDateSimple(dateStr),
+      data: groupedMonth[date],
     };
   });
 };

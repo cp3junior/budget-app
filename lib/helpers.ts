@@ -249,8 +249,8 @@ export const generateColors = (count: number): string[] => {
   const colors: string[] = [];
 
   for (let i = 0; i < count; i++) {
-    const hue = (i * 360) / count;
-    const color = `hsl(${hue}, 70%, 50%)`;
+    const hue = ((i + 3) * 360) / count;
+    const color = `hsl(${hue}, 80%, 50%)`;
     colors.push(color);
   }
 

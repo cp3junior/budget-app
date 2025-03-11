@@ -8,6 +8,7 @@ import DropDownMenu from "../../components/common/DropDownMenu/DropDownMenu";
 import SafeContainer from "../../components/common/SafeContainer";
 import Text from "../../components/common/Text";
 import HeaderTitle from "../../components/HeaderTitle";
+import TransactionPie from "../../components/transactions/TransactionPie";
 import withTabBar from "../../hoc/withTabBar";
 import { useAppContext } from "../../hook/useAppContext";
 import { COLLECTION_TRANSACTIONS } from "../../lib/constant";
@@ -27,8 +28,6 @@ import {
   getPercentage,
 } from "../../lib/helpers";
 import { colors } from "../../lib/theme";
-import FormListContainer from "../../components/common/FormList/FormListContainer";
-import TransactionPie from "../../components/transactions/TransactionPie";
 
 const monthsDropDown = generateMonthListDropdown(new Date());
 const currentMonthDefault = getMonthDropdown(new Date());
